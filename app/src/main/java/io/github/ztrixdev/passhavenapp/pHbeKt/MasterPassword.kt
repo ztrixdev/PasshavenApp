@@ -8,7 +8,7 @@ class MasterPassword {
             throw RuntimeException("Word count must be greater than zero!")
         }
 
-        val words = WordsList().getWords("google-10000-english-no-swears.txt")
+        val words = WordsList().getWords()
 
         if (words.isEmpty()) {
             throw RuntimeException("Words list is empty!")

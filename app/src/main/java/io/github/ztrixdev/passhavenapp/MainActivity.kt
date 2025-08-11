@@ -1,7 +1,6 @@
 package io.github.ztrixdev.passhavenapp
 
 import android.os.Bundle
-import android.provider.UserDictionary.Words
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,38 +11,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import io.github.ztrixdev.passhavenapp.pHbeKt.Keyfile
+import io.github.ztrixdev.passhavenapp.pHbeKt.Keygen
+import io.github.ztrixdev.passhavenapp.pHbeKt.MasterPassword
 import io.github.ztrixdev.passhavenapp.ui.theme.PasshavenAppTheme
+import java.security.KeyStore
+import javax.crypto.SecretKey
+
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            PasshavenAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PasshavenAppTheme {
-        Greeting("Android")
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
+    // TODO
     }
 }

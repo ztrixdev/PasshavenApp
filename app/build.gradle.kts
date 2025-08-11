@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -14,6 +15,10 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,8 +45,14 @@ android {
 }
 
 dependencies {
-    implementation(libs.lazysodium.java)
-    implementation(libs.jna)
+    val lazyVersion = "5.2.0"
+    val jnaVersion = "5.17.0"
+    val roomVersion = "2.7.2"
+
+    implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
+    implementation("net.java.dev.jna:jna:$jnaVersion@aar")
+    implementation("androidx.room:room-runtime:$roomVersion")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
