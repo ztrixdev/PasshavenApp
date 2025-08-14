@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">passhaven</string>
+    <string name="intro_part_greeting_text_welcome">" вітаем у passhaven"</string>
+    <string name="intro_part_greeting_text_description_p1">passhaven гэта цалкам адкрыты, толькі-лакальны менеджэр пароляў і сакрэтаў які выклікае давер.</string>
+    <string name="intro_part_greeting_text_description_p2">ніякіх сервераў і мянтоў, вашыя сакрэты ніколі не пакідаюць прыладу.</string>
+    <string name="intro_part_greeting_button_get_started">пачаць</string>
+    <string name="mp_creation_title">стварыце майстар-пароль</string>
+    <string name="mp_creation_text_description_p1">майстар-пароль выкарыстоўваецца для стварэння ключа шыфравання для вашага сховішча. ён ніяк не захоўваецца.</string>
+    <string name="mp_creation_text_description_p2">пароль складаецца з паслядоўнасці слоў (на англійскай). захавайце яго ў бяспечным месцы. вы страціце доступ да сховішча пры страце.</string>
+    <string name="mp_creation_regen_button_text">перагенераваць</string>
+    <string name="click_regenerate_once">націсніце перагенераваць хоць раз</string>
+    <string name="continue_button">працягнуць</string>
+</resources>

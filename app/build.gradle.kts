@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "io.github.ztrixdev.passhavenapp"
+    namespace = "ru.ztrixdev.projects.passhavenapp"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "io.github.ztrixdev.passhavenapp"
+        applicationId = "ru.ztrixdev.projects.passhavenapp"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -52,6 +52,7 @@ dependencies {
     implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
+    implementation(kotlincrypto.hash.sha3)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

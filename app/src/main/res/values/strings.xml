@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">PasshavenApp</string>
+    <string name="app_name">passhaven</string>
+    <string name="intro_part_greeting_text_welcome">welcome to passhaven!</string>
+    <string name="intro_part_greeting_text_description_p1">passhaven is a fully open-source, local-only secrets manager that you can trust.</string>
+    <string name="intro_part_greeting_text_description_p2">no server, no authorities involved, your secrets never leave your device</string>
+    <string name="intro_part_greeting_button_get_started">get started</string>
+
+    <string name="mp_creation_title">create a master password</string>
+    <string name="mp_creation_text_description_p1">a master password is used to create a special key to encrypt your vault. it is not stored in any way.</string>
+    <string name="mp_creation_text_description_p2">this password consists of a sequence of words. write it down somewhere secure. you will loose access to your vault if you loose it.</string>
+    <string name="mp_creation_regen_button_text">regenerate</string>
+    <string name="click_regenerate_once">click regenerate at least once</string>
+    <string name="continue_button">continue</string>
 </resources>
