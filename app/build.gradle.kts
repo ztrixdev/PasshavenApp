@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    id("androidx.room")
 }
 
 android {
@@ -44,6 +45,16 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.uuid.ExperimentalUuidApi")
+    }
+}
+
 dependencies {
     val lazyVersion = "5.2.0"
     val jnaVersion = "5.17.0"
@@ -52,8 +63,9 @@ dependencies {
     implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.gson)
     implementation(kotlincrypto.hash.sha3)
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
