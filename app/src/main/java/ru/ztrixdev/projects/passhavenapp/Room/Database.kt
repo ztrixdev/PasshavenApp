@@ -19,19 +19,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun vaultDao(): VaultDao
 }
 
-object DatabaseProvider {
-    private var instance: AppDatabase? = null
-
-    fun getDatabase(context: Context): AppDatabase {
-        if (instance == null) {
-            instance = Room.databaseBuilder(
-                context.applicationContext,
-                AppDatabase::class.java,
-                db_name
-            ).build()
-        }
-        return instance!!
-    }
-}
 
 

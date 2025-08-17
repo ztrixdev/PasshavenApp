@@ -55,10 +55,11 @@ class Keygen {
         return key
     }
 
+    val AKSProviderName = "AndroidKeyStore"
     fun generateAndroidKey(alias: String) {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES,
-            "AndroidKeyStore"
+            AKSProviderName
         )
 
         val builder = KeyGenParameterSpec.Builder(
