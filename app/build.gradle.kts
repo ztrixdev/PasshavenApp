@@ -10,6 +10,9 @@ android {
     namespace = "ru.ztrixdev.projects.passhavenapp"
     compileSdk = 36
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.0.1"
+    }
     defaultConfig {
         applicationId = "ru.ztrixdev.projects.passhavenapp"
         minSdk = 24

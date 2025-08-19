@@ -19,7 +19,9 @@ data class Vault (
     @ColumnInfo("mp_salt") val mpSalt: ByteArray,
     @ColumnInfo("mp_iv") val mpIv: ByteArray,
     @ColumnInfo("mp_hash") val mpHash: ByteArray,
-    @ColumnInfo("pin_hash") val pinHash: ByteArray
+    @ColumnInfo("mp_hash_iv") val mpHashIv: ByteArray,
+    @ColumnInfo("pin_hash") val pinHash: ByteArray,
+    @ColumnInfo("pin_hash_iv") val pinHashIv: ByteArray
 )
 
 @Dao

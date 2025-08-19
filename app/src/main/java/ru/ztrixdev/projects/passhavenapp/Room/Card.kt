@@ -15,10 +15,8 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 data class Card (
     @PrimaryKey val uuid: Uuid,
+    @ColumnInfo(name = "reprompt") val reprompt: Boolean,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "is_second_layer_protected") val isSLPd: Boolean,
-    @ColumnInfo(name = "mp_reprompt") val mpReprompt: Boolean?,
-    @ColumnInfo(name = "second_layer_salt") val SLS: String?,
     @ColumnInfo(name = "number") val number: String,
     @ColumnInfo(name = "expiration_date") val expirationDate: String,
     @ColumnInfo(name = "cvc_cvv") val cvcCvv: String,
