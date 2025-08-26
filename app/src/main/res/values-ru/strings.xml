@@ -10,5 +10,15 @@
     <string name="mp_creation_text_description_p2">пароль состоит из последовательности слов (на английском). сохраните его в безопасном месте. вы потеряете доступ к хранилищу при утере.</string>
     <string name="mp_creation_regen_button_text">перегенерировать</string>
     <string name="click_regenerate_once">нажмите перегенерировать хоть раз</string>
+    <string name="mp_creation_man_enter_mp">введите желаемый МП</string>
+    <string name="mp_creation_checkbox_special_chars">содержит 2 или более спецсимволов (например: !, @, $)</string>
+    <string name="mp_creation_checkbox_digits">содержит 2 или более цифр (например: 1, 2, 3)</string>
+    <string name="mp_creation_checkbox_length">содержит более 8 символов</string>
+    <string name="mp_creation_checkbox_uppercase">содержит 2 или более заглавных букв (например: А, Б, В)</string>
+    <string name="mp_creation_man_start">я введу свой МП вручную</string>
     <string name="continue_button">продолжить</string>
+    <string name="pin_creation_title">создайте PIN</string>
+    <string name="pin_creation_description">PIN будет использован как альтернативный способ входа в хранилище. он должен содержать не менее 6 цифр и не более 12</string>
+    <string name="pin_creation_enter_pin">введите желаемый PIN</string>
+    <string name="pin_creation_enter_pin_again">введите ваш PIN еще раз</string>
 </resources>

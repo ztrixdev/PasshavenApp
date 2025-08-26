@@ -59,6 +59,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 dependencies {
+    implementation(libs.material)
+    implementation(libs.androidx.ui.text)
     val lazyVersion = "5.2.0"
     val jnaVersion = "5.17.0"
     val roomVersion = "2.7.2"

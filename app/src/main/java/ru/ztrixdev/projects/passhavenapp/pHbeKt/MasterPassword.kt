@@ -45,6 +45,6 @@ class MasterPassword {
     }
 
     fun verifyPIN(PIN: Int): Boolean {
-        return PIN.toString().length >= 6
+        return PIN.toString().length >= 6 && PIN.toString().length <= 12 && !PIN.toString().contains("1234") && !PIN.toString().contains("4321")
     }
 }

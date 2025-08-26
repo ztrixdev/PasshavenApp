@@ -4,11 +4,20 @@
     <string name="intro_part_greeting_text_description_p1">passhaven is a fully open-source, local-only secrets manager that you can trust.</string>
     <string name="intro_part_greeting_text_description_p2">no server, no authorities involved, your secrets never leave your device</string>
     <string name="intro_part_greeting_button_get_started">get started</string>
-
     <string name="mp_creation_title">create a master password</string>
     <string name="mp_creation_text_description_p1">a master password is used to create a special key to encrypt your vault. it is not stored in any way.</string>
     <string name="mp_creation_text_description_p2">this password consists of a sequence of words. write it down somewhere secure. you will loose access to your vault if you loose it.</string>
     <string name="mp_creation_regen_button_text">regenerate</string>
     <string name="click_regenerate_once">click regenerate at least once</string>
+    <string name="mp_creation_man_enter_mp">enter your desired MP</string>
+    <string name="mp_creation_checkbox_special_chars">contains 2 or more special characters (e.g: !, @, $)</string>
+    <string name="mp_creation_checkbox_digits">contains 2 or more digits (e.g: 1, 2, 3)</string>
+    <string name="mp_creation_checkbox_length">contains more than 8 characters overall</string>
+    <string name="mp_creation_checkbox_uppercase">contains 2 or more uppercase letters (e.g: A, B, C)</string>
+    <string name="mp_creation_man_start">i\'ll enter my MP manually</string>
     <string name="continue_button">continue</string>
+    <string name="pin_creation_title">create a PIN</string>
+    <string name="pin_creation_description">the PIN will be used as an alternative way to login into the vault. it should be no less than 6 digits and no more than 12 digits.</string>
+    <string name="pin_creation_enter_pin">enter your desired PIN: </string>
+    <string name="pin_creation_enter_pin_again">enter your desired PIN once again:</string>
 </resources>
