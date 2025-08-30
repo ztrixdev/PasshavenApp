@@ -1,6 +1,5 @@
 package ru.ztrixdev.projects.passhavenapp
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,19 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
-import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PasshavenAppTheme {
+            MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     val context = LocalContext.current
                     Thread {
-                        if (DatabaseProvider.getDatabase(context).vaultDao().getVault() == emptyList<Vault>()) {
+                        val vlt = DatabaseProvider.getDatabase(context).vaultDao().getVault()
+                        if (vlt == emptyList<Vault>()) {
                             val intent = Intent(context, IntroActivity::class.java)
+                            context.startActivity(intent)
+                        }
+                        else {
+                            val intent = Intent(context, LoginActivity::class.java)
                             context.startActivity(intent)
                         }
                     }.start()

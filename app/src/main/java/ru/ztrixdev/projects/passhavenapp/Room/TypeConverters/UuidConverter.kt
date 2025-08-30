@@ -40,7 +40,7 @@ class UuidConverter {
         return stringList?.mapNotNull { str ->
             try {
                 Uuid.parse(str)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 null
             }
         } ?: emptyList()

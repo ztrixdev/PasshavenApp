@@ -8,7 +8,7 @@ class StringListConverter {
 
     @TypeConverter
     fun listToJson(list: List<String>): String? {
-        return gson.toJson(list);
+        return gson.toJson(list)
     }
 
     @TypeConverter

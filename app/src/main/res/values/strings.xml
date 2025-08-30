@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">passhaven</string>
+    <string name="login_label">login | passhaven</string>
+    <string name="intro_label">welcome | passhaven</string>
     <string name="intro_part_greeting_text_welcome">welcome to passhaven!</string>
     <string name="intro_part_greeting_text_description_p1">passhaven is a fully open-source, local-only secrets manager that you can trust.</string>
     <string name="intro_part_greeting_text_description_p2">no server, no authorities involved, your secrets never leave your device</string>
@@ -20,4 +22,9 @@
     <string name="pin_creation_description">the PIN will be used as an alternative way to login into the vault. it should be no less than 6 digits and no more than 12 digits.</string>
     <string name="pin_creation_enter_pin">enter your desired PIN: </string>
     <string name="pin_creation_enter_pin_again">enter your desired PIN once again:</string>
+    <string name="login_to_passhaven">login to your vault</string>
+    <string name="login_with_mp_instead">I will login using my master password</string>
+    <string name="login_enter_mp">enter your MP</string>
+    <string name="login_incorrect_mp">incorrect MP! can\'t login!!</string>
+    <string name="login_incorrect_pin">incorrect PIN! can\'t login!!</string>
 </resources>

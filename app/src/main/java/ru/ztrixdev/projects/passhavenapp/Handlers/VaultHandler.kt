@@ -1,7 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.Handlers
 
 import android.content.Context
-import androidx.core.util.Consumer
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
 import ru.ztrixdev.projects.passhavenapp.Room.VaultDao
@@ -64,7 +63,9 @@ class VaultHandler {
             mpHash = encryptedMPHashCipherAndIV[CryptoNames.cipher]!!,
             mpHashIv = encryptedMPHashCipherAndIV[CryptoNames.iv]!!,
             pinHash = encryptedPINHashCipherAndIV[CryptoNames.cipher]!!,
-            pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!)
+            pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!,
+            flabs = 20,
+            flabsr = 20)
 
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         // Deletes all the previous vaults to avoid having more than one vault, which will result in errors.
@@ -80,6 +81,8 @@ class VaultHandler {
         val vault = vaultDao.getVault()
         if (vault == emptyList<Vault>())
             return false
+        if (vault[0].flabsr <= 0)
+            if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(kg.AKSProviderName).apply { load(null) }
         val mpHashProtectingKey: Key? = keystore.getKey(mpHashProtectingKeyName, null)
@@ -87,7 +90,12 @@ class VaultHandler {
 
         val decryptedMPHash = ac.decrypt(mapOf(CryptoNames.cipher to vault[0].mpHash, CryptoNames.iv to vault[0].mpHashIv), mpHashProtectingKey as SecretKey)
 
-        return cs.keccak512(passwd).contentEquals(decryptedMPHash)
+        val loginResult = cs.keccak512(passwd).contentEquals(decryptedMPHash)
+        if (!loginResult)
+            vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
+        vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
+
+        return loginResult
     }
 
     fun loginByPIN(PIN: Int, context: Context): Boolean {
@@ -95,14 +103,20 @@ class VaultHandler {
         val vault = vaultDao.getVault()
         if (vault == emptyList<Vault>())
             return false
+        if (vault[0].flabsr <= 0)
+            if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(kg.AKSProviderName).apply { load(null) }
         val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
         val decryptedPINHash = ac.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
+        val loginResult = cs.keccak512(PIN.toString()).contentEquals(decryptedPINHash)
+        if (!loginResult)
+            vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
+        vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
 
-        return cs.keccak512(PIN.toString()).contentEquals(decryptedPINHash)
+        return loginResult
     }
 
     fun selfDestroy(dao: VaultDao): Boolean {

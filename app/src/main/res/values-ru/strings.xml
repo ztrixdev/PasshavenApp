@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">passhaven</string>
+    <string name="login_label">вход | passhaven</string>
+    <string name="intro_label">добро пожаловать | passhaven</string>
     <string name="intro_part_greeting_text_welcome">" добро пожаловать в passhaven"</string>
     <string name="intro_part_greeting_text_description_p1">passhaven это полностью открытый, только-локальный менеджер паролей и секретов который внушает доверие.</string>
     <string name="intro_part_greeting_text_description_p2">никаких серверов и ментов, ваши секреты никогда не покидают устройство.</string>
@@ -21,4 +23,9 @@
     <string name="pin_creation_description">PIN будет использован как альтернативный способ входа в хранилище. он должен содержать не менее 6 цифр и не более 12</string>
     <string name="pin_creation_enter_pin">введите желаемый PIN</string>
     <string name="pin_creation_enter_pin_again">введите ваш PIN еще раз</string>
+    <string name="login_to_passhaven">войти в ваше хранилище</string>
+    <string name="login_with_mp_instead">Я войду используя свой мастер-пароль</string>
+    <string name="login_enter_mp">введите свой МП</string>
+    <string name="login_incorrect_mp">неправильный МП! попробуйте еще раз!!</string>
+    <string name="login_incorrect_pin">неправильный PIN! попробуйте еще раз!!</string>
 </resources>

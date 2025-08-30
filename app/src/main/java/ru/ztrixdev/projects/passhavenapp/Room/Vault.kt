@@ -21,7 +21,9 @@ data class Vault (
     @ColumnInfo("mp_hash") val mpHash: ByteArray,
     @ColumnInfo("mp_hash_iv") val mpHashIv: ByteArray,
     @ColumnInfo("pin_hash") val pinHash: ByteArray,
-    @ColumnInfo("pin_hash_iv") val pinHashIv: ByteArray
+    @ColumnInfo("pin_hash_iv") val pinHashIv: ByteArray,
+    @ColumnInfo("failed_login_attempts_before_suicide") val flabs: Int,
+    @ColumnInfo("failed_login_attempts_before_suicide_remaining") val flabsr: Int
 )
 
 @Dao
@@ -32,6 +34,9 @@ interface VaultDao {
 
     @Insert
     fun insert(vararg vlt: Vault)
+
+    @Query("update vault set failed_login_attempts_before_suicide_remaining=:flabsr where uuid=:uuid")
+    fun update(flabsr: Int, uuid: Uuid)
 
     @Update
     fun update(vararg vlt: Vault)
