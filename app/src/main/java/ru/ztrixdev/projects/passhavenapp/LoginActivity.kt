@@ -3,9 +3,10 @@ package ru.ztrixdev.projects.passhavenapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,14 +30,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -45,30 +47,36 @@ import androidx.compose.ui.unit.sp
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.ViewModels.LoginViewModel
 
-private val lvm = LoginViewModel()
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val loginViewModel: LoginViewModel by viewModels()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            if (lvm.loginMethod.value == LoginMethods.ByPIN) {
-                LoginByPIN(this.applicationContext)
-            } else if (lvm.loginMethod.value == LoginMethods.ByMP) {
-                LoginByMP(this.applicationContext)
+            val context = this.applicationContext
+
+            if (loginViewModel.loginMethod.value == LoginMethods.ByPIN) {
+                LoginByPIN(loginViewModel)
+            } else if (loginViewModel.loginMethod.value == LoginMethods.ByMP) {
+                LoginByMP(loginViewModel)
             }
-            if (lvm.loginSuccessful.value) {
-                val intent = Intent(this.applicationContext, VaultOverviewActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                this.applicationContext.startActivity(intent)
+            LaunchedEffect(loginViewModel.loginSuccessful.value) {
+                if (loginViewModel.loginSuccessful.value) {
+                    context.startActivity(
+                        Intent(context, VaultOverviewActivity::class.java)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                }
             }
         }
     }
 }
 
-var PINLoginAttemptCount = mutableIntStateOf(0)
-var MPLoginAttemptsCount = mutableIntStateOf(0)
+
 
 @Composable
-private fun LoginByPIN(ctx: Context) {
+private fun LoginByPIN(loginViewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,18 +91,18 @@ private fun LoginByPIN(ctx: Context) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(64.dp))
-        LPINDigits()
-        if (!lvm.loginSuccessful.value && PINLoginAttemptCount.intValue > 0) {
+        LPINDigits(loginViewModel)
+        if (!loginViewModel.loginSuccessful.value && loginViewModel.pinLoginAttempts.intValue > 0) {
             Text(
                 text = stringResource(R.string.login_incorrect_pin),
                 modifier = Modifier.padding(bottom = 10.dp),
                 color = darkColorScheme().error
             )
         }
-        LPINPad(ctx)
+        LPINPad(loginViewModel)
         Spacer(modifier = Modifier.size(16.dp))
         TextButton(
-            onClick = { lvm.loginMethod.value = LoginMethods.ByMP }
+            onClick = { loginViewModel.loginMethod.value = LoginMethods.ByMP }
         ) {
             Text(
                 text = stringResource(R.string.login_with_mp_instead),
@@ -106,7 +114,7 @@ private fun LoginByPIN(ctx: Context) {
 }
 
 @Composable
-private fun LPINDigits() {
+private fun LPINDigits(loginViewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +125,7 @@ private fun LPINDigits() {
         Row(
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            for (i in 0 until lvm.pinLength.intValue) {
+            for (i in 0 until loginViewModel.pinLength.intValue) {
                 Box(
                     modifier = Modifier
                         .size(22.dp) // Set the size of the circle
@@ -128,12 +136,12 @@ private fun LPINDigits() {
     }
 }
 
-private const val backspace = "⌫"
-private const val tick = "✔"
+
+
 
 @Composable
-private fun LPINPad(ctx: Context) {
-    val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", backspace, "0", tick)
+private fun LPINPad(loginViewModel: LoginViewModel) {
+    val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick])
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,15 +157,16 @@ private fun LPINPad(ctx: Context) {
         ) {
             items(padElements.size) { index ->
                 val element = padElements[index]
+                val localContext = LocalContext.current
                 Button(
-                    onClick = { lvm.onLPINPadClicked(btnClicked = element, ctx = ctx ) },
+                    onClick = { loginViewModel.onLPINPadClicked(btnClicked = element.toString(), ctx = localContext) },
                     modifier = Modifier
                         .padding(6.dp)
                         .size(60.dp), // Set a fixed size for buttons
                     colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
                 ) {
                     Text(
-                        text = element,
+                        text = element.toString(),
                         fontSize = 24.sp,
                         color = darkColorScheme().onSecondaryContainer
                     )
@@ -168,7 +177,7 @@ private fun LPINPad(ctx: Context) {
 }
 
 @Composable
-fun LoginByMP(ctx: Context) {
+fun LoginByMP(loginViewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -197,7 +206,7 @@ fun LoginByMP(ctx: Context) {
                 .padding(top = 16.dp),
             colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = Color.White)
         )
-        if (!lvm.loginSuccessful.value && MPLoginAttemptsCount.intValue > 0) {
+        if (!loginViewModel.loginSuccessful.value && loginViewModel.mpLoginAttempts.intValue > 0) {
             Text(
                 text = stringResource(R.string.login_incorrect_mp),
                 modifier = Modifier.padding(top = 10.dp),
@@ -205,10 +214,10 @@ fun LoginByMP(ctx: Context) {
             )
         }
         Spacer(modifier = Modifier.size(32.dp))
+        val localContext = LocalContext.current
         Button(
             onClick = {
-                lvm.tryLoginWithMP(mp = text.text, ctx = ctx)
-                MPLoginAttemptsCount.intValue++
+                loginViewModel.tryLoginWithMP(mp = text.text, ctx = localContext)
             },
             enabled = true,
             modifier = Modifier.padding(horizontal = 20.dp),

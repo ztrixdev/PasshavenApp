@@ -12,7 +12,8 @@ object DatabaseProvider {
                 context.applicationContext,
                 AppDatabase::class.java,
                 db_name
-            ).build()
+            ).allowMainThreadQueries()
+                .build()
         }
         return instance!!
     }

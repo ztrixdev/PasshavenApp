@@ -21,17 +21,15 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     val context = LocalContext.current
-                    Thread {
-                        val vlt = DatabaseProvider.getDatabase(context).vaultDao().getVault()
-                        if (vlt == emptyList<Vault>()) {
-                            val intent = Intent(context, IntroActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                        else {
-                            val intent = Intent(context, LoginActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                    }.start()
+                    val vlt = DatabaseProvider.getDatabase(context).vaultDao().getVault()
+                    if (vlt == emptyList<Vault>()) {
+                        val intent = Intent(context, IntroActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                    else {
+                        val intent = Intent(context, LoginActivity::class.java)
+                        context.startActivity(intent)
+                    }
                 }
             }
         }

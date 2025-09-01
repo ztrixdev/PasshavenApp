@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +24,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,22 +50,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.ViewModels.IntroViewModel
-
-val ivm = IntroViewModel()
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 
 class IntroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val introViewModel: IntroViewModel by viewModels()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MaterialTheme {
-                when (ivm.currentStage.value) {
-                    IntroStages.Greeting -> IntroPartGreeting()
-                    IntroStages.PINCreation -> IntroPartCreatePIN()
-                    IntroStages.MasterPasswordGenerator -> IntroPartCreateMPG()
-                    IntroStages.ManualMPSet -> IntroPartCreateMPM()
+                when (introViewModel.currentStage.value) {
+                    IntroStages.Greeting -> IntroPartGreeting(introViewModel)
+                    IntroStages.PINCreation -> IntroPartCreatePIN(introViewModel)
+                    IntroStages.MasterPasswordGenerator -> IntroPartCreateMPG(introViewModel)
+                    IntroStages.ManualMPSet -> IntroPartCreateMPM(introViewModel)
                     IntroStages.CreateVault -> {
-                        ivm.tryCreateVault(this.applicationContext)
+
+                        introViewModel.tryCreateVault(this.applicationContext)
                         this.applicationContext.startActivity(Intent(this.applicationContext, VaultOverviewActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                     }
                 }
@@ -78,7 +81,7 @@ class IntroActivity : ComponentActivity() {
 // =====================================================================
 
 @Composable
-private fun IntroPartGreeting() {
+private fun IntroPartGreeting(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -122,7 +125,7 @@ private fun IntroPartGreeting() {
         Spacer(modifier = Modifier.size(32.dp))
         Button(
             onClick = {
-                ivm.currentStage.value = IntroStages.MasterPasswordGenerator
+                introViewModel.currentStage.value = IntroStages.MasterPasswordGenerator
             },
             modifier = Modifier.padding(horizontal = 20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
@@ -142,19 +145,9 @@ private fun IntroPartGreeting() {
 // MP block starts here
 // =====================================================================
 
-
 @Composable
-private fun IntroPartCreateMPG() {
-    MPCreationG()
-}
-
-@Composable
-private fun IntroPartCreateMPM() {
-    MPCreationM()
-}
-
-@Composable
-private fun MPCreationG() {
+private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
+    val masterPassword = MasterPassword()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -199,7 +192,7 @@ private fun MPCreationG() {
                 .background(darkColorScheme().background)
                 .border(2.dp, darkColorScheme().secondaryContainer, shape = MaterialTheme.shapes.medium)
         ) {
-            if (ivm.currentMP.value.isBlank()) {
+            if (introViewModel.currentMP.value.isBlank()) {
                 Text(
                     text = stringResource(R.string.click_regenerate_once),
                     modifier = Modifier.padding(10.dp),
@@ -208,7 +201,7 @@ private fun MPCreationG() {
                 )
             } else {
                 Text(
-                    text = ivm.currentMP.value,
+                    text = introViewModel.currentMP.value,
                     modifier = Modifier.padding(10.dp),
                     style = MaterialTheme.typography.titleLarge,
                     color = darkColorScheme().secondary
@@ -218,14 +211,14 @@ private fun MPCreationG() {
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        TextButton(onClick = { ivm.generateMP() }, modifier = Modifier.fillMaxWidth()) {
+        TextButton(onClick = { introViewModel.generateMP() }, modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(R.string.mp_creation_regen_button_text), fontSize = 16.sp)
         }
 
         TextButton(
             onClick = {
-                        ivm.currentMP.value = ""
-                        ivm.currentStage.value = IntroStages.ManualMPSet
+                        introViewModel.currentMP.value = ""
+                        introViewModel.currentStage.value = IntroStages.ManualMPSet
                       }, modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(R.string.mp_creation_man_start), fontSize = 16.sp)
         }
@@ -233,14 +226,14 @@ private fun MPCreationG() {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                if (ivm.mp.verify(ivm.currentMP.value)) {
-                    ivm.currentStage.value = IntroStages.PINCreation
+                if (masterPassword.verify(introViewModel.currentMP.value)) {
+                    introViewModel.currentStage.value = IntroStages.PINCreation
                 } else {
                     // a weird generation might happen and the generator won't generate a normal passowrd
-                    ivm.generateMP()
+                    introViewModel.generateMP()
                 }
             },
-            enabled = (ivm.currentMP.value != "click regenerate at least once"),
+            enabled = (introViewModel.currentMP.value != "click regenerate at least once"),
             modifier = Modifier.padding(horizontal = 20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
         ) {
@@ -254,7 +247,8 @@ private fun MPCreationG() {
 }
 
 @Composable
-private fun MPCreationM() {
+private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
+    val masterPassword = MasterPassword()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -292,8 +286,8 @@ private fun MPCreationM() {
             value = text,
             onValueChange = { newText ->
                 text = newText
-                ivm.currentMP.value = newText.text
-                ivm.checkMP()
+                introViewModel.currentMP.value = newText.text
+                introViewModel.checkMP()
             },
             placeholder = {
                 Text(text = stringResource(R.string.mp_creation_man_enter_mp))
@@ -312,7 +306,7 @@ private fun MPCreationM() {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    checked = ivm.containsEnoughSpecialChars.value,
+                    checked = introViewModel.containsEnoughSpecialChars.value,
                     onCheckedChange = null,
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp),
@@ -321,7 +315,7 @@ private fun MPCreationM() {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    checked = ivm.containsEnoughDigits.value,
+                    checked = introViewModel.containsEnoughDigits.value,
                     onCheckedChange = null,
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp)
@@ -330,7 +324,7 @@ private fun MPCreationM() {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    checked = ivm.containsEnoughUppercaseLetters.value,
+                    checked = introViewModel.containsEnoughUppercaseLetters.value,
                     onCheckedChange = null,
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp)
@@ -339,7 +333,7 @@ private fun MPCreationM() {
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
-                    checked = ivm.containsEnoughLettersOverall.value,
+                    checked = introViewModel.containsEnoughLettersOverall.value,
                     onCheckedChange = null,
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp),
@@ -354,10 +348,10 @@ private fun MPCreationM() {
 
         Button(
             onClick = {
-                if (ivm.mp.verify(ivm.currentMP.value))
-                    ivm.currentStage.value = IntroStages.PINCreation
+                if (masterPassword.verify(introViewModel.currentMP.value))
+                    introViewModel.currentStage.value = IntroStages.PINCreation
             },
-            enabled = ivm.mp.verify(ivm.currentMP.value),
+            enabled = masterPassword.verify(introViewModel.currentMP.value),
             modifier = Modifier.padding(horizontal = 20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
         ) {
@@ -378,7 +372,7 @@ private fun MPCreationM() {
 // PIN block starts here
 // =====================================================================
 @Composable
-private fun IntroPartCreatePIN() {
+private fun IntroPartCreatePIN(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -386,15 +380,15 @@ private fun IntroPartCreatePIN() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CPINInfo()
-        CPINDigits()
-        CPINPad()
+        CPINInfo(introViewModel)
+        CPINDigits(introViewModel)
+        CPINPad(introViewModel)
     }
 }
 
 
 @Composable
-private fun CPINInfo() {
+private fun CPINInfo(introViewModel: IntroViewModel) {
     Text(
         text = stringResource(R.string.pin_creation_title),
         modifier = Modifier.padding(bottom = 24.dp),
@@ -417,7 +411,7 @@ private fun CPINInfo() {
         textAlign = TextAlign.Center,
         color = darkColorScheme().primary
     )
-    if (ivm.firstPromptDone.intValue == 1) {
+    if (introViewModel.firstPromptDone.intValue == 1) {
         Text(
             text = stringResource(R.string.pin_creation_enter_pin_again),
             modifier = Modifier.padding(bottom = 24.dp),
@@ -438,7 +432,7 @@ private fun CPINInfo() {
 }
 
 @Composable
-private fun CPINDigits() {
+private fun CPINDigits(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -449,8 +443,8 @@ private fun CPINDigits() {
         Row(
             horizontalArrangement = Arrangement.spacedBy(7.dp)
         ) {
-            if (ivm.firstPromptDone.intValue == 0) {
-                for (i in 0 until ivm.firstPromptPin.value.length) {
+            if (introViewModel.firstPromptDone.intValue == 0) {
+                for (i in 0 until introViewModel.firstPromptPin.value.length) {
                     Box(
                         modifier = Modifier
                             .size(22.dp) // Set the size of the circle
@@ -458,7 +452,7 @@ private fun CPINDigits() {
                     )
                 }
             } else {
-                for (i in 0 until ivm.secondPromptPin.value.length) {
+                for (i in 0 until introViewModel.secondPromptPin.value.length) {
                     Box(
                         modifier = Modifier
                             .size(22.dp)
@@ -470,12 +464,9 @@ private fun CPINDigits() {
     }
 }
 
-private const val backspace = "⌫"
-private const val tick = "✔"
-
 @Composable
-private fun CPINPad() {
-    val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", backspace, "0", tick)
+private fun CPINPad(introViewModel: IntroViewModel) {
+    val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick].toString())
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -492,7 +483,7 @@ private fun CPINPad() {
             items(padElements.size) { index ->
                 val element = padElements[index]
                 Button(
-                    onClick = { ivm.onCPINPadClick(btnClicked = element) },
+                    onClick = { introViewModel.onCPINPadClick(btnClicked = element) },
                     modifier = Modifier
                         .padding(6.dp)
                         .size(60.dp), // Set a fixed size for buttons

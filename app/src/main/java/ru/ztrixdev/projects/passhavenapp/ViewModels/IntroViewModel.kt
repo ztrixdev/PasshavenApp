@@ -1,35 +1,38 @@
 package ru.ztrixdev.projects.passhavenapp.ViewModels
 
-import android.app.Application
 import android.content.Context
-import android.content.Intent
-import androidx.activity.ComponentActivity
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
-import ru.ztrixdev.projects.passhavenapp.R
-import ru.ztrixdev.projects.passhavenapp.VaultOverviewActivity
+import ru.ztrixdev.projects.passhavenapp.MP_ABSOLUTE_LENGTH
+import ru.ztrixdev.projects.passhavenapp.MP_DIGITS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_LENGTH_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_SPECCHARS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_UPPERCASE_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.specialCharacters
+import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 
-class IntroViewModel {
-    val mp = MasterPassword()
+class IntroViewModel(private val masterPassword: MasterPassword = MasterPassword()) : ViewModel() {
     val currentStage = mutableStateOf(IntroStages.Greeting)
 
     val containsEnoughSpecialChars = mutableStateOf(false)
     val containsEnoughDigits = mutableStateOf(false)
     val containsEnoughUppercaseLetters = mutableStateOf(false)
     val containsEnoughLettersOverall = mutableStateOf(false)
+        
 
     fun checkMP() {
-        if (currentMP.value.length < 8)
+        if (currentMP.value.length < MP_LENGTH_MINIMUM)
             containsEnoughLettersOverall.value = false
-        if (currentMP.value.length > 8 && currentMP.value.length < 18)
+        if (currentMP.value.length > MP_LENGTH_MINIMUM && currentMP.value.length < MP_ABSOLUTE_LENGTH)
             containsEnoughLettersOverall.value = true
-        if (currentMP.value.length >= 18)
+        if (currentMP.value.length >= MP_ABSOLUTE_LENGTH)
             containsEnoughLettersOverall.value = true
 
         val specialCharacters = listOf('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', ';', ':', '\'', '"', '\\', '|', ',', '<', '.', '>', '/', '?')
@@ -43,24 +46,24 @@ class IntroViewModel {
                 uppercaseNumber++
         }
 
-        containsEnoughUppercaseLetters.value = uppercaseNumber >= 2
-        containsEnoughSpecialChars.value = specialCharNumber >= 2
-        containsEnoughDigits.value = digitNumber >= 2
+        containsEnoughUppercaseLetters.value = uppercaseNumber >= MP_UPPERCASE_MINIMUM
+        containsEnoughSpecialChars.value = specialCharNumber >= MP_SPECCHARS_MINIMUM
+        containsEnoughDigits.value = digitNumber >= MP_DIGITS_MINIMUM
     }
 
     var currentMP = mutableStateOf("")
 
     fun generateMP() {
-        currentMP.value = mp.genMP(6)
+        currentMP.value = masterPassword.genMP(6)
     }
 
 
     val firstPromptDone = mutableIntStateOf(0)
+        
     val firstPromptPin = mutableStateOf("")
+        
     val secondPromptPin = mutableStateOf("")
-
-    private val backspace = "⌫"
-    private val tick = "✔"
+        
 
     @OptIn(ExperimentalStdlibApi::class, ExperimentalComposeUiApi::class)
     fun onCPINPadClick(btnClicked: Any) {
@@ -68,22 +71,22 @@ class IntroViewModel {
             try {
                 val newNumber = btnClicked.toString()
                 if (firstPromptDone.intValue == 1) {
-                    if (secondPromptPin.value.length < 12)
+                    if (secondPromptPin.value.length < PIN_LENGTH_LIMIT)
                         secondPromptPin.value += newNumber
                 }
                 else {
-                    if (firstPromptPin.value.length < 12)
+                    if (firstPromptPin.value.length < PIN_LENGTH_LIMIT)
                         firstPromptPin.value += newNumber
                 }
             } catch (_: NumberFormatException) {
                 println("Somehow the clicked button contains a digit, but, it can't be parsed by Kotlin .toInt extension private function. Weird lol")
             }
-        } else if (btnClicked.toString() == backspace) {
+        } else if (btnClicked.toString() == specialCharacters[SpecialCharNames.Backspace].toString()) {
             if (firstPromptDone.intValue == 1)
                 secondPromptPin.value = secondPromptPin.value.dropLast(1)
             else
                 firstPromptPin.value = firstPromptPin.value.dropLast(1)
-        } else if (btnClicked.toString() == tick) {
+        } else if (btnClicked.toString() == specialCharacters[SpecialCharNames.Tick].toString()) {
             if (firstPromptDone.intValue == 1) {
                 if (firstPromptPin.value.contentEquals(secondPromptPin.value)) {
                     currentStage.value = IntroStages.CreateVault
@@ -92,7 +95,7 @@ class IntroViewModel {
                     resetPIN()
             }
             else {
-                if (!mp.verifyPIN(firstPromptPin.value.toInt()))
+                if (!masterPassword.verifyPIN(firstPromptPin.value))
                     resetPIN()
 
                 firstPromptDone.intValue = 1
@@ -101,12 +104,10 @@ class IntroViewModel {
     }
 
     fun tryCreateVault(ctx: Context) {
-        Thread {
-            val vh = VaultHandler()
-            if (mp.verify(currentMP.value) && mp.verifyPIN(secondPromptPin.value.toInt())) {
-                vh.createVault(currentMP.value, secondPromptPin.value.toInt(),ctx)
-            }
-        }.start()
+        val vh = VaultHandler()
+        if (masterPassword.verify(currentMP.value) && masterPassword.verifyPIN(secondPromptPin.value)) {
+            vh.createVault(currentMP.value, secondPromptPin.value,ctx)
+        }
     }
 
     private fun resetPIN() {

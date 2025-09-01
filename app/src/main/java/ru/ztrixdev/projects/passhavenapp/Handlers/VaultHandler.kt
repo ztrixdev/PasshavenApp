@@ -24,7 +24,7 @@ class VaultHandler {
     private val cs: Checksum = Checksum()
     private val mp: MasterPassword = MasterPassword()
 
-    fun createVault(masterPassword: String, PIN: Int, context: Context): List<Vault> {
+    fun createVault(masterPassword: String, PIN: String, context: Context): List<Vault> {
         if (!mp.verify(passwd = masterPassword))
             throw IllegalArgumentException("The provided password doesn't meet the requirements. Check the requirements and try again.")
         if (!mp.verifyPIN(PIN))
@@ -98,7 +98,7 @@ class VaultHandler {
         return loginResult
     }
 
-    fun loginByPIN(PIN: Int, context: Context): Boolean {
+    fun loginByPIN(PIN: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
         if (vault == emptyList<Vault>())

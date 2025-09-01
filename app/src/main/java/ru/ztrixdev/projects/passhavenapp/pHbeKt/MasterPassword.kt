@@ -1,5 +1,12 @@
 package ru.ztrixdev.projects.passhavenapp.pHbeKt
 
+import ru.ztrixdev.projects.passhavenapp.MP_ABSOLUTE_LENGTH
+import ru.ztrixdev.projects.passhavenapp.MP_DIGITS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_LENGTH_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_SPECCHARS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.MP_UPPERCASE_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_LIMIT
+import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_MINIMUM
 import kotlin.random.Random
 
 class MasterPassword {
@@ -24,9 +31,9 @@ class MasterPassword {
     }
 
     fun verify(passwd: String): Boolean {
-        if (passwd.length >= 18)
+        if (passwd.length >= MP_ABSOLUTE_LENGTH)
             return true
-        if (passwd.length <= 8)
+        if (passwd.length <= MP_LENGTH_MINIMUM)
             return false
 
         val specialCharacters = listOf('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', ';', ':', '\'', '"', '\\', '|', ',', '<', '.', '>', '/', '?')
@@ -41,10 +48,10 @@ class MasterPassword {
         }
 
         // A good password would look like this: JFKAssasination1963!?
-        return digitNumber >= 3 && specialCharNumber >= 2 && uppercaseNumber >= 2
+        return digitNumber >= MP_DIGITS_MINIMUM && specialCharNumber >= MP_SPECCHARS_MINIMUM && uppercaseNumber >= MP_UPPERCASE_MINIMUM
     }
 
-    fun verifyPIN(PIN: Int): Boolean {
-        return PIN.toString().length >= 6 && PIN.toString().length <= 12 && !PIN.toString().contains("1234") && !PIN.toString().contains("4321")
+    fun verifyPIN(PIN: String): Boolean {
+        return PIN.length >= PIN_LENGTH_MINIMUM && PIN.length <= PIN_LENGTH_LIMIT && !PIN.contains("1234") && !PIN.contains("4321")
     }
 }
