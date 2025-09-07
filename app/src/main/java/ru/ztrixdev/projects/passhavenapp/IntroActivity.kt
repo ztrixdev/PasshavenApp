@@ -147,7 +147,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
 
 @Composable
 private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
-    val masterPassword = MasterPassword()
+    val MasterPassword = MasterPassword
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -226,7 +226,7 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = {
-                if (masterPassword.verify(introViewModel.currentMP.value)) {
+                if (MasterPassword.verify(introViewModel.currentMP.value)) {
                     introViewModel.currentStage.value = IntroStages.PINCreation
                 } else {
                     // a weird generation might happen and the generator won't generate a normal passowrd
@@ -248,7 +248,6 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
 
 @Composable
 private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
-    val masterPassword = MasterPassword()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -348,10 +347,10 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
 
         Button(
             onClick = {
-                if (masterPassword.verify(introViewModel.currentMP.value))
+                if (MasterPassword.verify(introViewModel.currentMP.value))
                     introViewModel.currentStage.value = IntroStages.PINCreation
             },
-            enabled = masterPassword.verify(introViewModel.currentMP.value),
+            enabled = MasterPassword.verify(introViewModel.currentMP.value),
             modifier = Modifier.padding(horizontal = 20.dp),
             colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
         ) {

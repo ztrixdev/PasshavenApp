@@ -43,3 +43,4 @@ interface AccountDao {
     @Delete
     fun delete(vararg acc: Account)
 }
+

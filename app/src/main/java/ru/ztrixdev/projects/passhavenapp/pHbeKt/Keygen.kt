@@ -6,10 +6,10 @@ import com.goterl.lazysodium.interfaces.PwHash
 import javax.crypto.KeyGenerator
 
 
-class Keygen {
+object Keygen {
     @OptIn(ExperimentalStdlibApi::class)
     fun deriveKeySaltPairFromMP(password: String): Map<CryptoNames, ByteArray> {
-        val lazySodium = SodiumHelper().getSodium()
+        val lazySodium = SodiumHelper.getSodium()
 
         val key = ByteArray(32)
         val salt = lazySodium.randomBytesBuf(PwHash.SALTBYTES)
@@ -32,7 +32,7 @@ class Keygen {
 
     @OptIn(ExperimentalStdlibApi::class)
     fun getKeyWithMPnSalt(password: String, salt: ByteArray): ByteArray {
-        val lazySodium = SodiumHelper().getSodium()
+        val lazySodium = SodiumHelper.getSodium()
 
         if (salt.size != PwHash.SALTBYTES) {
             throw IllegalArgumentException("Salt length should be ${PwHash.SALTBYTES} bytes long.")

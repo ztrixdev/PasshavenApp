@@ -9,13 +9,13 @@ import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_MINIMUM
 import kotlin.random.Random
 
-class MasterPassword {
+object MasterPassword {
     fun genMP(wordCount: Int): String {
         if (wordCount <= 0) {
             throw RuntimeException("Word count must be greater than zero!")
         }
 
-        val words = WordsList().getWords()
+        val words = WordsList.getWords()
 
         if (words.isEmpty()) {
             throw RuntimeException("Words list is empty!")

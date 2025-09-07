@@ -18,7 +18,9 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 
-class IntroViewModel(private val masterPassword: MasterPassword = MasterPassword()) : ViewModel() {
+class IntroViewModel() : ViewModel() {
+    private val masterPassword = MasterPassword
+
     val currentStage = mutableStateOf(IntroStages.Greeting)
 
     val containsEnoughSpecialChars = mutableStateOf(false)

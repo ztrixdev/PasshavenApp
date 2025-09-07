@@ -3,7 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.pHbeKt
 import com.goterl.lazysodium.LazySodiumAndroid
 import com.goterl.lazysodium.SodiumAndroid
 
-class SodiumHelper {
+object SodiumHelper {
     fun getSodium(): LazySodiumAndroid {
         val sodium = SodiumAndroid()
         if (sodium.sodium_init() < 0)

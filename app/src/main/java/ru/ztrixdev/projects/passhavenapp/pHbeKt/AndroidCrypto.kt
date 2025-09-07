@@ -4,8 +4,8 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-class AndroidCrypto {
-    private val transformation: String = "AES/GCM/NoPadding"
+object AndroidCrypto {
+    private const val transformation: String = "AES/GCM/NoPadding"
 
     @OptIn(ExperimentalStdlibApi::class)
     fun encrypt(unencryptedData: ByteArray?, secretKey: SecretKey?): Map<CryptoNames, ByteArray> {

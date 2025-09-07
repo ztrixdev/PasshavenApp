@@ -1,6 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.pHbeKt
 
-class WordsList {
+object WordsList {
     val googleWl = """
         the
         of
