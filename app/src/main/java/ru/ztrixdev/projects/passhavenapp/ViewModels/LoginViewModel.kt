@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
-import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_LIMIT
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames

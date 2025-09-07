@@ -1,4 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp
+package ru.ztrixdev.projects.passhavenapp.pHbeKt
 
 // pin-related constants
 const val PIN_LENGTH_LIMIT = 12

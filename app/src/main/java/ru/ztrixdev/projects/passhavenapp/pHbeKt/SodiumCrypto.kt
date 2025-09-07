@@ -3,7 +3,6 @@ package ru.ztrixdev.projects.passhavenapp.pHbeKt
 import com.goterl.lazysodium.interfaces.SecretBox
 import kotlin.random.Random
 import com.goterl.lazysodium.utils.Key
-import ru.ztrixdev.projects.passhavenapp.NONCE_HEXED_LENGTH
 
 object SodiumCrypto {
     val sodium = SodiumHelper.getSodium()

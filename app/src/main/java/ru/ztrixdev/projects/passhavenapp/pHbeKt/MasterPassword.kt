@@ -1,12 +1,5 @@
 package ru.ztrixdev.projects.passhavenapp.pHbeKt
 
-import ru.ztrixdev.projects.passhavenapp.MP_ABSOLUTE_LENGTH
-import ru.ztrixdev.projects.passhavenapp.MP_DIGITS_MINIMUM
-import ru.ztrixdev.projects.passhavenapp.MP_LENGTH_MINIMUM
-import ru.ztrixdev.projects.passhavenapp.MP_SPECCHARS_MINIMUM
-import ru.ztrixdev.projects.passhavenapp.MP_UPPERCASE_MINIMUM
-import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_LIMIT
-import ru.ztrixdev.projects.passhavenapp.PIN_LENGTH_MINIMUM
 import kotlin.random.Random
 
 object MasterPassword {

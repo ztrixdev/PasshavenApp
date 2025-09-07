@@ -5,7 +5,6 @@ import android.security.keystore.KeyProperties
 import com.goterl.lazysodium.interfaces.PwHash
 import javax.crypto.KeyGenerator
 
-
 object Keygen {
     @OptIn(ExperimentalStdlibApi::class)
     fun deriveKeySaltPairFromMP(password: String): Map<CryptoNames, ByteArray> {
@@ -55,11 +54,10 @@ object Keygen {
         return key
     }
 
-    val AKSProviderName = "AndroidKeyStore"
     fun generateAndroidKey(alias: String) {
         val keyGenerator = KeyGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_AES,
-            AKSProviderName
+            keystoreInstanceName
         )
 
         val builder = KeyGenParameterSpec.Builder(

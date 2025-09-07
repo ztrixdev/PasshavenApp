@@ -1,13 +1,9 @@
 package ru.ztrixdev.projects.passhavenapp.Room
 
 import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Entity
-import androidx.room.Insert
 import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.Update
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.SodiumCrypto
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -15,32 +11,35 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 data class Card (
     @PrimaryKey val uuid: Uuid,
-    @ColumnInfo(name = "reprompt") val reprompt: Boolean,
-    @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "number") val number: String,
-    @ColumnInfo(name = "expiration_date") val expirationDate: String,
-    @ColumnInfo(name = "cvc_cvv") val cvcCvv: String,
-    @ColumnInfo(name = "brand") val brand: String,
-    @ColumnInfo(name = "cardholder") val cardholder: String,
-    @ColumnInfo(name = "additional_note") val additionalNote: String?
+    @ColumnInfo(name = "reprompt") var reprompt: Boolean,
+    @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "number") var number: String,
+    @ColumnInfo(name = "expiration_date") var expirationDate: String,
+    @ColumnInfo(name = "cvc_cvv") var cvcCvv: String,
+    @ColumnInfo(name = "brand") var brand: String,
+    @ColumnInfo(name = "cardholder") var cardholder: String,
+    @ColumnInfo(name = "additional_note") var additionalNote: String?
 )
 
-@Dao
-@OptIn(ExperimentalUuidApi::class)
-interface CardDao {
-    @Query("select * from card")
-    fun getALl(): List<Card>
+fun Card.encrypt(key: ByteArray) {
+    name = SodiumCrypto.encrypt(name, key)
+    number = SodiumCrypto.encrypt(number, key)
+    expirationDate = SodiumCrypto.encrypt(expirationDate, key)
+    cvcCvv = SodiumCrypto.encrypt(cvcCvv, key)
+    brand = SodiumCrypto.encrypt(brand, key)
+    cardholder = SodiumCrypto.encrypt(cardholder, key)
+    if (additionalNote != null)
+        additionalNote = SodiumCrypto.encrypt(additionalNote as String, key)
+}
 
-    @Query("select * from card where uuid like :cardUUID limit 1")
-    fun getFolderByUUID(cardUUID: Uuid): Card
-
-    @Insert
-    fun insert(vararg crd: Card)
-
-    @Update
-    fun update(vararg crd: Card)
-
-    @Delete
-    fun delete(vararg crd: Card)
+fun Card.decrypt(key: ByteArray) {
+    name = SodiumCrypto.decrypt(name, key)
+    number = SodiumCrypto.decrypt(number, key)
+    expirationDate = SodiumCrypto.decrypt(expirationDate, key)
+    cvcCvv = SodiumCrypto.decrypt(cvcCvv, key)
+    brand = SodiumCrypto.decrypt(brand, key)
+    cardholder = SodiumCrypto.decrypt(cardholder, key)
+    if (additionalNote != null)
+        additionalNote = SodiumCrypto.decrypt(additionalNote as String, key)
 }
 

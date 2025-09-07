@@ -11,7 +11,7 @@ object DatabaseProvider {
             instance = Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                db_name
+                databaseName
             ).allowMainThreadQueries()
                 .build()
         }

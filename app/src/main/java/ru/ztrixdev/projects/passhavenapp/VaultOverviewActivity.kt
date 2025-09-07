@@ -9,14 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.AndroidCrypto
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.CryptoNames
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.SodiumCrypto
-import java.security.KeyStore
-import javax.crypto.SecretKey
 
 class VaultOverviewActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +18,7 @@ class VaultOverviewActivity: ComponentActivity() {
         setContent()
         {
             MaterialTheme {
-                Text("your vault is created and will soon be here!", color = Color.White, style = MaterialTheme.typography.displayMedium, modifier = Modifier.padding(40.dp))
+                Text("This section is actively under construction", color = Color.White, style = MaterialTheme.typography.displayMedium, modifier = Modifier.padding(40.dp))
             }
         }
     }

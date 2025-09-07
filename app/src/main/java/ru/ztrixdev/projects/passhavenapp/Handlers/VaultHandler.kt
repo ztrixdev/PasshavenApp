@@ -3,39 +3,34 @@ package ru.ztrixdev.projects.passhavenapp.Handlers
 import android.content.Context
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
-import ru.ztrixdev.projects.passhavenapp.Room.VaultDao
+import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.AndroidCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Checksum
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.CryptoNames
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Keygen
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.keystoreInstanceName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.mpHashProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.mpProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.pinHashProtectingKeyName
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
 import kotlin.uuid.Uuid
 
 class VaultHandler {
-    private val mpProtectingKeyName = "VaultKey_MP"
-    private val mpHashProtectingKeyName = "VaultKey_MPHash"
-    private val pinHashProtectingKeyName = "VaultKey_PINHash"
-
-    private val keygen = Keygen
-    private val androidCrypto = AndroidCrypto
-    private val checksum = Checksum
-    private val masterPassword = MasterPassword
-
     fun createVault(password: String, PIN: String, context: Context): List<Vault> {
-        if (!masterPassword.verify(passwd = password))
+        if (!MasterPassword.verify(passwd = password))
             throw IllegalArgumentException("The provided password doesn't meet the requirements. Check the requirements and try again.")
-        if (!masterPassword.verifyPIN(PIN))
+        if (!MasterPassword.verifyPIN(PIN))
             throw IllegalArgumentException("The provided PIN doesn't meet the requirements. Check the requirements and try again.")
 
         // Generates a new key in KeyStore to protect the MP-derived key.
-        keygen.generateAndroidKey(mpProtectingKeyName)
-        keygen.generateAndroidKey(mpHashProtectingKeyName)
-        keygen.generateAndroidKey(pinHashProtectingKeyName)
+        Keygen.generateAndroidKey(mpProtectingKeyName)
+        Keygen.generateAndroidKey(mpHashProtectingKeyName)
+        Keygen.generateAndroidKey(pinHashProtectingKeyName)
 
-        val keystore: KeyStore = KeyStore.getInstance(keygen.AKSProviderName).apply { load(null) }
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
         val mpProtectingKey: Key? = keystore.getKey(mpProtectingKeyName, null)
         val mpHashProtectingKey: Key? = keystore.getKey(mpHashProtectingKeyName, null)
         val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
@@ -46,16 +41,16 @@ class VaultHandler {
         if (pinHashProtectingKey == null)
             throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might nott have been generated...")
 
-        val mpDerivedKeySaltPair = keygen.deriveKeySaltPairFromMP(password)
+        val mpDerivedKeySaltPair = Keygen.deriveKeySaltPairFromMP(password)
         val key = mpDerivedKeySaltPair[CryptoNames.key]
         val salt = mpDerivedKeySaltPair[CryptoNames.salt]
-        val encryptedKeyCipherAndIV= androidCrypto.encrypt(key, mpProtectingKey as SecretKey)
+        val encryptedKeyCipherAndIV= AndroidCrypto.encrypt(key, mpProtectingKey as SecretKey)
 
-        val mpHash = checksum.keccak512(password)
-        val pinHash = checksum.keccak512(PIN)
+        val mpHash = Checksum.keccak512(password)
+        val pinHash = Checksum.keccak512(PIN)
 
-        val encryptedMPHashCipherAndIV = androidCrypto.encrypt(mpHash, mpHashProtectingKey as SecretKey)
-        val encryptedPINHashCipherAndIV = androidCrypto.encrypt(pinHash, pinHashProtectingKey as SecretKey)
+        val encryptedMPHashCipherAndIV = AndroidCrypto.encrypt(mpHash, mpHashProtectingKey as SecretKey)
+        val encryptedPINHashCipherAndIV = AndroidCrypto.encrypt(pinHash, pinHashProtectingKey as SecretKey)
 
         val vault = Vault(uuid = Uuid.random(),
             mpKey = encryptedKeyCipherAndIV[CryptoNames.cipher]!!,
@@ -84,13 +79,13 @@ class VaultHandler {
         if (vault[0].flabsr <= 0)
             if (selfDestroy(vaultDao)) return false
 
-        val keystore: KeyStore = KeyStore.getInstance(keygen.AKSProviderName).apply { load(null) }
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
         val mpHashProtectingKey: Key? = keystore.getKey(mpHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $mpHashProtectingKeyName key! A $mpHashProtectingKeyName key might not have been generated...")
 
-        val decryptedMPHash = androidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpHash, CryptoNames.iv to vault[0].mpHashIv), mpHashProtectingKey as SecretKey)
+        val decryptedMPHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpHash, CryptoNames.iv to vault[0].mpHashIv), mpHashProtectingKey as SecretKey)
 
-        val loginResult = checksum.keccak512(passwd).contentEquals(decryptedMPHash)
+        val loginResult = Checksum.keccak512(passwd).contentEquals(decryptedMPHash)
         if (!loginResult)
             vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
         vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
@@ -106,12 +101,12 @@ class VaultHandler {
         if (vault[0].flabsr <= 0)
             if (selfDestroy(vaultDao)) return false
 
-        val keystore: KeyStore = KeyStore.getInstance(keygen.AKSProviderName).apply { load(null) }
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
         val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
-        val decryptedPINHash = androidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
-        val loginResult = checksum.keccak512(PIN.toString()).contentEquals(decryptedPINHash)
+        val decryptedPINHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
+        val loginResult = Checksum.keccak512(PIN.toString()).contentEquals(decryptedPINHash)
         if (!loginResult)
             vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
         vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
