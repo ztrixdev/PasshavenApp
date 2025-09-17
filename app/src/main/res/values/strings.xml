@@ -27,4 +27,9 @@
     <string name="login_enter_mp">enter your MP</string>
     <string name="login_incorrect_mp">incorrect MP! can\'t login!!</string>
     <string name="login_incorrect_pin">incorrect PIN! can\'t login!!</string>
+    <string name="select_folder">select a folder…</string>
+    <string name="unfoldered">no folder</string>
+    <string name="select_type">select type…</string>
+    <string name="account">👥 account</string>
+    <string name="card">💳 bank card</string>
 </resources>

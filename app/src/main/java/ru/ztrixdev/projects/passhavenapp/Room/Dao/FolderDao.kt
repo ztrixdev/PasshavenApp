@@ -15,8 +15,11 @@ interface FolderDao {
     @Query("select * from folder")
     fun getALl(): List<Folder>
 
-    @Query("select * from folder where uuid like :folderUUID limit 1")
-    fun getFolderByUUID(folderUUID: Uuid): Folder
+    @Query("select * from folder where uuid like :folderUuid limit 1")
+    fun getFolderByUuid(folderUuid: Uuid): Folder?
+
+    @Query("update folder set entries=:newEntryList where uuid like :folderUUID")
+    fun resetEntryList(newEntryList: List<Uuid>, folderUUID: Uuid)
 
     @Insert
     fun insert(vararg fld: Folder)

@@ -28,4 +28,9 @@
     <string name="login_enter_mp">введите свой МП</string>
     <string name="login_incorrect_mp">неправильный МП! попробуйте еще раз!!</string>
     <string name="login_incorrect_pin">неправильный PIN! попробуйте еще раз!!</string>
+    <string name="select_folder">выберите папку…</string>
+    <string name="unfoldered">без папки</string>
+    <string name="select_type">выберите тип…</string>
+    <string name="account">👥 аккаунт</string>
+    <string name="card">💳 банковская карта</string>
 </resources>

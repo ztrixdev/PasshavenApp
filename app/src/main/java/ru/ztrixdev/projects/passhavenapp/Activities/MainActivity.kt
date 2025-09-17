@@ -1,4 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp
+package ru.ztrixdev.projects.passhavenapp.Activities
 
 import android.content.Intent
 import android.os.Bundle

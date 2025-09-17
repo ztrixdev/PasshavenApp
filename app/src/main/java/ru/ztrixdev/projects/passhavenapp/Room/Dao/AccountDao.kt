@@ -15,8 +15,8 @@ interface AccountDao {
     @Query("select * from account")
     fun getALl(): List<Account>
 
-    @Query("select * from account where uuid like :accountUUID limit 1")
-    fun getFolderByUUID(accountUUID: Uuid): Account
+    @Query("select * from account where uuid like :accountUuid limit 1")
+    fun getAccountByUuid(accountUuid: Uuid): Account?
 
     @Insert
     fun insert(vararg acc: Account)

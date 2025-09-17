@@ -10,7 +10,7 @@ import kotlin.uuid.Uuid
 @Entity
 @OptIn(ExperimentalUuidApi::class)
 data class Account (
-    @PrimaryKey val uuid: Uuid,
+    @PrimaryKey var uuid: Uuid?,
     @ColumnInfo(name = "reprompt") var reprompt: Boolean,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "username") var username: String,

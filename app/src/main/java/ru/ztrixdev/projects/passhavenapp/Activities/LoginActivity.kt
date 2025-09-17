@@ -1,6 +1,5 @@
-package ru.ztrixdev.projects.passhavenapp
+package ru.ztrixdev.projects.passhavenapp.Activities
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -28,7 +27,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,8 +42,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.ViewModels.LoginViewModel
+import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +81,7 @@ private fun LoginByPIN(loginViewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -87,7 +89,7 @@ private fun LoginByPIN(loginViewModel: LoginViewModel) {
         Text(
             text = stringResource(R.string.login_to_passhaven),
             style = MaterialTheme.typography.displaySmall,
-            color = darkColorScheme().primary,
+            color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(64.dp))
@@ -96,7 +98,7 @@ private fun LoginByPIN(loginViewModel: LoginViewModel) {
             Text(
                 text = stringResource(R.string.login_incorrect_pin),
                 modifier = Modifier.padding(bottom = 10.dp),
-                color = darkColorScheme().error
+                color = MaterialTheme.colorScheme.error
             )
         }
         LPINPad(loginViewModel)
@@ -107,7 +109,7 @@ private fun LoginByPIN(loginViewModel: LoginViewModel) {
             Text(
                 text = stringResource(R.string.login_with_mp_instead),
                 style = MaterialTheme.typography.titleSmall,
-                color = darkColorScheme().primary
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -129,7 +131,7 @@ private fun LPINDigits(loginViewModel: LoginViewModel) {
                 Box(
                     modifier = Modifier
                         .size(22.dp) // Set the size of the circle
-                        .background(darkColorScheme().secondaryContainer, shape = CircleShape) // Set the background color and shape
+                        .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape) // Set the background color and shape
                 )
             }
         }
@@ -163,12 +165,12 @@ private fun LPINPad(loginViewModel: LoginViewModel) {
                     modifier = Modifier
                         .padding(6.dp)
                         .size(60.dp), // Set a fixed size for buttons
-                    colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                 ) {
                     Text(
                         text = element.toString(),
                         fontSize = 24.sp,
-                        color = darkColorScheme().onSecondaryContainer
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
@@ -181,6 +183,7 @@ fun LoginByMP(loginViewModel: LoginViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -188,7 +191,7 @@ fun LoginByMP(loginViewModel: LoginViewModel) {
         Text(
             text = stringResource(R.string.login_to_passhaven),
             style = MaterialTheme.typography.displaySmall,
-            color = darkColorScheme().primary,
+            color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.size(64.dp))
@@ -210,7 +213,7 @@ fun LoginByMP(loginViewModel: LoginViewModel) {
             Text(
                 text = stringResource(R.string.login_incorrect_mp),
                 modifier = Modifier.padding(top = 10.dp),
-                color = darkColorScheme().error
+                color = MaterialTheme.colorScheme.error
             )
         }
         Spacer(modifier = Modifier.size(32.dp))
@@ -221,12 +224,12 @@ fun LoginByMP(loginViewModel: LoginViewModel) {
             },
             enabled = true,
             modifier = Modifier.padding(horizontal = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
         ) {
             Text(
                 text = stringResource(R.string.continue_button),
                 fontSize = 18.sp,
-                color = darkColorScheme().onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
     }

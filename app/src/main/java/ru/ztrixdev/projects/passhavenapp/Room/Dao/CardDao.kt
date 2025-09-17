@@ -15,8 +15,8 @@ interface CardDao {
     @Query("select * from card")
     fun getALl(): List<Card>
 
-    @Query("select * from card where uuid like :cardUUID limit 1")
-    fun getFolderByUUID(cardUUID: Uuid): Card
+    @Query("select * from card where uuid like :cardUuid limit 1")
+    fun getCardByUuid(cardUuid: Uuid): Card?
 
     @Insert
     fun insert(vararg crd: Card)

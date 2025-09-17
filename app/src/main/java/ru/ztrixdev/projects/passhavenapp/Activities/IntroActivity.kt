@@ -1,4 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp
+package ru.ztrixdev.projects.passhavenapp.Activities
 
 // the AWFULLY LARGE IMPORTS
 // java and kotlin are just a joke when it comes to imports
@@ -33,7 +33,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,9 +47,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.ViewModels.IntroViewModel
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class IntroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +87,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(darkColorScheme().background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -95,7 +97,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
         Icon(
             painter = painterResource(R.drawable.lock_person_40px),
@@ -103,7 +105,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
             modifier = Modifier
                 .size(200.dp)
                 .padding(bottom = 24.dp),
-            tint = darkColorScheme().secondary
+            tint = MaterialTheme.colorScheme.secondary
         )
         Spacer(modifier = Modifier.size(32.dp))
         Text(
@@ -112,7 +114,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
             lineHeight = 24.sp,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = stringResource(R.string.intro_part_greeting_text_description_p2),
@@ -120,7 +122,7 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
             fontSize = 18.sp,
             textAlign = TextAlign.Center,
             lineHeight = 24.sp,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.size(32.dp))
         Button(
@@ -128,10 +130,11 @@ private fun IntroPartGreeting(introViewModel: IntroViewModel) {
                 introViewModel.currentStage.value = IntroStages.MasterPasswordGenerator
             },
             modifier = Modifier.padding(horizontal = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
         ) {
             Text(
                 text = stringResource(R.string.intro_part_greeting_button_get_started),
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 18.sp
             )
         }
@@ -151,7 +154,7 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(darkColorScheme().background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -161,7 +164,7 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
 
         Icon(
@@ -170,41 +173,41 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
             modifier = Modifier
                 .size(128.dp)
                 .padding(bottom = 16.dp),
-            tint = darkColorScheme().secondary
+            tint = MaterialTheme.colorScheme.secondary
         )
 
         Text(
             text = stringResource(R.string.mp_creation_text_description_p1),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(bottom = 4.dp),
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = stringResource(R.string.mp_creation_text_description_p2),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(bottom = 24.dp),
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(darkColorScheme().background)
-                .border(2.dp, darkColorScheme().secondaryContainer, shape = MaterialTheme.shapes.medium)
+                .background(MaterialTheme.colorScheme.background)
+                .border(2.dp, MaterialTheme.colorScheme.secondaryContainer, shape = MaterialTheme.shapes.medium)
         ) {
             if (introViewModel.currentMP.value.isBlank()) {
                 Text(
                     text = stringResource(R.string.click_regenerate_once),
                     modifier = Modifier.padding(10.dp),
                     style = MaterialTheme.typography.titleLarge,
-                    color = darkColorScheme().secondary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             } else {
                 Text(
                     text = introViewModel.currentMP.value,
                     modifier = Modifier.padding(10.dp),
                     style = MaterialTheme.typography.titleLarge,
-                    color = darkColorScheme().secondary
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -235,12 +238,12 @@ private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
             },
             enabled = (introViewModel.currentMP.value != "click regenerate at least once"),
             modifier = Modifier.padding(horizontal = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
         ) {
             Text(
                 text = stringResource(R.string.continue_button),
                 fontSize = 18.sp,
-                color = darkColorScheme().primary
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -251,7 +254,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(darkColorScheme().background)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -261,7 +264,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             fontSize = 28.sp,
             textAlign = TextAlign.Center,
-            color = darkColorScheme().primary,
+            color = MaterialTheme.colorScheme.primary,
         )
 
         Icon(
@@ -270,14 +273,14 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
             modifier = Modifier
                 .size(128.dp)
                 .padding(bottom = 16.dp),
-            tint = darkColorScheme().secondary
+            tint = MaterialTheme.colorScheme.secondary
         )
 
         Text(
             text = stringResource(R.string.mp_creation_text_description_p1),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(bottom = 8.dp),
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
 
         var text by remember { mutableStateOf(TextFieldValue("")) }
@@ -294,7 +297,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = Color.White)
+            colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = MaterialTheme.colorScheme.primary)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -310,7 +313,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp),
                 )
-                Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = darkColorScheme().primary, fontSize =12.sp)
+                Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.primary, fontSize =12.sp)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
@@ -319,7 +322,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(stringResource(R.string.mp_creation_checkbox_digits), color = darkColorScheme().primary, fontSize =12.sp)
+                Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.primary, fontSize =12.sp)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
@@ -328,7 +331,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
                     enabled = false,
                     modifier = Modifier.padding(end = 5.dp)
                 )
-                Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = darkColorScheme().primary,  fontSize =12.sp)
+                Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.primary,  fontSize =12.sp)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
@@ -338,7 +341,7 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
                     modifier = Modifier.padding(end = 5.dp),
                 )
                 Text(stringResource(R.string.mp_creation_checkbox_length),
-                    color = darkColorScheme().primary,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize =12.sp)
             }
         }
@@ -352,12 +355,12 @@ private fun IntroPartCreateMPM(introViewModel: IntroViewModel) {
             },
             enabled = MasterPassword.verify(introViewModel.currentMP.value),
             modifier = Modifier.padding(horizontal = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
         ) {
             Text(
                 text = stringResource(R.string.continue_button),
                 fontSize = 18.sp,
-                color = darkColorScheme().onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             )
         }
     }
@@ -375,6 +378,7 @@ private fun IntroPartCreatePIN(introViewModel: IntroViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -393,7 +397,7 @@ private fun CPINInfo(introViewModel: IntroViewModel) {
         modifier = Modifier.padding(bottom = 24.dp),
         style = MaterialTheme.typography.displaySmall,
         textAlign = TextAlign.Center,
-        color = darkColorScheme().primary
+        color = MaterialTheme.colorScheme.primary
     )
     Icon(
         painter = painterResource(R.drawable.pin_48px),
@@ -401,14 +405,14 @@ private fun CPINInfo(introViewModel: IntroViewModel) {
         modifier = Modifier
             .size(128.dp)
             .padding(bottom = 24.dp),
-        tint = darkColorScheme().secondary
+        tint = MaterialTheme.colorScheme.secondary
     )
     Text(
         text = stringResource(R.string.pin_creation_description),
         modifier = Modifier.padding(bottom = 24.dp),
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        color = darkColorScheme().primary
+        color = MaterialTheme.colorScheme.primary
     )
     if (introViewModel.firstPromptDone.intValue == 1) {
         Text(
@@ -416,7 +420,7 @@ private fun CPINInfo(introViewModel: IntroViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
     }
     else {
@@ -425,7 +429,7 @@ private fun CPINInfo(introViewModel: IntroViewModel) {
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = darkColorScheme().primary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -447,7 +451,7 @@ private fun CPINDigits(introViewModel: IntroViewModel) {
                     Box(
                         modifier = Modifier
                             .size(22.dp) // Set the size of the circle
-                            .background(darkColorScheme().secondaryContainer, shape = CircleShape) // Set the background color and shape
+                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape) // Set the background color and shape
                     )
                 }
             } else {
@@ -455,7 +459,7 @@ private fun CPINDigits(introViewModel: IntroViewModel) {
                     Box(
                         modifier = Modifier
                             .size(22.dp)
-                            .background(darkColorScheme().secondaryContainer, shape = CircleShape)
+                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
                     )
                 }
             }
@@ -486,10 +490,11 @@ private fun CPINPad(introViewModel: IntroViewModel) {
                     modifier = Modifier
                         .padding(6.dp)
                         .size(60.dp), // Set a fixed size for buttons
-                    colors = ButtonDefaults.buttonColors(containerColor = darkColorScheme().secondaryContainer)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
                 ) {
                     Text(
                         text = element,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontSize = 24.sp
                     )
                 }
