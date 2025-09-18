@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86_64",
+  "command": "/home/ztrix/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=x86_64-none-linux-android24 --sysroot=/home/ztrix/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -Dpasshavenapp_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles/passhavenapp.dir/passhavenapp.cpp.o -c /home/ztrix/AndroidStudioProjects/PasshavenApp/app/src/main/cpp/passhavenapp.cpp",
+  "file": "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/src/main/cpp/passhavenapp.cpp"
+}
+]

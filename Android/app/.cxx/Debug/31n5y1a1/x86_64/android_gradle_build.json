@@ -1,0 +1,38 @@
+{
+  "buildFiles": [
+    "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/ztrix/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/ztrix/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "passhavenapp::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "passhavenapp",
+      "output": "/home/ztrix/AndroidStudioProjects/PasshavenApp/app/build/intermediates/cxx/Debug/31n5y1a1/obj/x86_64/libpasshavenapp.so",
+      "runtimeFiles": []
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/home/ztrix/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/home/ztrix/Android/Sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

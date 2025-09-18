@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+  </component>
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/emoji_people_40px.xml">
+        <config>
+          <theme>@android:style/Theme.Material.NoActionBar</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/lock_person_40px.xml">
+        <config>
+          <theme>@style/Theme.PasshavenApp</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/password_40px.xml">
+        <config>
+          <theme>@style/Theme.PasshavenApp</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/drawable/pin_48px.xml">
+        <config>
+          <theme>@style/Theme.PasshavenApp</theme>
+        </config>
+      </layout>
+    </layouts>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="221700ff-7513-47cc-9c56-9f1d3fad186b" name="Changes" comment="Refactor ViewModels and enhance password/PIN handling&#10;&#10;Key changes:&#10;- Refactored `IntroViewModel` and `LoginViewModel` to be `ViewModel` subclasses, allowing them to be managed by `viewModel()` delegate in Activities.&#10;- Introduced constants for password and PIN length/complexity requirements in a new `limits.kt` file and updated `MasterPassword.kt` to use them.&#10;- Changed PIN parameters and storage from `Int` to `String` in `MasterPassword.kt`, `VaultHandler.kt`, `IntroViewModel.kt`, and `LoginViewModel.kt` for better handling of leading zeros and length checks.&#10;- Modified `LoginActivity`:&#10;    - Used `viewModels()` delegate to get `LoginViewModel` instance.&#10;    - Used `LaunchedEffect` to observe `loginSuccessful` state and navigate accordingly.&#10;    - Removed manual threading for database operations and login logic.&#10;    - Updated `LPINPad` and `LoginByMP` to pass `ViewModel` instances.&#10;    - Replaced hardcoded &quot;⌫&quot; and &quot;✔&quot; with values from a new `specialCharacters.kt` map, accessed via `SpecialCharNames` enum.&#10;    - Moved login attempt counters from global scope into `LoginViewModel`.&#10;- Modified `IntroActivity`:&#10;    - Used `viewModels()` delegate to get `IntroViewModel` instance.&#10;    - Passed `IntroViewModel` instance to composable functions.&#10;    - Removed manual threading for vault creation.&#10;- Updated `DatabaseProvider.kt` to call `allowMainThreadQueries()` on the database builder. This is a temporary measure and should be addressed by moving database operations off the main thread.&#10;- Created `SpecialCharNames.kt` enum for special characters used in PIN pads.&#10;- Created `specialCharacters.kt` to map `SpecialCharNames` to their character representations.&#10;- Removed redundant thread creation in `MainActivity.kt` for checking vault existence." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\ztrix\.android\avd\Medium_Phone.avd)]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Data Class" />
+        <option value="valueResourceFile" />
+        <option value="Kotlin Object" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin Enum" />
+        <option value="Kotlin File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="30bD7zj1DwAF4NdABJv48lAAIZU" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin.MainActivityKt.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ztrix/Dropbox/AndroidStudioProjects/PasshavenApp&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/src/main/res/drawable" />
+      <recent name="$PROJECT_DIR$/app/src/main/cpp/libsodium" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ztrix\Dropbox\AndroidStudioProjects\PasshavenApp\app\src\main\res\drawable" />
+      <recent name="$PROJECT_DIR$/app/src/main/res/drawable" />
+      <recent name="$PROJECT_DIR$/app/src/main/res/drawable/Icons" />
+      <recent name="$PROJECT_DIR$/app/src/main/java/io/github/ztrixdev/passhavenapp" />
+    </key>
+    <key name="K2MoveDeclarationsDialog.RECENT_PACKAGE_KEY">
+      <recent name="ru.ztrixdev.projects.passhavenapp" />
+      <recent name="ru.ztrixdev.projects.passhavenapp.ViewModels.Enums" />
+      <recent name="ru.ztrixdev.projects.passhavenapp.Room" />
+      <recent name="io.github.ztrixdev.passhavenapp.Room" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Android App.app">
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+      <module name="PasshavenApp.app" />
+      <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="ALLOW_ASSUME_VERIFIED" value="false" />
+      <option name="CLEAR_APP_STORAGE" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="RESTORE_ENABLED" value="false" />
+      <option name="RESTORE_FILE" value="" />
+      <option name="RESTORE_FRESH_INSTALL_ONLY" value="false" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Hybrid>
+      <Java>
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Java>
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="MainActivityKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="io.ztrixdev.projects.passhavenapp.MainActivityKt" />
+      <module name="PasshavenApp.app.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Kotlin.MainActivityKt" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="221700ff-7513-47cc-9c56-9f1d3fad186b" name="Changes" comment="" />
+      <created>1753887215988</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1753887215988</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Fixed dumb decisions made by idiots">
+      <option name="closed" value="true" />
+      <created>1754922264238</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754922264239</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Refractor, add activities&#10;&#10;- Renamed package from `io.github.ztrixdev.passhavenapp` to `ru.ztrixdev.projects.passhavenapp`.&#10;- Added `IntroActivity` for the initial intro screen, the first step of the intro.&#10;- Added `MPCreationActivity` for the second step of the intro - MP generation. The vault creation is not done.&#10;- Added Russian and Belarusian locales.">
+      <option name="closed" value="true" />
+      <created>1755180523024</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1755180523025</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Refactor Vault and entry entities, enhance VaultHandler security&#10;&#10;Key changes:&#10;- Modified `Vault` entity:&#10;    - Added `mp_hash_iv` and `pin_hash_iv` fields for storing initialization vectors for master password and PIN hashes.&#10;- Refactored `Account` and `Card` entities:&#10;    - Replaced `is_second_layer_protected`, `mp_reprompt`, and `second_layer_salt` with a single `reprompt` boolean field.&#10;- Updated `VaultHandler`:&#10;    - Implemented master password and PIN verification logic in `createVault` using new `MasterPassword.verify()` and `MasterPassword.verifyPIN()` methods.&#10;    - Encrypted master password and PIN hashes before storing them in the `Vault` entity.&#10;    - Decrypt master password and PIN hashes during login for verification.&#10;    - Added `selfDestroy` method to delete all existing vaults before creating a new one, ensuring only one vault exists.&#10;    - Generated separate AndroidKeyStore keys for protecting the MP-derived key, MP hash, and PIN hash.&#10;- Added master password and PIN verification methods (`verify`, `verifyPIN`) to `MasterPassword.kt`.&#10;- Updated `.gitignore` to ignore the entire `.idea/` directory.">
+      <option name="closed" value="true" />
+      <created>1755603153942</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1755603153942</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Refactor IntroActivity, add PIN creation and manual MP input&#10;&#10;Key changes:&#10;- Deleted `MPCreationActivity.kt` and moved its functionality into `IntroActivity.kt` as part of a multi-stage introduction process.&#10;- Created `IntroStages.kt` enum to manage the different stages of the introduction: `Greeting`, `MasterPasswordGenerator`, `ManualMPSet`, `PINCreation`, `CreateVault`.&#10;- Implemented UI and logic for PIN creation (`IntroPartCreatePIN`, `CPINInfo`, `CPINDigits`, `CPINPad` composables) in `IntroActivity.kt`.&#10;- Added UI and logic for manual Master Password input (`IntroPartCreateMPM`, `MPCreationM` composables) in `IntroActivity.kt`.&#10;- Updated `MasterPassword.kt` to refine PIN verification logic (length between 6 and 12, not sequential).&#10;- Modified `MainActivity.kt` to check if a vault exists and navigate to `IntroActivity` if not.&#10;- Updated `build.gradle.kts` to include `material` and `androidx.ui.text` dependencies.&#10;- Registered `IntroActivity` in `AndroidManifest.xml`.">
+      <option name="closed" value="true" />
+      <created>1756214961616</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756214961616</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Refactor IntroActivity to use ViewModel, add LoginActivity, enhance Vault security&#10;&#10;Key changes:&#10;- Refactored `IntroActivity`:&#10;    - Moved UI logic and state management to `IntroViewModel`.&#10;    - Updated UI to use `MaterialTheme` and `darkColorScheme`.&#10;    - Navigates to `VaultOverviewActivity` after vault creation.&#10;- Created `LoginActivity` and `LoginViewModel`:&#10;    - Implemented PIN and Master Password login methods.&#10;    - Added UI for PIN pad and MP input.&#10;    - Navigates to `VaultOverviewActivity` on successful login.&#10;- Enhanced `VaultHandler`:&#10;    - Added `flabs` (failed login attempts before suicide) and `flabsr` (remaining attempts) to `Vault` entity.&#10;    - Implemented logic to decrement `flabsr` on failed login attempts.&#10;    - Added a self-destruct mechanism if `flabsr` reaches zero.&#10;    - Resets `flabsr` to `flabs` on successful login.&#10;- Updated `MainActivity`:&#10;    - Navigates to `LoginActivity` if a vault exists, otherwise to `IntroActivity`.&#10;- Updated `AndroidManifest.xml`:&#10;    - Added `LoginActivity` and `VaultOverviewActivity`.&#10;    - Set `Theme.Material3.Dark` for all activities.&#10;    - Updated labels for activities.&#10;- Moved `IntroStages.kt` to `ViewModels/Enums/` directory.&#10;- Deleted unused theme files: `Color.kt`, `Theme.kt`, `Type.kt`.&#10;- Deleted Belarusian localization file (temporary)`values-be/strings.xml`.&#10;- Minor fixes in `UuidConverter.kt` and `StringListConverter.kt`.">
+      <option name="closed" value="true" />
+      <created>1756552629681</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1756552629681</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Refactor ViewModels and enhance password/PIN handling&#10;&#10;Key changes:&#10;- Refactored `IntroViewModel` and `LoginViewModel` to be `ViewModel` subclasses, allowing them to be managed by `viewModel()` delegate in Activities.&#10;- Introduced constants for password and PIN length/complexity requirements in a new `limits.kt` file and updated `MasterPassword.kt` to use them.&#10;- Changed PIN parameters and storage from `Int` to `String` in `MasterPassword.kt`, `VaultHandler.kt`, `IntroViewModel.kt`, and `LoginViewModel.kt` for better handling of leading zeros and length checks.&#10;- Modified `LoginActivity`:&#10;    - Used `viewModels()` delegate to get `LoginViewModel` instance.&#10;    - Used `LaunchedEffect` to observe `loginSuccessful` state and navigate accordingly.&#10;    - Removed manual threading for database operations and login logic.&#10;    - Updated `LPINPad` and `LoginByMP` to pass `ViewModel` instances.&#10;    - Replaced hardcoded &quot;⌫&quot; and &quot;✔&quot; with values from a new `specialCharacters.kt` map, accessed via `SpecialCharNames` enum.&#10;    - Moved login attempt counters from global scope into `LoginViewModel`.&#10;- Modified `IntroActivity`:&#10;    - Used `viewModels()` delegate to get `IntroViewModel` instance.&#10;    - Passed `IntroViewModel` instance to composable functions.&#10;    - Removed manual threading for vault creation.&#10;- Updated `DatabaseProvider.kt` to call `allowMainThreadQueries()` on the database builder. This is a temporary measure and should be addressed by moving database operations off the main thread.&#10;- Created `SpecialCharNames.kt` enum for special characters used in PIN pads.&#10;- Created `specialCharacters.kt` to map `SpecialCharNames` to their character representations.&#10;- Removed redundant thread creation in `MainActivity.kt` for checking vault existence.">
+      <option name="closed" value="true" />
+      <created>1756750011041</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1756750011041</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed dumb decisions made by idiots" />
+    <MESSAGE value="Refractor, add activities&#10;&#10;- Renamed package from `io.github.ztrixdev.passhavenapp` to `ru.ztrixdev.projects.passhavenapp`.&#10;- Added `IntroActivity` for the initial intro screen, the first step of the intro.&#10;- Added `MPCreationActivity` for the second step of the intro - MP generation. The vault creation is not done.&#10;- Added Russian and Belarusian locales." />
+    <MESSAGE value="Refactor Vault and entry entities, enhance VaultHandler security&#10;&#10;Key changes:&#10;- Modified `Vault` entity:&#10;    - Added `mp_hash_iv` and `pin_hash_iv` fields for storing initialization vectors for master password and PIN hashes.&#10;- Refactored `Account` and `Card` entities:&#10;    - Replaced `is_second_layer_protected`, `mp_reprompt`, and `second_layer_salt` with a single `reprompt` boolean field.&#10;- Updated `VaultHandler`:&#10;    - Implemented master password and PIN verification logic in `createVault` using new `MasterPassword.verify()` and `MasterPassword.verifyPIN()` methods.&#10;    - Encrypted master password and PIN hashes before storing them in the `Vault` entity.&#10;    - Decrypt master password and PIN hashes during login for verification.&#10;    - Added `selfDestroy` method to delete all existing vaults before creating a new one, ensuring only one vault exists.&#10;    - Generated separate AndroidKeyStore keys for protecting the MP-derived key, MP hash, and PIN hash.&#10;- Added master password and PIN verification methods (`verify`, `verifyPIN`) to `MasterPassword.kt`.&#10;- Updated `.gitignore` to ignore the entire `.idea/` directory." />
+    <MESSAGE value="Refactor IntroActivity, add PIN creation and manual MP input&#10;&#10;Key changes:&#10;- Deleted `MPCreationActivity.kt` and moved its functionality into `IntroActivity.kt` as part of a multi-stage introduction process.&#10;- Created `IntroStages.kt` enum to manage the different stages of the introduction: `Greeting`, `MasterPasswordGenerator`, `ManualMPSet`, `PINCreation`, `CreateVault`.&#10;- Implemented UI and logic for PIN creation (`IntroPartCreatePIN`, `CPINInfo`, `CPINDigits`, `CPINPad` composables) in `IntroActivity.kt`.&#10;- Added UI and logic for manual Master Password input (`IntroPartCreateMPM`, `MPCreationM` composables) in `IntroActivity.kt`.&#10;- Updated `MasterPassword.kt` to refine PIN verification logic (length between 6 and 12, not sequential).&#10;- Modified `MainActivity.kt` to check if a vault exists and navigate to `IntroActivity` if not.&#10;- Updated `build.gradle.kts` to include `material` and `androidx.ui.text` dependencies.&#10;- Registered `IntroActivity` in `AndroidManifest.xml`." />
+    <MESSAGE value="Refactor IntroActivity to use ViewModel, add LoginActivity, enhance Vault security&#10;&#10;Key changes:&#10;- Refactored `IntroActivity`:&#10;    - Moved UI logic and state management to `IntroViewModel`.&#10;    - Updated UI to use `MaterialTheme` and `darkColorScheme`.&#10;    - Navigates to `VaultOverviewActivity` after vault creation.&#10;- Created `LoginActivity` and `LoginViewModel`:&#10;    - Implemented PIN and Master Password login methods.&#10;    - Added UI for PIN pad and MP input.&#10;    - Navigates to `VaultOverviewActivity` on successful login.&#10;- Enhanced `VaultHandler`:&#10;    - Added `flabs` (failed login attempts before suicide) and `flabsr` (remaining attempts) to `Vault` entity.&#10;    - Implemented logic to decrement `flabsr` on failed login attempts.&#10;    - Added a self-destruct mechanism if `flabsr` reaches zero.&#10;    - Resets `flabsr` to `flabs` on successful login.&#10;- Updated `MainActivity`:&#10;    - Navigates to `LoginActivity` if a vault exists, otherwise to `IntroActivity`.&#10;- Updated `AndroidManifest.xml`:&#10;    - Added `LoginActivity` and `VaultOverviewActivity`.&#10;    - Set `Theme.Material3.Dark` for all activities.&#10;    - Updated labels for activities.&#10;- Moved `IntroStages.kt` to `ViewModels/Enums/` directory.&#10;- Deleted unused theme files: `Color.kt`, `Theme.kt`, `Type.kt`.&#10;- Deleted Belarusian localization file (temporary)`values-be/strings.xml`.&#10;- Minor fixes in `UuidConverter.kt` and `StringListConverter.kt`." />
+    <MESSAGE value="Refactor ViewModels and enhance password/PIN handling&#10;&#10;Key changes:&#10;- Refactored `IntroViewModel` and `LoginViewModel` to be `ViewModel` subclasses, allowing them to be managed by `viewModel()` delegate in Activities.&#10;- Introduced constants for password and PIN length/complexity requirements in a new `limits.kt` file and updated `MasterPassword.kt` to use them.&#10;- Changed PIN parameters and storage from `Int` to `String` in `MasterPassword.kt`, `VaultHandler.kt`, `IntroViewModel.kt`, and `LoginViewModel.kt` for better handling of leading zeros and length checks.&#10;- Modified `LoginActivity`:&#10;    - Used `viewModels()` delegate to get `LoginViewModel` instance.&#10;    - Used `LaunchedEffect` to observe `loginSuccessful` state and navigate accordingly.&#10;    - Removed manual threading for database operations and login logic.&#10;    - Updated `LPINPad` and `LoginByMP` to pass `ViewModel` instances.&#10;    - Replaced hardcoded &quot;⌫&quot; and &quot;✔&quot; with values from a new `specialCharacters.kt` map, accessed via `SpecialCharNames` enum.&#10;    - Moved login attempt counters from global scope into `LoginViewModel`.&#10;- Modified `IntroActivity`:&#10;    - Used `viewModels()` delegate to get `IntroViewModel` instance.&#10;    - Passed `IntroViewModel` instance to composable functions.&#10;    - Removed manual threading for vault creation.&#10;- Updated `DatabaseProvider.kt` to call `allowMainThreadQueries()` on the database builder. This is a temporary measure and should be addressed by moving database operations off the main thread.&#10;- Created `SpecialCharNames.kt` enum for special characters used in PIN pads.&#10;- Created `specialCharacters.kt` to map `SpecialCharNames` to their character representations.&#10;- Removed redundant thread creation in `MainActivity.kt` for checking vault existence." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor ViewModels and enhance password/PIN handling&#10;&#10;Key changes:&#10;- Refactored `IntroViewModel` and `LoginViewModel` to be `ViewModel` subclasses, allowing them to be managed by `viewModel()` delegate in Activities.&#10;- Introduced constants for password and PIN length/complexity requirements in a new `limits.kt` file and updated `MasterPassword.kt` to use them.&#10;- Changed PIN parameters and storage from `Int` to `String` in `MasterPassword.kt`, `VaultHandler.kt`, `IntroViewModel.kt`, and `LoginViewModel.kt` for better handling of leading zeros and length checks.&#10;- Modified `LoginActivity`:&#10;    - Used `viewModels()` delegate to get `LoginViewModel` instance.&#10;    - Used `LaunchedEffect` to observe `loginSuccessful` state and navigate accordingly.&#10;    - Removed manual threading for database operations and login logic.&#10;    - Updated `LPINPad` and `LoginByMP` to pass `ViewModel` instances.&#10;    - Replaced hardcoded &quot;⌫&quot; and &quot;✔&quot; with values from a new `specialCharacters.kt` map, accessed via `SpecialCharNames` enum.&#10;    - Moved login attempt counters from global scope into `LoginViewModel`.&#10;- Modified `IntroActivity`:&#10;    - Used `viewModels()` delegate to get `IntroViewModel` instance.&#10;    - Passed `IntroViewModel` instance to composable functions.&#10;    - Removed manual threading for vault creation.&#10;- Updated `DatabaseProvider.kt` to call `allowMainThreadQueries()` on the database builder. This is a temporary measure and should be addressed by moving database operations off the main thread.&#10;- Created `SpecialCharNames.kt` enum for special characters used in PIN pads.&#10;- Created `specialCharacters.kt` to map `SpecialCharNames` to their character representations.&#10;- Removed redundant thread creation in `MainActivity.kt` for checking vault existence." />
+  </component>
+  <component name="play_dynamic_filters_status">
+    <option name="appIdToCheckInfo">
+      <map>
+        <entry key="io.github.ztrixdev.passhavenapp">
+          <value>
+            <CheckInfo lastCheckTimestamp="1755157187560" />
+          </value>
+        </entry>
+        <entry key="io.github.ztrixdev.passhavenapp.test">
+          <value>
+            <CheckInfo lastCheckTimestamp="1755157187566" />
+          </value>
+        </entry>
+        <entry key="ru.ztrixdev.projects.passhavenapp">
+          <value>
+            <CheckInfo lastCheckTimestamp="1756472858676" />
+          </value>
+        </entry>
+        <entry key="ru.ztrixdev.projects.passhavenapp.test">
+          <value>
+            <CheckInfo lastCheckTimestamp="1756472858676" />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
