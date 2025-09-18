@@ -1,5 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.pHbeKt;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 public class PasswordGenerator {
@@ -81,7 +82,7 @@ public class PasswordGenerator {
         int charsPoolLen = charsPool.toArray().length;
 
         StringBuilder result = new StringBuilder();
-        Random rnd = new Random();
+        SecureRandom rnd = new SecureRandom();
         for (int i = 0; i < _options.get(PasswordGeneratorSettings.Length); i++) {
             result.append(charsPool.get(rnd.nextInt(charsPoolLen)));
         }
