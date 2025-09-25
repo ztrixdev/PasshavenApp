@@ -73,6 +73,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation(libs.gson)
     implementation(kotlincrypto.hash.sha3)
+    implementation(libs.material.icons.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

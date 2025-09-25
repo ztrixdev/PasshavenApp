@@ -3,14 +3,14 @@ package ru.ztrixdev.projects.passhavenapp.Room
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.SodiumCrypto
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Entity
 @OptIn(ExperimentalUuidApi::class)
 data class Account (
-    @PrimaryKey var uuid: Uuid?,
+    @PrimaryKey var uuid: Uuid,
     @ColumnInfo(name = "reprompt") var reprompt: Boolean,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "username") var username: String,

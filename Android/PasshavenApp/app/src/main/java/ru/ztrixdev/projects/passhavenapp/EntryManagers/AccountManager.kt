@@ -8,8 +8,7 @@ import kotlin.uuid.Uuid
 
 object AccountManager {
     fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray) {
-        if (account.uuid == null)
-            account.uuid = Uuid.random()
+        account.uuid = Uuid.random()
         account.encrypt(encryptionKey)
 
         database.accountDao().insert(account)

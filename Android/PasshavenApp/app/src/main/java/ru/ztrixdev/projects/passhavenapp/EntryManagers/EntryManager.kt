@@ -1,7 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
-import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import kotlin.uuid.Uuid
 
 object EntryManager {

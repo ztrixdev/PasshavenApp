@@ -1,4 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp.pHbeKt
+package ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto
 
 const val keystoreInstanceName = "AndroidKeyStore"
 

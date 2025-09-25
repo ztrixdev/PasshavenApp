@@ -1,6 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp.pHbeKt;
-
-import java.util.List;
+package ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators;
 
 public class PasswordGeneratorCharsets {
     public static Character[] latinLowercase = {

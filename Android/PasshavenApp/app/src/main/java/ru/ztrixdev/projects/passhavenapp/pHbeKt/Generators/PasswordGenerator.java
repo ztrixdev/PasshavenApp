@@ -1,8 +1,10 @@
-package ru.ztrixdev.projects.passhavenapp.pHbeKt;
+package ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators;
 
 import java.security.SecureRandom;
 import java.util.*;
 
+// chat should I rewrite all PG in kotlin? don't think so lol.
+// when I'll make the iOS version of this software piece, all generators will be written in objc, just for the memes
 public class PasswordGenerator {
     private static final Integer DEFAULT_PASSWORD_LENGTH = 16;
     private static final Integer DEFAULT_ALLOW_DIGITS = 1;

@@ -28,9 +28,23 @@
     <string name="login_enter_mp">введите свой МП</string>
     <string name="login_incorrect_mp">неправильный МП! попробуйте еще раз!!</string>
     <string name="login_incorrect_pin">неправильный PIN! попробуйте еще раз!!</string>
-    <string name="select_folder">выберите папку…</string>
+    <string name="select_folder">выберите папку:</string>
     <string name="unfoldered">без папки</string>
-    <string name="select_type">выберите тип…</string>
+    <string name="select_type">выберите тип:</string>
     <string name="account">👥 аккаунт</string>
     <string name="card">💳 банковская карта</string>
+    <string name="newentryactivity_titlebar">новая запись…</string>
+    <string name="card_number_placeholder">4242 4242 4242 4242</string>
+    <string name="card_mm_yy_placeholder">ММ/ГГ</string>
+    <string name="card_cvc_cvv_placeholder">CVC/CVV</string>
+    <string name="cardholder_name_placeholder">ДМИТРИЙ ИЦКОВ</string>
+    <string name="error_card_number_invalid">такого номера не существует</string>
+    <string name="error_card_number_too_short">номер карты слишком короток</string>
+    <string name="error_card_number_too_long">номер карты слишком дилнный</string>
+    <string name="error_card_expdate_invalid">такой даты окончания действия не бывает</string>
+    <string name="error_card_cvccvv_invalid">такого CVC/CVV не бывает</string>
+    <string name="cards_brand">"бренд карты: "</string>
+    <string name="new_entry_name">имя*</string>
+    <string name="name_cannot_be_empty">имя не может быть пустым</string>
+    <string name="additional_note">заметка</string>
 </resources>

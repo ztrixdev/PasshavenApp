@@ -1,6 +1,8 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
+import android.content.Context
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
+import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import kotlin.uuid.Uuid
 
@@ -57,6 +59,16 @@ object FolderManager {
             folderUUID = targetFolderUuid
         )
         return EntryFolderOperationResults.Success
+    }
+
+    fun getFolders(context: Context): List<Folder> {
+        val db = DatabaseProvider.getDatabase(context = context)
+        return db.folderDao().getALl()
+    }
+
+    fun getFolderByUuid(context: Context, uuid: Uuid): Folder? {
+        val db = DatabaseProvider.getDatabase(context = context)
+        return db.folderDao().getFolderByUuid(uuid)
     }
 }
 

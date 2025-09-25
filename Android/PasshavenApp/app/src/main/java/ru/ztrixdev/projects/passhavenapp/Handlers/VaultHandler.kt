@@ -4,15 +4,15 @@ import android.content.Context
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.AndroidCrypto
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.AndroidCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Checksum
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.CryptoNames
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.Keygen
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.CryptoNames
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.Keygen
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.keystoreInstanceName
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.mpHashProtectingKeyName
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.mpProtectingKeyName
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.pinHashProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.keystoreInstanceName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.mpHashProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.mpProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.pinHashProtectingKeyName
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
@@ -106,7 +106,7 @@ class VaultHandler {
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
         val decryptedPINHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
-        val loginResult = Checksum.keccak512(PIN.toString()).contentEquals(decryptedPINHash)
+        val loginResult = Checksum.keccak512(PIN).contentEquals(decryptedPINHash)
         if (!loginResult)
             vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
         vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
@@ -123,5 +123,18 @@ class VaultHandler {
             vaults = dao.getVault()
         }
         return true
+    }
+
+    fun getEncryptionKey(context: Context): ByteArray {
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()
+        if (vault == emptyList<Vault>())
+            throw RuntimeException("No vault found!")
+
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
+        val mpProtectingKey: Key? = keystore.getKey(mpProtectingKeyName, null)
+            ?: throw RuntimeException("Cannot retrieve the $mpProtectingKeyName key! A $mpProtectingKeyName key might not have been generated...")
+
+        return AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpKey, CryptoNames.iv to vault[0].mpIv), mpProtectingKey as SecretKey)
     }
 }

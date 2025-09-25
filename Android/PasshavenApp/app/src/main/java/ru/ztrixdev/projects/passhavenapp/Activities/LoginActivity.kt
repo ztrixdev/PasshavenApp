@@ -72,165 +72,160 @@ class LoginActivity: ComponentActivity() {
             }
         }
     }
-}
 
-
-
-@Composable
-private fun LoginByPIN(loginViewModel: LoginViewModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.login_to_passhaven),
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.size(64.dp))
-        LPINDigits(loginViewModel)
-        if (!loginViewModel.loginSuccessful.value && loginViewModel.pinLoginAttempts.intValue > 0) {
-            Text(
-                text = stringResource(R.string.login_incorrect_pin),
-                modifier = Modifier.padding(bottom = 10.dp),
-                color = MaterialTheme.colorScheme.error
-            )
-        }
-        LPINPad(loginViewModel)
-        Spacer(modifier = Modifier.size(16.dp))
-        TextButton(
-            onClick = { loginViewModel.loginMethod.value = LoginMethods.ByMP }
+    @Composable
+    private fun LoginByPIN(loginViewModel: LoginViewModel) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.login_with_mp_instead),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
+                text = stringResource(R.string.login_to_passhaven),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
-        }
-    }
-}
-
-@Composable
-private fun LPINDigits(loginViewModel: LoginViewModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(bottom = 64.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(7.dp)
-        ) {
-            for (i in 0 until loginViewModel.pinLength.intValue) {
-                Box(
-                    modifier = Modifier
-                        .size(22.dp) // Set the size of the circle
-                        .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape) // Set the background color and shape
+            Spacer(modifier = Modifier.size(64.dp))
+            LPINDigits(loginViewModel)
+            if (!loginViewModel.loginSuccessful.value && loginViewModel.pinLoginAttempts.intValue > 0) {
+                Text(
+                    text = stringResource(R.string.login_incorrect_pin),
+                    modifier = Modifier.padding(bottom = 10.dp),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            LPINPad(loginViewModel)
+            Spacer(modifier = Modifier.size(16.dp))
+            TextButton(
+                onClick = { loginViewModel.loginMethod.value = LoginMethods.ByMP }
+            ) {
+                Text(
+                    text = stringResource(R.string.login_with_mp_instead),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
     }
-}
 
-
-
-
-@Composable
-private fun LPINPad(loginViewModel: LoginViewModel) {
-    val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick])
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally // Center align the buttons
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+    @Composable
+    private fun LPINDigits(loginViewModel: LoginViewModel) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.spacedBy(4.dp) // Increase spacing for better appearance
+                .wrapContentHeight()
+                .padding(bottom = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(padElements.size) { index ->
-                val element = padElements[index]
-                val localContext = LocalContext.current
-                Button(
-                    onClick = { loginViewModel.onLPINPadClicked(btnClicked = element.toString(), ctx = localContext) },
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .size(60.dp), // Set a fixed size for buttons
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
-                ) {
-                    Text(
-                        text = element.toString(),
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                for (i in 0 until loginViewModel.pinLength.intValue) {
+                    Box(
+                        modifier = Modifier
+                            .size(22.dp) // Set the size of the circle
+                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape) // Set the background color and shape
                     )
                 }
             }
         }
     }
-}
 
-@Composable
-fun LoginByMP(loginViewModel: LoginViewModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.login_to_passhaven),
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.size(64.dp))
-        var text by remember { mutableStateOf(TextFieldValue("")) }
-        OutlinedTextField(
-            value = text,
-            onValueChange = { newText ->
-                text = newText
-            },
-            placeholder = {
-                Text(text = stringResource(R.string.login_enter_mp))
-            },
+    @Composable
+    private fun LPINPad(loginViewModel: LoginViewModel) {
+        val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick])
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = Color.White)
-        )
-        if (!loginViewModel.loginSuccessful.value && loginViewModel.mpLoginAttempts.intValue > 0) {
-            Text(
-                text = stringResource(R.string.login_incorrect_mp),
-                modifier = Modifier.padding(top = 10.dp),
-                color = MaterialTheme.colorScheme.error
-            )
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally // Center align the buttons
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                verticalArrangement = Arrangement.spacedBy(4.dp) // Increase spacing for better appearance
+            ) {
+                items(padElements.size) { index ->
+                    val element = padElements[index]
+                    val localContext = LocalContext.current
+                    Button(
+                        onClick = { loginViewModel.onLPINPadClicked(btnClicked = element.toString(), ctx = localContext) },
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .size(60.dp), // Set a fixed size for buttons
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                    ) {
+                        Text(
+                            text = element.toString(),
+                            fontSize = 24.sp,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
         }
-        Spacer(modifier = Modifier.size(32.dp))
-        val localContext = LocalContext.current
-        Button(
-            onClick = {
-                loginViewModel.tryLoginWithMP(mp = text.text, ctx = localContext)
-            },
-            enabled = true,
-            modifier = Modifier.padding(horizontal = 20.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+    }
+
+    @Composable
+    private fun LoginByMP(loginViewModel: LoginViewModel) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(R.string.continue_button),
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                text = stringResource(R.string.login_to_passhaven),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.size(64.dp))
+            var text by remember { mutableStateOf(TextFieldValue("")) }
+            OutlinedTextField(
+                value = text,
+                onValueChange = { newText ->
+                    text = newText
+                },
+                placeholder = {
+                    Text(text = stringResource(R.string.login_enter_mp))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = Color.White)
+            )
+            if (!loginViewModel.loginSuccessful.value && loginViewModel.mpLoginAttempts.intValue > 0) {
+                Text(
+                    text = stringResource(R.string.login_incorrect_mp),
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            Spacer(modifier = Modifier.size(32.dp))
+            val localContext = LocalContext.current
+            Button(
+                onClick = {
+                    loginViewModel.tryLoginWithMP(mp = text.text, ctx = localContext)
+                },
+                enabled = true,
+                modifier = Modifier.padding(horizontal = 20.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                Text(
+                    text = stringResource(R.string.continue_button),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
         }
     }
 }
