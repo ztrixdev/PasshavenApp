@@ -1,3 +1,0 @@
-/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86/CMakeFiles/passhavenapp.dir
-/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86/CMakeFiles/edit_cache.dir
-/home/ztrix/AndroidStudioProjects/PasshavenApp/app/.cxx/Debug/31n5y1a1/x86/CMakeFiles/rebuild_cache.dir

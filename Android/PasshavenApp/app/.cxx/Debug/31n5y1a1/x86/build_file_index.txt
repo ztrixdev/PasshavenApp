@@ -1,1 +1,0 @@
-/home/ztrix/AndroidStudioProjects/PasshavenApp/app/src/main/cpp/CMakeLists.txt
