@@ -47,4 +47,18 @@
     <string name="new_entry_name">имя*</string>
     <string name="name_cannot_be_empty">имя не может быть пустым</string>
     <string name="additional_note">заметка</string>
+    <string name="username">имя пользователя (логин/e-mail)</string>
+    <string name="password">пароль</string>
+    <string name="mfa_secret">секретный ключ 2FA</string>
+    <string name="recovery_codes">коды восстановления</string>
+    <string name="card_number">номер карты</string>
+    <string name="card_expdate">дата истечения</string>
+    <string name="cardholder_name">имя держателя</string>
+    <string name="username_placeholder">ПоклейщикЦыпочек2010</string>
+    <string name="fill_this_field_up_pls">пожалуйста, заполните это поле.</string>
+    <string name="mfa_secret_supporting_text">ключ 2FA обычно выглядит так: HB3DEITWNDAFTDJTBRQNPONCXGTPK3N</string>
+    <string name="mfa_secret_invalid">секрет 2FA не проходит проверку на подлинность, проверьте его.</string>
+    <string name="generate_password_for_me">сгенерируйте пароль для меня, пожалуйста</string>
+    <string name="recovery_code_label">код восстановления #</string>
+    <string name="add_another_recovery_code">добавить код восстановления</string>
 </resources>

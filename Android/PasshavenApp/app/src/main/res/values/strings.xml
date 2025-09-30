@@ -53,4 +53,20 @@
     <string name="new_entry_name">name*</string>
     <string name="name_cannot_be_empty">name cannot be empty</string>
     <string name="additional_note">additional note</string>
+    <string name="username">username (login/email)</string>
+    <string name="password">password</string>
+    <string name="mfa_secret">MFA secret key</string>
+    <string name="recovery_codes">recovery codes</string>
+    <string name="card_number">card number</string>
+    <string name="card_expdate">expiration date</string>
+    <string name="card_cvccvv" translatable="false">CVC/CVV</string>
+    <string name="cardholder_name">cardholder name</string>
+    <string name="username_placeholder">TheGoochCollector</string>
+    <string name="password_placeholder" translatable="false">WoAiBeijingTiananmen0110</string>
+    <string name="fill_this_field_up_pls">please, fill up this field.</string>
+    <string name="mfa_secret_supporting_text">a mfa secret typically looks like this: LDWZKBKNEYG55F2IWQKGP3W7YPHK6LSW</string>
+    <string name="mfa_secret_invalid">this doesn\'t appear like a valid MFA secret</string>
+    <string name="generate_password_for_me">generate the password for me, please</string>
+    <string name="recovery_code_label">recovery code #</string>
+    <string name="add_another_recovery_code">add another recovery code</string>
 </resources>

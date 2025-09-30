@@ -1,5 +1,7 @@
 package ru.ztrixdev.projects.passhavenapp.Activities
 
+import android.R.attr.label
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +21,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -30,6 +37,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,11 +55,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import org.w3c.dom.Text
+import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewEntryViewModel
+
 
 class NewEntryActivity: ComponentActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,10 +72,12 @@ class NewEntryActivity: ComponentActivity()  {
         enableEdgeToEdge()
         setContent() {
             MaterialTheme {
+                val scrollState = rememberScrollState()
                 Column(
                     Modifier
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.background)
+                        .verticalScroll(scrollState)
                 ) {
                     MainBody(newEntryViewModel)
                 }
@@ -200,7 +214,8 @@ class NewEntryActivity: ComponentActivity()  {
         ) {
             IconButton(
                 onClick = {
-                    // todo: insert a cool transition to VaultOverviewActivity when it's done here
+                    val intent = Intent(this@NewEntryActivity, VaultOverviewActivity::class.java)
+                    this@NewEntryActivity.startActivity(intent)
                 },
                 modifier = Modifier
                     .padding(start = 10.dp)
@@ -227,7 +242,9 @@ class NewEntryActivity: ComponentActivity()  {
     @Composable
     private fun MainBody(newEntryViewModel: NewEntryViewModel) {
         Box(
-            Modifier.height(30.dp).background(MaterialTheme.colorScheme.secondaryContainer)
+            Modifier
+                .height(30.dp)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
         )
         Titlebar()
         Spacer(
@@ -278,7 +295,8 @@ class NewEntryActivity: ComponentActivity()  {
                 singleLine = true,
                 isError = nameIsEmptyProblem,
                 supportingText = @Composable {
-                    Text(stringResource(R.string.name_cannot_be_empty))
+                    Text(text =stringResource(R.string.name_cannot_be_empty),
+                        style = MaterialTheme.typography.bodySmall)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -297,7 +315,7 @@ class NewEntryActivity: ComponentActivity()  {
             )
 
             when (newEntryViewModel.selectedEntryType) {
-                EntryTypes.Account -> AccountSpecificFields()
+                EntryTypes.Account -> AccountSpecificFields(newEntryViewModel)
                 EntryTypes.Card -> CardSpecificFields(newEntryViewModel)
             }
 
@@ -331,6 +349,8 @@ class NewEntryActivity: ComponentActivity()  {
                 onClick = {
                     if (newEntryViewModel.selectedEntryType == EntryTypes.Card)
                         newEntryViewModel.pushNewEntry(card = newEntryViewModel.createCard(), context =  localctx)
+                    if (newEntryViewModel.selectedEntryType == EntryTypes.Account)
+                        newEntryViewModel.pushNewEntry(account = newEntryViewModel.createAccount(), context = localctx)
                           },
                 enabled = newEntryViewModel.allRequiredFieldsAreFilled,
                 colors = ButtonColors(
@@ -345,12 +365,194 @@ class NewEntryActivity: ComponentActivity()  {
             ) {
                 Text(stringResource(R.string.continue_button))
             }
+            Spacer(
+                modifier = Modifier.height(80.dp)
+            )
         }
     }
 
     @Composable
-    private fun AccountSpecificFields() {
+    private fun AccountSpecificFields(newEntryViewModel: NewEntryViewModel) {
+        var usernameIsEmptyProblem by remember { mutableStateOf(false) }
+        var passwordIsEmptyProblem by remember { mutableStateOf(false) }
+        var mfaSecretIsInvalidProblem by remember { mutableStateOf(false) }
 
+        Column {
+            // Username textfield
+            OutlinedTextField(
+                value = newEntryViewModel.username,
+                onValueChange = { it ->
+                    usernameIsEmptyProblem = it.text.isEmpty()
+                    newEntryViewModel.username = it
+                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                },
+                label = {
+                    Text(text = stringResource(R.string.username))
+                },
+                placeholder = {
+                    Text(text = stringResource(R.string.username_placeholder))
+                },
+                singleLine = true,
+                isError = usernameIsEmptyProblem,
+                supportingText = @Composable {
+                    if (usernameIsEmptyProblem)
+                        Text(text = stringResource(R.string.fill_this_field_up_pls),
+                            style = MaterialTheme.typography.bodySmall)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                )
+            )
+
+            // Password textfield
+            OutlinedTextField(
+                value = newEntryViewModel.password,
+                onValueChange = { it ->
+                    usernameIsEmptyProblem = it.text.isEmpty()
+                    newEntryViewModel.password = it
+                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                },
+                label = {
+                    Text(text = stringResource(R.string.password))
+                },
+                placeholder = {
+                    Text(text = stringResource(R.string.password_placeholder))
+                },
+                singleLine = true,
+                isError = passwordIsEmptyProblem,
+                supportingText = @Composable {
+                    if (passwordIsEmptyProblem)
+                        Text(text = stringResource(R.string.fill_this_field_up_pls),
+                            style = MaterialTheme.typography.bodySmall)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                )
+            )
+
+            // Generate password button
+            TextButton(
+                onClick = {
+                    newEntryViewModel.generatePassword()
+                }
+            ) {
+                Text(
+                    text = stringResource(R.string.generate_password_for_me),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            // MFA textfield
+            OutlinedTextField(
+                value = newEntryViewModel.mfaSecret,
+                onValueChange = { it ->
+                    mfaSecretIsInvalidProblem = !MFAHandler().verifySecret(it.text)
+                    newEntryViewModel.mfaSecret = it
+                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                },
+                label = {
+                    Text(text = stringResource(R.string.mfa_secret))
+                },
+                singleLine = true,
+                isError = mfaSecretIsInvalidProblem,
+                supportingText = @Composable {
+                    if (mfaSecretIsInvalidProblem)
+                        Text(text = stringResource(R.string.mfa_secret_invalid),
+                            style = MaterialTheme.typography.bodySmall)
+                    else
+                        Text(
+                            text = stringResource(R.string.mfa_secret_supporting_text),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                )
+            )
+
+            // Recovery codes section
+            Column {
+                // Todo: fix the middle deletion bug.
+                if (!newEntryViewModel.recoveryCodes.isEmpty()) {
+                    for (i in 1..newEntryViewModel.recoveryCodesAmount) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
+                                value = newEntryViewModel.recoveryCodes[i - 1],
+                                onValueChange = { it ->
+                                    newEntryViewModel.recoveryCodes[i - 1] = it
+                                },
+                                label = {
+                                    // recovery code #i
+                                    Text(text = "${stringResource(R.string.recovery_code_label)}${i}")
+                                },
+                                singleLine = true,
+                                colors = TextFieldDefaults.colors(
+                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                                )
+                            )
+                            if (newEntryViewModel.recoveryCodes.size > 1) {
+                                IconButton(
+                                    onClick = {newEntryViewModel.deleteRecoveryCode(index = i-1)},
+                                    modifier = Modifier.padding(start = 4.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.delete_24px),
+                                        contentDescription = "Trash bin icon. Do we really need content descriptions? I am thinking of putting some rap lyrics or Exotic Butters into a CD soon. ," ,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp)) // Add some space before the button
+                    TextButton(
+                        onClick = {
+                            newEntryViewModel.addRecoveryCode()
+                        },
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.add_24px),
+                            contentDescription = "Add button.",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp)) // Space between icon and text
+                        Text(text = stringResource(R.string.add_another_recovery_code))
+                    }
+                }
+            }
+        }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -405,6 +607,9 @@ class NewEntryActivity: ComponentActivity()  {
                             newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                         }
                 },
+                label = {
+                    Text(text = stringResource(R.string.card_number))
+                },
                 placeholder = {
                     Text(text = stringResource(R.string.card_number_placeholder))
                 },
@@ -413,12 +618,15 @@ class NewEntryActivity: ComponentActivity()  {
                 isError = cardNumberInvalidProblem || cardNumberTooShortProblem || cardNumberTooLongProblem,
                 supportingText = @Composable {
                     if (cardNumberInvalidProblem) {
-                        Text(text = stringResource(R.string.error_card_number_invalid))
+                        Text(text = stringResource(R.string.error_card_number_invalid),
+                            style = MaterialTheme.typography.bodySmall)
                     } else if (cardNumberTooShortProblem) {
-                        Text(text = stringResource(R.string.error_card_number_too_short))
+                        Text(text = stringResource(R.string.error_card_number_too_short),
+                            style = MaterialTheme.typography.bodySmall)
                     }
                     else if (cardNumberTooLongProblem) {
-                        Text(text = stringResource(R.string.error_card_number_too_long))
+                        Text(text = stringResource(R.string.error_card_number_too_long),
+                            style = MaterialTheme.typography.bodySmall)
                     }
                 },
                 modifier = Modifier
@@ -433,8 +641,10 @@ class NewEntryActivity: ComponentActivity()  {
                 )
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 // Expiration MM/YY Field
                 OutlinedTextField(
@@ -448,6 +658,9 @@ class NewEntryActivity: ComponentActivity()  {
                         } finally {
                             newEntryViewModel.expirationMMYY = it
                         } },
+                    label = {
+                        Text(text = stringResource(R.string.card_expdate))
+                    },
                     placeholder = {
                         Text(text = stringResource(R.string.card_mm_yy_placeholder))
                     },
@@ -455,7 +668,8 @@ class NewEntryActivity: ComponentActivity()  {
                     isError = cardExpirationDateInvalidProblem,
                     supportingText = @Composable {
                         if (cardExpirationDateInvalidProblem) {
-                            Text(text = stringResource(R.string.error_card_expdate_invalid))
+                            Text(text = stringResource(R.string.error_card_expdate_invalid),
+                                style = MaterialTheme.typography.bodySmall)
                         }
                     },
                     colors = TextFieldDefaults.colors(
@@ -489,7 +703,8 @@ class NewEntryActivity: ComponentActivity()  {
                     isError = cardCvcCvvInvalidProblem,
                     supportingText = @Composable {
                         if (cardCvcCvvInvalidProblem)
-                            Text(text = stringResource(R.string.error_card_cvccvv_invalid))
+                            Text(text = stringResource(R.string.error_card_cvccvv_invalid),
+                                style = MaterialTheme.typography.bodySmall)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = TextFieldDefaults.colors(
@@ -504,12 +719,15 @@ class NewEntryActivity: ComponentActivity()  {
             // Cardholder Name Field
             OutlinedTextField(
                 value = newEntryViewModel.cardholderName,
+                label = {
+                    Text(text = stringResource(R.string.cardholder_name))
+                },
                 placeholder =  {
                     Text(text = stringResource(R.string.cardholder_name_placeholder))
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 8.dp),
                 singleLine = true,
                 onValueChange = { it ->
                     newEntryViewModel.cardholderName = it
@@ -526,4 +744,6 @@ class NewEntryActivity: ComponentActivity()  {
             )
         }
     }
+
+
 }

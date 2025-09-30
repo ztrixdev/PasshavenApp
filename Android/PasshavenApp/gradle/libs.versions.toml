@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.0"
+googleauth = "1.5.0"
 gson = "2.13.2"
 kotlin = "2.0.21"
 coreKtx = "1.17.0"
@@ -15,6 +16,7 @@ uiText = "1.9.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+googleauth = { module = "com.warrenstrange:googleauth", version.ref = "googleauth" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

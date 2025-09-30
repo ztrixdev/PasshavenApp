@@ -7,11 +7,13 @@ import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import kotlin.uuid.Uuid
 
 object AccountManager {
-    fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray) {
+    fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray): Uuid {
         account.uuid = Uuid.random()
         account.encrypt(encryptionKey)
 
         database.accountDao().insert(account)
+
+        return account.uuid
     }
 
     fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Account? {

@@ -2,11 +2,14 @@ package ru.ztrixdev.projects.passhavenapp.ViewModels
 
 import android.content.Context
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
@@ -14,9 +17,11 @@ import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
+import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
 class NewEntryViewModel: ViewModel() {
@@ -45,18 +50,75 @@ class NewEntryViewModel: ViewModel() {
         selectedEntryType = type
     }
 
-    fun pushNewEntry(account: Account, context: Context): Boolean {
-        // todo
+    // Account-related code starts here:
+    var username by mutableStateOf(TextFieldValue(""))
+    var password by mutableStateOf(TextFieldValue(""))
+    var mfaSecret by mutableStateOf(TextFieldValue(""))
 
-        return false
+    var recoveryCodesAmount by mutableIntStateOf(1)
+    var recoveryCodes = mutableStateListOf<TextFieldValue>(TextFieldValue(""))
+
+    fun generatePassword() {
+        val passwordGenerator = PasswordGenerator()
+        passwordGenerator.setDefaultOptions()
+
+        password = TextFieldValue(passwordGenerator.generate())
     }
 
-    fun pushNewEntry(card: Card, context: Context): Uuid {
-        val key = VaultHandler().getEncryptionKey(context)
-        val res = CardManager.createCard(DatabaseProvider.getDatabase(context), card, key)
-        return res
+    fun addRecoveryCode() {
+        recoveryCodesAmount++
+        recoveryCodes.add(TextFieldValue(""))
     }
 
+    fun deleteRecoveryCode(index: Int) {
+        recoveryCodes.removeAt(index)
+        recoveryCodesAmount--
+    }
+
+    fun createAccount(): Account {
+        val roomEdibleCodes = emptyList<String>().toMutableList()
+        if (recoveryCodes.size > 1) {
+            recoveryCodes.forEach {
+                roomEdibleCodes += it.text
+            }
+        }
+
+        return Account(
+            uuid = Uuid.random(),
+            name = newEntryName.text,
+            username = username.text,
+            password = password.text,
+            // todo: add reprompt functionality
+            reprompt = false,
+            mfaSecret = mfaSecret.text,
+            recoveryCodes = roomEdibleCodes,
+            additionalNote = additionalNote.text,
+        )
+    }
+
+    fun pushNewEntry(account: Account, context: Context): Uuid {
+        val database = DatabaseProvider.getDatabase(context)
+
+        val newAccUuid = AccountManager.createAccount(
+            database = database,
+            account = account,
+            encryptionKey = VaultHandler().getEncryptionKey(context)
+        )
+
+        if (selectedFolderUuid != null) {
+            FolderManager.performEntryFolderOper(
+                database = database,
+                operation = FolderManager.EntryFolderOperations.Add,
+                entryUuid = newAccUuid,
+                targetFolderUuid = selectedFolderUuid as Uuid
+            )
+        }
+
+        return newAccUuid
+    }
+
+
+    // Card-related code starts here:
     var selectedCardBrand by mutableStateOf(CardBrands.Visa)
 
     var cardNumber by mutableStateOf(TextFieldValue(""))
@@ -130,6 +192,27 @@ class NewEntryViewModel: ViewModel() {
         return Card(uuid, false, name, number, expirationDate, cvcCvv, brand, cardholder, additionalNote)
     }
 
+    fun pushNewEntry(card: Card, context: Context): Uuid {
+        val database = DatabaseProvider.getDatabase(context)
+
+        val newCardUuid = CardManager.createCard(
+            database = database,
+            card = card,
+            encryptionKey = VaultHandler().getEncryptionKey(context)
+        )
+
+        if (selectedFolderUuid != null) {
+            FolderManager.performEntryFolderOper(
+                database = database,
+                operation = FolderManager.EntryFolderOperations.Add,
+                entryUuid = newCardUuid,
+                targetFolderUuid = selectedFolderUuid as Uuid
+            )
+        }
+
+        return newCardUuid
+    }
+
     var allRequiredFieldsAreFilled by mutableStateOf(checkRequiredFields())
     fun checkRequiredFields(): Boolean {
         if (newEntryName.text.isEmpty())
@@ -141,6 +224,13 @@ class NewEntryViewModel: ViewModel() {
                 expirationMMYY.text.isEmpty() -> false
                 cvcCVV.text.isEmpty() -> false
                 cardholderName.text.isEmpty() -> false
+                else -> true
+            }
+
+        if (selectedEntryType == EntryTypes.Account)
+            return when {
+                username.text.isEmpty() -> false
+                password.text.isEmpty() -> false
                 else -> true
             }
 
