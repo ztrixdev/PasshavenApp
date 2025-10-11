@@ -32,7 +32,7 @@
     <string name="select_type">select type:</string>
     <string name="account">👥 account</string>
     <string name="card">💳 bank card</string>
-    <string name="newentryactivity_titlebar">new entry…</string>
+    <string name="newentryactivity_titlebar">new entry</string>
     <string name="card_number_placeholder">4242 4242 4242 4242</string>
     <string name="card_mm_yy_placeholder">MM/YY</string>
     <string name="card_cvc_cvv_placeholder">CVC/CVV</string>
@@ -69,4 +69,11 @@
     <string name="generate_password_for_me">generate the password for me, please</string>
     <string name="recovery_code_label">recovery code #</string>
     <string name="add_another_recovery_code">add another recovery code</string>
+    <string name="newfolderactivity_titlebar">new folder</string>
+    <string name="folder_name_placeholder">e.g Game launchers</string>
+    <string name="folder_name_label">folder name*</string>
+    <string name="sort_by_type">by type</string>
+    <string name="sort_by_alphabet">by alphabet</string>
+    <string name="sort_by_date">by date</string>
+    <string name="reverse_sorting">reverse sorting?</string>
 </resources>

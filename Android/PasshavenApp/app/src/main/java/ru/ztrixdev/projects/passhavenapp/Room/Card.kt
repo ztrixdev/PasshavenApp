@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
+import java.util.Date
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -18,7 +19,8 @@ data class Card (
     @ColumnInfo(name = "cvc_cvv") var cvcCvv: String,
     @ColumnInfo(name = "brand") var brand: String,
     @ColumnInfo(name = "cardholder") var cardholder: String,
-    @ColumnInfo(name = "additional_note") var additionalNote: String?
+    @ColumnInfo(name = "additional_note") var additionalNote: String?,
+    @ColumnInfo(name = "date_created") var dateCreated: Long
 )
 
 fun Card.encrypt(key: ByteArray) {

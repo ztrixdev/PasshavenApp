@@ -93,6 +93,7 @@ class NewEntryViewModel: ViewModel() {
             mfaSecret = mfaSecret.text,
             recoveryCodes = roomEdibleCodes,
             additionalNote = additionalNote.text,
+            dateCreated = System.currentTimeMillis()
         )
     }
 
@@ -188,8 +189,9 @@ class NewEntryViewModel: ViewModel() {
         val brand = selectedCardBrand.toString()
         val cardholder = cardholderName.text
         val additionalNote = additionalNote.text
+        val dateCreated = System.currentTimeMillis()
 
-        return Card(uuid, false, name, number, expirationDate, cvcCvv, brand, cardholder, additionalNote)
+        return Card(uuid, false, name, number, expirationDate, cvcCvv, brand, cardholder, additionalNote, dateCreated)
     }
 
     fun pushNewEntry(card: Card, context: Context): Uuid {

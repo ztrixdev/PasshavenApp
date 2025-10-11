@@ -2,6 +2,7 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,6 +29,7 @@ import androidx.room.util.TableInfo
 import androidx.sqlite.throwSQLiteException
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.AccountDao
@@ -56,24 +58,19 @@ class VaultOverviewActivity: ComponentActivity() {
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
                 ){
-                    val accounts = DatabaseProvider.getDatabase(ctx).accountDao().getALl()
-                    accounts.forEach { it.decrypt(
-                        VaultHandler().getEncryptionKey(ctx)) }
-                    Text(
-                        modifier = Modifier.padding(all = 32.dp),
-                        color = Color.White,
-                        text = accounts.toString(),
-                        fontSize = 18.sp
+                    val db = DatabaseProvider.getDatabase(LocalContext.current)
+                    val key = VaultHandler().getEncryptionKey(LocalContext.current)
+                    val entries = EntryManager.getAllEntries(
+                        database = db,
+                        encryptionKey = key
                     )
-                    val cards = DatabaseProvider.getDatabase(ctx).cardDao().getALl()
-                    cards.forEach { it.decrypt(
-                        VaultHandler().getEncryptionKey(ctx)) }
-                    Text(
-                        modifier = Modifier.padding(all = 32.dp),
-                        color = Color.White,
-                        text = cards.toString(),
-                        fontSize = 18.sp
-                    )
+                    Text(text = "Sorted types here:", color = Color.White, fontSize = 16.sp)
+                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByType).toString(), color = Color.White, fontSize = 16.sp)
+                    Text(text = "Sorted names here:", color = Color.White, fontSize = 16.sp)
+                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByAlphabet).toString(), color = Color.White, fontSize = 16.sp)
+                    Text(text = "Sorted dates here:", color = Color.White, fontSize = 16.sp)
+                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByDate).toString(), color = Color.White, fontSize = 16.sp)
+
                     Button(
                         onClick = {
                             gotoNEA = true

@@ -61,4 +61,11 @@
     <string name="generate_password_for_me">сгенерируйте пароль для меня, пожалуйста</string>
     <string name="recovery_code_label">код восстановления #</string>
     <string name="add_another_recovery_code">добавить код восстановления</string>
+    <string name="newfolderactivity_titlebar">новая папка</string>
+    <string name="folder_name_placeholder">напр. Социальные сети</string>
+    <string name="folder_name_label">имя папки*</string>
+    <string name="sort_by_type">по типу</string>
+    <string name="sort_by_alphabet">по алфавиту</string>
+    <string name="sort_by_date">по дате</string>
+    <string name="reverse_sorting">в обратном порядке?</string>
 </resources>

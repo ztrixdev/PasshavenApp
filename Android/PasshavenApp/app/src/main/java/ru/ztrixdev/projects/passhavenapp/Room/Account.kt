@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
+import java.util.Date
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -17,7 +18,8 @@ data class Account (
     @ColumnInfo(name = "password") var password: String,
     @ColumnInfo(name = "mfa_secret") var mfaSecret: String?,
     @ColumnInfo(name = "recovery_codes") var recoveryCodes: List<String>?,
-    @ColumnInfo(name = "additional_note") var additionalNote: String?
+    @ColumnInfo(name = "additional_note") var additionalNote: String?,
+    @ColumnInfo(name = "date_created") var dateCreated: Long
 )
 
 fun Account.encrypt(key: ByteArray) {

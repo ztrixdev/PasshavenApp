@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ed1161cec070c2640e24d30aceee761d",
+    "identityHash": "c147d2ff469a8cca16c0a043c483da1a",
     "entities": [
       {
         "tableName": "Account",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `reprompt` INTEGER NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `password` TEXT NOT NULL, `mfa_secret` TEXT, `recovery_codes` TEXT, `additional_note` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `reprompt` INTEGER NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `password` TEXT NOT NULL, `mfa_secret` TEXT, `recovery_codes` TEXT, `additional_note` TEXT, `date_created` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -52,6 +52,12 @@
             "fieldPath": "additionalNote",
             "columnName": "additional_note",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "date_created",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -63,7 +69,7 @@
       },
       {
         "tableName": "Card",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `reprompt` INTEGER NOT NULL, `name` TEXT NOT NULL, `number` TEXT NOT NULL, `expiration_date` TEXT NOT NULL, `cvc_cvv` TEXT NOT NULL, `brand` TEXT NOT NULL, `cardholder` TEXT NOT NULL, `additional_note` TEXT, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `reprompt` INTEGER NOT NULL, `name` TEXT NOT NULL, `number` TEXT NOT NULL, `expiration_date` TEXT NOT NULL, `cvc_cvv` TEXT NOT NULL, `brand` TEXT NOT NULL, `cardholder` TEXT NOT NULL, `additional_note` TEXT, `date_created` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -117,6 +123,12 @@
             "fieldPath": "additionalNote",
             "columnName": "additional_note",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "date_created",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -128,7 +140,7 @@
       },
       {
         "tableName": "Folder",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `name` TEXT NOT NULL, `entries` TEXT NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `name` TEXT NOT NULL, `entries` TEXT NOT NULL, `date_created` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -146,6 +158,12 @@
             "fieldPath": "entries",
             "columnName": "entries",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCreated",
+            "columnName": "date_created",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -231,7 +249,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ed1161cec070c2640e24d30aceee761d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c147d2ff469a8cca16c0a043c483da1a')"
     ]
   }
 }

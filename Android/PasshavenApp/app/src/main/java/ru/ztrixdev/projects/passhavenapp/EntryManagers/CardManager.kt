@@ -25,14 +25,10 @@ object CardManager {
         return card
     }
 
-    fun getAllCards(database: AppDatabase, encryptionKey: ByteArray): MutableList<Card> {
+    fun getAllCards(database: AppDatabase, encryptionKey: ByteArray): List<Card> {
         val cards = database.cardDao().getALl()
-        val decrypted = emptyList<Card>().toMutableList()
-        for (card in cards) {
-            card.decrypt(encryptionKey)
-            decrypted += card
-        }
+        cards.forEach { it.decrypt(encryptionKey) }
 
-        return decrypted
+        return cards
     }
 }

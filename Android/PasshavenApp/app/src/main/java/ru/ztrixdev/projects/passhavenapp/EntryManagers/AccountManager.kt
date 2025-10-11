@@ -16,6 +16,13 @@ object AccountManager {
         return account.uuid
     }
 
+    fun getAllAccounts(database: AppDatabase, encryptionKey: ByteArray): List<Account> {
+        val accounts = database.accountDao().getALl()
+        accounts.forEach { it.decrypt(encryptionKey) }
+
+        return accounts
+    }
+
     fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Account? {
         val account = database.accountDao().getAccountByUuid(accountUuid = uuid)
         if (account == null)
