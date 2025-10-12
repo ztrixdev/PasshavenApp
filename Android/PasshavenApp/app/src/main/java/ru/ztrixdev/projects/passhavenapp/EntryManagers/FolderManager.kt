@@ -70,5 +70,9 @@ object FolderManager {
         val db = DatabaseProvider.getDatabase(context = context)
         return db.folderDao().getFolderByUuid(uuid)
     }
+
+    fun createFolder(db: AppDatabase, newFolder: Folder) {
+        db.folderDao().insert(newFolder)
+    }
 }
 

@@ -3,18 +3,30 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
@@ -26,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,20 +46,112 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.room.util.TableInfo
+import kotlinx.serialization.builtins.ArraySerializer
+import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.Room.Account
+import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewFolderViewModel
+import kotlin.getValue
 
 class NewFolderActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val newFolderViewModel: NewFolderViewModel by viewModels()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        setContent {
+            val localctx = LocalContext.current
+            LaunchedEffect(Unit) {
+                newFolderViewModel.loadEntries(localctx)
+                newFolderViewModel.sortEntries()
+            }
+            LaunchedEffect(newFolderViewModel.folderCreated.value) {
+                if (newFolderViewModel.folderCreated.value) {
+                    val intent = Intent(this@NewFolderActivity, VaultOverviewActivity::class.java)
+                    this@NewFolderActivity.startActivity(intent)
+                }
+            }
+
+            MaterialTheme {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    MainBody(newFolderViewModel)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MainBody(newFolderViewModel: NewFolderViewModel) {
+        Box(
+            Modifier
+                .height(30.dp)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+        )
+        Titlebar()
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
+        NameTextField(newFolderViewModel = newFolderViewModel)
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
+        Text(
+            text = stringResource(R.string.sort),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier
+                .padding(start = 16.dp)
+        )
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SortingKeySelectionDropdown(newFolderViewModel = newFolderViewModel)
+            ReverseSortingCheckbox(newFolderViewModel = newFolderViewModel)
+        }
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
+        EntryTable(newFolderViewModel = newFolderViewModel)
+        val localctx = LocalContext.current
+        Button(
+            onClick = {
+                newFolderViewModel.createFolder(localctx)
+                newFolderViewModel.folderCreated.value = true
+            },
+            enabled = newFolderViewModel.newFolderName.value.text.isNotEmpty(),
+            colors = ButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                disabledContainerColor = Color.LightGray,
+                disabledContentColor = Color.DarkGray
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp,
+                    start = 24.dp,
+                    end = 24.dp)
+        ) {
+            Text(stringResource(R.string.continue_button))
+        }
+        Spacer(
+            modifier = Modifier.height(80.dp)
+        )
     }
 
     @Preview
@@ -109,7 +214,7 @@ class NewFolderActivity: ComponentActivity() {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
+                .padding(top = 16.dp, start = 24.dp, end = 24.dp),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onBackground,
                 unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
@@ -144,7 +249,9 @@ class NewFolderActivity: ComponentActivity() {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .clickable {
                         isDropDownExpanded.value = true
                     }
                 ) {
@@ -172,6 +279,7 @@ class NewFolderActivity: ComponentActivity() {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
                                 newFolderViewModel.setSelectedSortingKey(sortingKeyStringsToEntryTypes[sortingKeyStringsToEntryTypes.keys.toList()[itemPosition.intValue]] as SortingKeys)
+                                newFolderViewModel.sortEntries()
                             }
                         )
                     }
@@ -187,12 +295,16 @@ class NewFolderActivity: ComponentActivity() {
         }
 
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp)
         ) {
             Checkbox(
                 checked = isCheckboxTicked.value,
                 onCheckedChange = {
                     isCheckboxTicked.value = it
+                    newFolderViewModel.reversedSorting.value = it
+                    newFolderViewModel.sortEntries()
                 },
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.primaryContainer,
@@ -209,4 +321,108 @@ class NewFolderActivity: ComponentActivity() {
         }
     }
 
+    @Composable
+    private fun EntryTable(newFolderViewModel: NewFolderViewModel) {
+        Column(
+            Modifier
+                .heightIn(320.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            repeat(newFolderViewModel.entries.size) { index ->
+                val entry = newFolderViewModel.entries[index]
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                ) {
+                    val isIncludingCheckboxTicked = remember { mutableStateOf(false) }
+                    Checkbox(
+                        checked = isIncludingCheckboxTicked.value,
+                        onCheckedChange = {
+                            isIncludingCheckboxTicked.value = it
+                            when (it) {
+                                true -> when (entry) {
+                                    is Card -> newFolderViewModel.includeEntry(entry.uuid)
+                                    is Account -> newFolderViewModel.includeEntry(entry.uuid)
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                }
+
+                                false -> when (entry) {
+                                    is Card -> newFolderViewModel.removeEntry(entry.uuid)
+                                    is Account -> newFolderViewModel.removeEntry(entry.uuid)
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                }
+                            }
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primaryContainer,
+                            uncheckedColor = MaterialTheme.colorScheme.secondaryContainer
+                        ),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text =
+                            when (entry) {
+                                is Card -> entry.name
+                                is Account -> entry.name
+                                else -> "ERR_UNRECOGNIZABLE_TYPE"
+                            },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            top = 8.dp
+                        )
+                            .width(56.dp)
+                    )
+                    Text(
+                        text =
+                            when (entry) {
+                                is Card -> stringResource(R.string.card)
+                                is Account -> stringResource(R.string.account)
+                                else -> "ERR_UNRECOGNIZABLE_TYPE"
+                            },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            top = 8.dp
+                        )
+                            .width(56.dp)
+                    )
+                    Text(
+                        text =
+                            when (entry) {
+                                is Card -> entry.number
+                                is Account -> entry.username
+                                else -> "ERR_UNRECOGNIZABLE_TYPE"
+                            },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            top = 8.dp
+                        )
+                            .width(64.dp)
+                    )
+                    Text(
+                        text =
+                            when (entry) {
+                                is Card -> DateTimeProcessor().convertToHumanReadable(entry.dateCreated)
+                                is Account -> DateTimeProcessor().convertToHumanReadable(entry.dateCreated)
+                                else -> "ERR_UNRECOGNIZABLE_TYPE"
+                            },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(
+                            start = 8.dp,
+                            top = 8.dp
+                        )
+                            .width(96.dp)
+                    )
+                }
+            }
+        }
+    }
 }

@@ -41,5 +41,10 @@
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">
         </activity>
+        <activity
+            android:name=".Activities.NewFolderActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark">
+        </activity>
     </application>
 </manifest>

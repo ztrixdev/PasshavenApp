@@ -48,6 +48,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -82,6 +83,12 @@ class NewEntryActivity: ComponentActivity()  {
         enableEdgeToEdge()
         setContent() {
             MaterialTheme {
+                LaunchedEffect(newEntryViewModel.entryCreated.value) {
+                    if (newEntryViewModel.entryCreated.value) {
+                        val intent = Intent(this@NewEntryActivity, VaultOverviewActivity::class.java)
+                        this@NewEntryActivity.startActivity(intent)
+                    }
+                }
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier
@@ -361,7 +368,9 @@ class NewEntryActivity: ComponentActivity()  {
                         newEntryViewModel.pushNewEntry(card = newEntryViewModel.createCard(), context =  localctx)
                     if (newEntryViewModel.selectedEntryType == EntryTypes.Account)
                         newEntryViewModel.pushNewEntry(account = newEntryViewModel.createAccount(), context = localctx)
-                          },
+
+                    newEntryViewModel.entryCreated.value = true
+                },
                 enabled = newEntryViewModel.allRequiredFieldsAreFilled,
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,

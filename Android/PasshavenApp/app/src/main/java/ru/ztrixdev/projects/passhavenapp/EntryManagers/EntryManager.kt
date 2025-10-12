@@ -28,12 +28,48 @@ object EntryManager {
         return null
     }
 
-    fun getAllEntries(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
+    fun getAllEntriesForUI(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
         val allEntries = emptyList<Any>().toMutableList()
         allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))
         allEntries.addAll(CardManager.getAllCards(database, encryptionKey))
 
-        return allEntries
+        val desecretified = emptyList<Any>().toMutableList()
+        allEntries.forEach { desecretified.add(desecretify(it)) }
+
+        return desecretified
+    }
+
+    fun desecretify(entry: Any): Any {
+        when (entry) {
+            is Account -> {
+                return Account(
+                    uuid = entry.uuid,
+                    reprompt = entry.reprompt,
+                    name = entry.name,
+                    username = entry.username,
+                    password = entry.password.substring(0,2) + "*****",
+                    mfaSecret = "",
+                    recoveryCodes = emptyList(),
+                    additionalNote = "",
+                    dateCreated = entry.dateCreated
+                )
+            }
+            is Card -> {
+                return Card(
+                    uuid = entry.uuid,
+                    reprompt = entry.reprompt,
+                    name = entry.name,
+                    number = "***" + entry.number.takeLast(4),
+                    expirationDate = "**/" + entry.expirationDate.takeLast(2),
+                    cvcCvv = "***",
+                    brand = entry.brand,
+                    cardholder = entry.cardholder,
+                    additionalNote = "",
+                    dateCreated = entry.dateCreated
+                )
+            }
+        }
+        return "ERR_UNRECOGNIZABLE_TYPE"
     }
 
     fun sortEntries(entries: List<Any>, sortingKey: SortingKeys): MutableList<Any> {

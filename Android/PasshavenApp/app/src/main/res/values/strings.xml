@@ -76,4 +76,5 @@
     <string name="sort_by_alphabet">by alphabet</string>
     <string name="sort_by_date">by date</string>
     <string name="reverse_sorting">reverse sorting?</string>
+    <string name="sort">sorting…</string>
 </resources>

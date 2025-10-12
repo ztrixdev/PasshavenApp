@@ -25,6 +25,8 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
 class NewEntryViewModel: ViewModel() {
+    val entryCreated = mutableStateOf(false)
+
     var selectedFolderUuid by mutableStateOf<Uuid?>(null)
 
     fun setSelectedFolder(folder: Folder) {

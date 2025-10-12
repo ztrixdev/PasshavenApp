@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room.Database
@@ -29,6 +31,7 @@ import androidx.room.util.TableInfo
 import androidx.sqlite.throwSQLiteException
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.Account
@@ -46,6 +49,7 @@ class VaultOverviewActivity: ComponentActivity() {
             // this some raw shii, don't mind it, its really ugly
             MaterialTheme {
                 var gotoNEA by remember { mutableStateOf(false) }
+                var gotoNFA by remember { mutableStateOf(false) }
                 val ctx = LocalContext.current
                 LaunchedEffect(gotoNEA) {
                     if (gotoNEA) {
@@ -55,22 +59,21 @@ class VaultOverviewActivity: ComponentActivity() {
                         )
                     }
                 }
+                LaunchedEffect(gotoNFA) {
+                    if (gotoNFA) {
+                        ctx .startActivity(
+                            Intent(ctx, NewFolderActivity::class.java)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
+                }
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
                 ){
                     val db = DatabaseProvider.getDatabase(LocalContext.current)
                     val key = VaultHandler().getEncryptionKey(LocalContext.current)
-                    val entries = EntryManager.getAllEntries(
-                        database = db,
-                        encryptionKey = key
-                    )
-                    Text(text = "Sorted types here:", color = Color.White, fontSize = 16.sp)
-                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByType).toString(), color = Color.White, fontSize = 16.sp)
-                    Text(text = "Sorted names here:", color = Color.White, fontSize = 16.sp)
-                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByAlphabet).toString(), color = Color.White, fontSize = 16.sp)
-                    Text(text = "Sorted dates here:", color = Color.White, fontSize = 16.sp)
-                    Text(text = EntryManager.sortEntries(entries, SortingKeys.ByDate).toString(), color = Color.White, fontSize = 16.sp)
-
+                    val entries = FolderManager.getFolders(LocalContext.current)
+                    Text(text = entries.toString(), color = Color.White, style = TextStyle.Default)
                     Button(
                         onClick = {
                             gotoNEA = true
@@ -78,6 +81,14 @@ class VaultOverviewActivity: ComponentActivity() {
                         modifier = Modifier.padding(all = 30.dp)
                     ) {
                         Text("Go to New Entry Activity")
+                    }
+                    Button(
+                        onClick = {
+                            gotoNFA = true
+                        },
+                        modifier = Modifier.padding(all = 30.dp)
+                    ) {
+                        Text("Go to New Folder Activity")
                     }
                 }
             }
