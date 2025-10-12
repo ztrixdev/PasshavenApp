@@ -17,7 +17,6 @@ import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
-import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
