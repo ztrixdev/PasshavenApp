@@ -1,8 +1,8 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
 import ru.ztrixdev.projects.passhavenapp.Room.Account
-import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
+import ru.ztrixdev.projects.passhavenapp.Room.Card
 import kotlin.uuid.Uuid
 
 object EntryManager {
@@ -126,5 +126,14 @@ object EntryManager {
                 return sortedList
             }
         }
+    }
+
+    fun getUuids(entries: List<Any>): List<Uuid> {
+        val uuids: MutableList<Uuid> = mutableListOf()
+        entries.forEach {
+            if (it is Card) uuids.add(it.uuid)
+            if (it is Account) uuids.add(it.uuid)
+        }
+        return uuids.toList()
     }
 }

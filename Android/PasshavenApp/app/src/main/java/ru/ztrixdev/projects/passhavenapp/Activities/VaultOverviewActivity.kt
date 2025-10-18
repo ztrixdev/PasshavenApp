@@ -22,7 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
+import ru.ztrixdev.projects.passhavenapp.Handlers.ExportTemplates
+import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 
@@ -61,6 +64,7 @@ class VaultOverviewActivity: ComponentActivity() {
                     val key = VaultHandler().getEncryptionKey(LocalContext.current)
                     val entries = FolderManager.getFolders(LocalContext.current)
                     Text(text = entries.toString(), color = Color.White, style = TextStyle.Default)
+                    Text(text = ExportsHandler.export(ExportTemplates.Passhaven, EntryManager.getAllEntriesForUI(db, key), entries), color = Color.White, style = TextStyle.Default)
                     Button(
                         onClick = {
                             gotoNEA = true
