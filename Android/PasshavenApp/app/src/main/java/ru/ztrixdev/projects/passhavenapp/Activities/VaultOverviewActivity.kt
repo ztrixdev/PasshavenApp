@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.Handlers.ExportTemplates
@@ -64,7 +65,20 @@ class VaultOverviewActivity: ComponentActivity() {
                     val key = VaultHandler().getEncryptionKey(LocalContext.current)
                     val entries = FolderManager.getFolders(LocalContext.current)
                     Text(text = entries.toString(), color = Color.White, style = TextStyle.Default)
-                    Text(text = ExportsHandler.export(ExportTemplates.Passhaven, EntryManager.getAllEntriesForUI(db, key), entries), color = Color.White, style = TextStyle.Default)
+                    val export = ExportsHandler.export(ExportTemplates.Passhaven, EntryManager.getAllEntriesForUI(db, key), entries)
+                    val encExport = ExportsHandler.protectExport(export, "GlebIsMegaZhir")
+                    Text(text = export, color = Color.White, style = TextStyle.Default)
+                    Text(text = encExport, color = Color.White, style = TextStyle.Default)
+                    try {
+                        println(ExportsHandler.getProtectedExport(encExport, "GlebIsMegaZhir6"))
+                    } catch (e: Exception) {
+                        println(e.message)
+                    }
+
+                    val launcher = rememberDirectoryPickerLauncher { directory ->
+                        // todo: implement regular password-protected backups
+                        println(directory?.androidFile)
+                    }
                     Button(
                         onClick = {
                             gotoNEA = true
@@ -72,6 +86,14 @@ class VaultOverviewActivity: ComponentActivity() {
                         modifier = Modifier.padding(all = 30.dp)
                     ) {
                         Text("Go to New Entry Activity")
+                    }
+                    Button(
+                        onClick = {
+                            launcher.launch()
+                        },
+                        modifier = Modifier.padding(all = 30.dp)
+                    ) {
+                        Text("Open filepicker")
                     }
                     Button(
                         onClick = {

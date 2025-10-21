@@ -87,6 +87,8 @@ dependencies {
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.symbol.processing.api)
+    implementation(libs.filekit.dialogs.compose)
     implementation(libs.googleauth)
     implementation(libs.gson)
     implementation(kotlincrypto.hash.sha3)
