@@ -1,18 +1,21 @@
 package ru.ztrixdev.projects.passhavenapp.Handlers
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.net.toUri
+import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
-import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.AndroidCrypto
+import ru.ztrixdev.projects.passhavenapp.TimeInMillis
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Checksum
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.AndroidCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.CryptoNames
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.Keygen
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.keystoreInstanceName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.mpHashProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.mpProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.pinHashProtectingKeyName
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
@@ -60,7 +63,11 @@ class VaultHandler {
             pinHash = encryptedPINHashCipherAndIV[CryptoNames.cipher]!!,
             pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!,
             flabs = 20,
-            flabsr = 20)
+            flabsr = 20,
+            // By default every 3 days
+            backupEvery = TimeInMillis.ThreeDays.toLong(),
+            lastBackup = 0,
+            backupFolder = "".toUri())
 
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         // Deletes all the previous vaults to avoid having more than one vault, which will result in errors.
@@ -96,6 +103,7 @@ class VaultHandler {
     fun loginByPIN(PIN: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
+
         if (vault == emptyList<Vault>())
             return false
         if (vault[0].flabsr <= 0)
@@ -109,8 +117,9 @@ class VaultHandler {
         val loginResult = Checksum.keccak512(PIN).contentEquals(decryptedPINHash)
         if (!loginResult)
             vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
-        vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
-
+        else {
+            vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
+        }
         return loginResult
     }
 
@@ -123,6 +132,15 @@ class VaultHandler {
             vaults = dao.getVault()
         }
         return true
+    }
+
+    fun setBackupFolder(uri: Uri, context: Context) {
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()
+
+        val vaultClone = vault[0]
+        vaultClone.backupFolder = uri
+        vaultDao.update(vaultClone)
     }
 
     fun getEncryptionKey(context: Context): ByteArray {

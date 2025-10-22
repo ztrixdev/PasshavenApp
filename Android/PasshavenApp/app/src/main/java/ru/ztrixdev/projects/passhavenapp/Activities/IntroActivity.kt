@@ -148,7 +148,6 @@ class IntroActivity : ComponentActivity() {
 
     @Composable
     private fun IntroPartCreateMPG(introViewModel: IntroViewModel) {
-        val MasterPassword = MasterPassword
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -295,6 +294,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
+                singleLine = true,
                 colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = MaterialTheme.colorScheme.primary)
             )
 
