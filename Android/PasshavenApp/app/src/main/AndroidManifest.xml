@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Dark">
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">
@@ -20,28 +21,33 @@
             </intent-filter>
         </activity>
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.IntroActivity"
             android:exported="true"
             android:label="@string/intro_label"
             android:theme="@style/Theme.Material3.Dark">
         </activity>
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.LoginActivity"
             android:exported="true"
             android:label="@string/login_label"
             android:theme="@style/Theme.Material3.Dark">
         </activity>
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.VaultOverviewActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">
         </activity>
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.NewEntryActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">
         </activity>
         <activity
+            android:screenOrientation="fullSensor"
             android:name=".Activities.NewFolderActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">

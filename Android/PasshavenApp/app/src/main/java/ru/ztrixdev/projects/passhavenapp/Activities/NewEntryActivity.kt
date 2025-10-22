@@ -319,6 +319,7 @@ class NewEntryActivity: ComponentActivity()  {
             when (newEntryViewModel.selectedEntryType) {
                 EntryTypes.Account -> AccountSpecificFields(newEntryViewModel)
                 EntryTypes.Card -> CardSpecificFields(newEntryViewModel)
+                EntryTypes.Folder -> {}
             }
 
             Spacer(
