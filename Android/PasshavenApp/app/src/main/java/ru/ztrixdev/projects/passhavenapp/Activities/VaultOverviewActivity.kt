@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
@@ -42,6 +43,7 @@ class VaultOverviewActivity: ComponentActivity() {
                 var gotoNEA by remember { mutableStateOf(false) }
                 var gotoNFA by remember { mutableStateOf(false) }
                 val ctx = LocalContext.current
+
                 LaunchedEffect(gotoNEA) {
                     if (gotoNEA) {
                         ctx .startActivity(
@@ -61,23 +63,21 @@ class VaultOverviewActivity: ComponentActivity() {
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
                 ){
+                    val localctx = LocalContext.current
                     val db = DatabaseProvider.getDatabase(LocalContext.current)
                     val key = VaultHandler().getEncryptionKey(LocalContext.current)
                     val entries = FolderManager.getFolders(LocalContext.current)
                     Text(text = entries.toString(), color = Color.White, style = TextStyle.Default)
-                    val export = ExportsHandler.export(ExportTemplates.Passhaven, EntryManager.getAllEntriesForUI(db, key), entries)
+                    val export = ExportsHandler.getExport(ExportTemplates.Passhaven, EntryManager.getAllEntriesForUI(db, key), entries)
                     val encExport = ExportsHandler.protectExport(export, "GlebIsMegaZhir")
                     Text(text = export, color = Color.White, style = TextStyle.Default)
                     Text(text = encExport, color = Color.White, style = TextStyle.Default)
-                    try {
-                        println(ExportsHandler.getProtectedExport(encExport, "GlebIsMegaZhir6"))
-                    } catch (e: Exception) {
-                        println(e.message)
-                    }
-
+                    Text(text = "Is a backup due atm: ${ExportsHandler.checkIfABackupIsDue(localctx)}", color = Color.White, style = TextStyle.Default)
+                    val resolver = this@VaultOverviewActivity.contentResolver
                     val launcher = rememberDirectoryPickerLauncher { directory ->
-                        // todo: implement regular password-protected backups
-                        println(directory?.androidFile)
+                        val uri = directory.toString().toUri()
+                        VaultHandler().setBackupFolder(uri, localctx)
+                        ExportsHandler.exportToFolder(resolver, encExport, localctx)
                     }
                     Button(
                         onClick = {
@@ -93,7 +93,7 @@ class VaultOverviewActivity: ComponentActivity() {
                         },
                         modifier = Modifier.padding(all = 30.dp)
                     ) {
-                        Text("Open filepicker")
+                        Text("Export vault to folder")
                     }
                     Button(
                         onClick = {
