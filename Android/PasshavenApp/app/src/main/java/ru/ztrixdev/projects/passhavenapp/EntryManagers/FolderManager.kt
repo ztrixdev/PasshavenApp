@@ -21,7 +21,7 @@ object FolderManager {
         Success
     }
 
-    fun performEntryFolderOper(operation: EntryFolderOperations, database: AppDatabase, entryUuid: Uuid, targetFolderUuid: Uuid): EntryFolderOperationResults {
+    suspend fun performEntryFolderOper(operation: EntryFolderOperations, database: AppDatabase, entryUuid: Uuid, targetFolderUuid: Uuid): EntryFolderOperationResults {
         val dao = database.folderDao()
 
         val targetFolder = dao.getFolderByUuid(targetFolderUuid)
@@ -61,17 +61,17 @@ object FolderManager {
         return EntryFolderOperationResults.Success
     }
 
-    fun getFolders(context: Context): List<Folder> {
+    suspend fun getFolders(context: Context): List<Folder> {
         val db = DatabaseProvider.getDatabase(context = context)
         return db.folderDao().getALl()
     }
 
-    fun getFolderByUuid(context: Context, uuid: Uuid): Folder? {
+    suspend fun getFolderByUuid(context: Context, uuid: Uuid): Folder? {
         val db = DatabaseProvider.getDatabase(context = context)
         return db.folderDao().getFolderByUuid(uuid)
     }
 
-    fun createFolder(db: AppDatabase, newFolder: Folder) {
+    suspend fun createFolder(db: AppDatabase, newFolder: Folder) {
         db.folderDao().insert(newFolder)
     }
 }

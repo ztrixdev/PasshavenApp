@@ -13,17 +13,17 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 interface CardDao {
     @Query("select * from card")
-    fun getALl(): List<Card>
+    suspend fun getALl(): List<Card>
 
     @Query("select * from card where uuid like :cardUuid limit 1")
-    fun getCardByUuid(cardUuid: Uuid): Card?
+    suspend fun getCardByUuid(cardUuid: Uuid): Card?
 
     @Insert
-    fun insert(vararg crd: Card)
+    suspend fun insert(vararg crd: Card)
 
     @Update
-    fun update(vararg crd: Card)
+    suspend fun update(vararg crd: Card)
 
     @Delete
-    fun delete(vararg crd: Card)
+    suspend fun delete(vararg crd: Card)
 }

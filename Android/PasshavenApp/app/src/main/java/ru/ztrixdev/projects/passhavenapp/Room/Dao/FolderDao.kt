@@ -13,20 +13,20 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 interface FolderDao {
     @Query("select * from folder")
-    fun getALl(): List<Folder>
+    suspend fun getALl(): List<Folder>
 
     @Query("select * from folder where uuid like :folderUuid limit 1")
-    fun getFolderByUuid(folderUuid: Uuid): Folder?
+    suspend fun getFolderByUuid(folderUuid: Uuid): Folder?
 
     @Query("update folder set entries=:newEntryList where uuid like :folderUUID")
-    fun resetEntryList(newEntryList: List<Uuid>, folderUUID: Uuid)
+    suspend fun resetEntryList(newEntryList: List<Uuid>, folderUUID: Uuid)
 
     @Insert
-    fun insert(vararg fld: Folder)
+    suspend fun insert(vararg fld: Folder)
 
     @Update
-    fun update(vararg fld: Folder)
+    suspend fun update(vararg fld: Folder)
 
     @Delete
-    fun delete(vararg fld: Folder)
+    suspend fun delete(vararg fld: Folder)
 }

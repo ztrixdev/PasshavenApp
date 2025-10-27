@@ -79,14 +79,17 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 dependencies {
     implementation(libs.material)
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.compose.ui)
     val lazyVersion = "5.2.0"
     val jnaVersion = "5.17.0"
-    val roomVersion = "2.7.2"
+    val roomVersion = "2.8.3"
 
     implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.symbol.processing.api)
     implementation(libs.filekit.dialogs.compose)
     implementation(libs.googleauth)

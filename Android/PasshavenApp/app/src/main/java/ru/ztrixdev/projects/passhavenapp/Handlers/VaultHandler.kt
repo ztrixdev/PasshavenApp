@@ -22,7 +22,7 @@ import javax.crypto.SecretKey
 import kotlin.uuid.Uuid
 
 class VaultHandler {
-    fun createVault(password: String, PIN: String, context: Context): List<Vault> {
+    suspend fun createVault(password: String, PIN: String, context: Context): List<Vault> {
         if (!MasterPassword.verify(passwd = password))
             throw IllegalArgumentException("The provided password doesn't meet the requirements. Check the requirements and try again.")
         if (!MasterPassword.verifyPIN(PIN))
@@ -78,7 +78,7 @@ class VaultHandler {
         return vaultDao.getVault()
     }
 
-    fun loginByPassword(passwd: String, context: Context): Boolean {
+    suspend fun loginByPassword(passwd: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
         if (vault == emptyList<Vault>())
@@ -100,7 +100,7 @@ class VaultHandler {
         return loginResult
     }
 
-    fun loginByPIN(PIN: String, context: Context): Boolean {
+    suspend fun loginByPIN(PIN: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
 
@@ -123,7 +123,7 @@ class VaultHandler {
         return loginResult
     }
 
-    fun selfDestroy(dao: VaultDao): Boolean {
+    suspend fun selfDestroy(dao: VaultDao): Boolean {
         var vaults = dao.getVault()
         while (vaults != emptyList<Vault>()) {
             for (vlt: Vault in vaults) {
@@ -134,7 +134,7 @@ class VaultHandler {
         return true
     }
 
-    fun setBackupFolder(uri: Uri, context: Context) {
+    suspend fun setBackupFolder(uri: Uri, context: Context) {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
 
@@ -143,7 +143,7 @@ class VaultHandler {
         vaultDao.update(vaultClone)
     }
 
-    fun getEncryptionKey(context: Context): ByteArray {
+    suspend fun getEncryptionKey(context: Context): ByteArray {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
         if (vault == emptyList<Vault>())

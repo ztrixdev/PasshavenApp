@@ -51,6 +51,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.R
@@ -89,6 +92,7 @@ class NewFolderActivity: ComponentActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newFolderViewModel: NewFolderViewModel) {
         Box(
@@ -125,8 +129,10 @@ class NewFolderActivity: ComponentActivity() {
         val localctx = LocalContext.current
         Button(
             onClick = {
-                newFolderViewModel.createFolder(localctx)
-                newFolderViewModel.folderCreated.value = true
+                lifecycleScope.launch {
+                    newFolderViewModel.createFolder(localctx)
+                    newFolderViewModel.folderCreated.value = true
+                }
             },
             enabled = newFolderViewModel.newFolderName.value.text.isNotEmpty(),
             colors = ButtonColors(

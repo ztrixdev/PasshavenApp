@@ -7,7 +7,7 @@ import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import kotlin.uuid.Uuid
 
 object AccountManager {
-    fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray): Uuid {
+    suspend fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray): Uuid {
         account.uuid = Uuid.random()
         account.encrypt(encryptionKey)
 
@@ -16,14 +16,14 @@ object AccountManager {
         return account.uuid
     }
 
-    fun getAllAccounts(database: AppDatabase, encryptionKey: ByteArray): List<Account> {
+    suspend fun getAllAccounts(database: AppDatabase, encryptionKey: ByteArray): List<Account> {
         val accounts = database.accountDao().getALl()
         accounts.forEach { it.decrypt(encryptionKey) }
 
         return accounts
     }
 
-    fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Account? {
+    suspend fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Account? {
         val account = database.accountDao().getAccountByUuid(accountUuid = uuid)
         if (account == null)
             return null

@@ -9,7 +9,7 @@ object EntryManager {
     // This function will look through all Room tables the app has to get an entry by it's Uuid.
     // At the moment it will ask Room around if there is an account, a card or a folder with the Uuid provided and return the sought object on detection.
     // If found none, it will return null.
-    fun getEntryByUuid(database: AppDatabase, soughtUuid: Uuid): Any? {
+    suspend fun getEntryByUuid(database: AppDatabase, soughtUuid: Uuid): Any? {
         val folderDao = database.folderDao()
         val folderSearchResult = folderDao.getFolderByUuid(soughtUuid)
         if (folderSearchResult != null)
@@ -28,7 +28,7 @@ object EntryManager {
         return null
     }
 
-    fun getAllEntriesForUI(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
+    suspend fun getAllEntriesForUI(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
         val allEntries = emptyList<Any>().toMutableList()
         allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))
         allEntries.addAll(CardManager.getAllCards(database, encryptionKey))

@@ -34,8 +34,9 @@ object ExportsHandler {
 
     private val _export_filename_part_1 = "export_";
     private val _export_filename_part_2 = "_full.phbckp"
-    fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
+    suspend fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+
         val vault = vaultDao.getVault()[0]
 
         val path = vault.backupFolder
@@ -76,7 +77,7 @@ object ExportsHandler {
         return true
     }
 
-    fun checkIfABackupIsDue(context: Context): Boolean {
+    suspend fun checkIfABackupIsDue(context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()[0]
         

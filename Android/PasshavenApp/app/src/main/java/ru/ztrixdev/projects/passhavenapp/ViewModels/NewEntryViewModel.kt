@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
@@ -32,11 +33,11 @@ class NewEntryViewModel: ViewModel() {
         selectedFolderUuid = folder.uuid
     }
 
-    fun getFolders(context: Context): List<Folder> {
+    suspend fun getFolders(context: Context): List<Folder> {
         return FolderManager.getFolders(context)
     }
 
-    fun getSelectedFolder(context: Context): Folder? {
+    suspend fun getSelectedFolder(context: Context): Folder? {
         return FolderManager.getFolderByUuid(context, selectedFolderUuid as Uuid)
     }
 
@@ -98,7 +99,8 @@ class NewEntryViewModel: ViewModel() {
         )
     }
 
-    fun pushNewEntry(account: Account, context: Context): Uuid {
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend fun pushNewEntry(account: Account, context: Context): Uuid {
         val database = DatabaseProvider.getDatabase(context)
 
         val newAccUuid = AccountManager.createAccount(
@@ -195,8 +197,9 @@ class NewEntryViewModel: ViewModel() {
         return Card(uuid, false, name, number, expirationDate, cvcCvv, brand, cardholder, additionalNote, dateCreated)
     }
 
-    fun pushNewEntry(card: Card, context: Context): Uuid {
+    suspend fun pushNewEntry(card: Card, context: Context): Uuid {
         val database = DatabaseProvider.getDatabase(context)
+
 
         val newCardUuid = CardManager.createCard(
             database = database,

@@ -7,7 +7,7 @@ import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import kotlin.uuid.Uuid
 
 object CardManager {
-    fun createCard(database: AppDatabase, card: Card, encryptionKey: ByteArray): Uuid {
+    suspend fun createCard(database: AppDatabase, card: Card, encryptionKey: ByteArray): Uuid {
         card.uuid = Uuid.random()
         card.encrypt(encryptionKey)
 
@@ -16,7 +16,7 @@ object CardManager {
         return card.uuid
     }
 
-    fun retrieveCardByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Card? {
+    suspend fun retrieveCardByUuid(database: AppDatabase, uuid: Uuid, encryptionKey: ByteArray): Card? {
         val card = database.cardDao().getCardByUuid(cardUuid = uuid)
         if (card == null)
             return null
@@ -25,7 +25,7 @@ object CardManager {
         return card
     }
 
-    fun getAllCards(database: AppDatabase, encryptionKey: ByteArray): List<Card> {
+    suspend fun getAllCards(database: AppDatabase, encryptionKey: ByteArray): List<Card> {
         val cards = database.cardDao().getALl()
         cards.forEach { it.decrypt(encryptionKey) }
 

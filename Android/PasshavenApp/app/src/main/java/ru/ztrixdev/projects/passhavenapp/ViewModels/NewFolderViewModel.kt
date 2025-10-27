@@ -31,7 +31,7 @@ class NewFolderViewModel: ViewModel() {
     val newFolderName = mutableStateOf(TextFieldValue(""))
     val reversedSorting = mutableStateOf(false)
 
-    fun loadEntries(context: Context) {
+    suspend fun loadEntries(context: Context) {
         val db = DatabaseProvider.getDatabase(context)
         val key = VaultHandler().getEncryptionKey(context)
 
@@ -57,7 +57,7 @@ class NewFolderViewModel: ViewModel() {
         _includedEntriesUuid.remove(entryUuid)
     }
 
-    fun createFolder(context: Context) {
+    suspend fun createFolder(context: Context) {
         val db = DatabaseProvider.getDatabase(context)
 
         val newFolder = Folder(

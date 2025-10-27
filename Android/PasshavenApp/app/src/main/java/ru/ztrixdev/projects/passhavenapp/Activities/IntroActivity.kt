@@ -41,12 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.runBlocking
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
@@ -61,6 +63,7 @@ class IntroActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val localctx = LocalContext.current
             MaterialTheme {
                 when (introViewModel.currentStage.value) {
                     IntroStages.Greeting -> IntroPartGreeting(introViewModel)
@@ -68,8 +71,15 @@ class IntroActivity : ComponentActivity() {
                     IntroStages.MasterPasswordGenerator -> IntroPartCreateMPG(introViewModel)
                     IntroStages.ManualMPSet -> IntroPartCreateMPM(introViewModel)
                     IntroStages.CreateVault -> {
-                        introViewModel.tryCreateVault(this.applicationContext)
-                        this.applicationContext.startActivity(Intent(this.applicationContext, VaultOverviewActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        runBlocking {
+                            introViewModel.tryCreateVault(localctx)
+                            localctx.startActivity(
+                                Intent(
+                                    localctx,
+                                    VaultOverviewActivity::class.java
+                                ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        }
                     }
                 }
             }
@@ -79,7 +89,6 @@ class IntroActivity : ComponentActivity() {
 
 // Greeting block starts here
 // =====================================================================
-
     @Composable
     private fun IntroPartGreeting(introViewModel: IntroViewModel) {
         Column(

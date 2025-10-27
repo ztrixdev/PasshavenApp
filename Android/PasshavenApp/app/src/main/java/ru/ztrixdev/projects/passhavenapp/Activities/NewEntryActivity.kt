@@ -1,5 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.Activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -52,12 +53,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewEntryViewModel
+import kotlin.uuid.Uuid
 
 
 class NewEntryActivity: ComponentActivity()  {
@@ -68,12 +74,6 @@ class NewEntryActivity: ComponentActivity()  {
         enableEdgeToEdge()
         setContent() {
             MaterialTheme {
-                LaunchedEffect(newEntryViewModel.entryCreated.value) {
-                    if (newEntryViewModel.entryCreated.value) {
-                        val intent = Intent(this@NewEntryActivity, VaultOverviewActivity::class.java)
-                        this@NewEntryActivity.startActivity(intent)
-                    }
-                }
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier
@@ -89,6 +89,8 @@ class NewEntryActivity: ComponentActivity()  {
 
     @Composable
     private fun FolderSelectionDropdown(newEntryViewModel: NewEntryViewModel) {
+        val localctx = LocalContext.current
+
         val isDropDownExpanded = remember {
             mutableStateOf(false)
         }
@@ -97,7 +99,11 @@ class NewEntryActivity: ComponentActivity()  {
             mutableIntStateOf(-1)
         }
 
-        val folders = newEntryViewModel.getFolders(LocalContext.current)
+        var folders = emptyList<Folder>()
+        LaunchedEffect(Unit) {
+           folders = newEntryViewModel.getFolders(localctx)
+        }
+
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,6 +247,7 @@ class NewEntryActivity: ComponentActivity()  {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newEntryViewModel: NewEntryViewModel) {
         Box(
@@ -350,12 +357,12 @@ class NewEntryActivity: ComponentActivity()  {
             val localctx = LocalContext.current
             Button(
                 onClick = {
-                    if (newEntryViewModel.selectedEntryType == EntryTypes.Card)
-                        newEntryViewModel.pushNewEntry(card = newEntryViewModel.createCard(), context =  localctx)
-                    if (newEntryViewModel.selectedEntryType == EntryTypes.Account)
-                        newEntryViewModel.pushNewEntry(account = newEntryViewModel.createAccount(), context = localctx)
-
-                    newEntryViewModel.entryCreated.value = true
+                    lifecycleScope.launch {
+                        finish(localctx, newEntryViewModel) {
+                            val intent = Intent(localctx, VaultOverviewActivity::class.java)
+                            localctx.startActivity(intent)
+                        }
+                    }
                 },
                 enabled = newEntryViewModel.allRequiredFieldsAreFilled,
                 colors = ButtonColors(
@@ -373,6 +380,22 @@ class NewEntryActivity: ComponentActivity()  {
             Spacer(
                 modifier = Modifier.height(80.dp)
             )
+        }
+    }
+
+    private suspend fun finish(localctx: Context, newEntryViewModel: NewEntryViewModel, onSuccess: () -> Unit) {
+        var newEntryUuid = Uuid.random()
+        val newEntryUuidClone = newEntryUuid
+
+        if (newEntryViewModel.selectedEntryType == EntryTypes.Card)
+            newEntryUuid = newEntryViewModel.pushNewEntry(card = newEntryViewModel.createCard(), context =  localctx)
+        if (newEntryViewModel.selectedEntryType == EntryTypes.Account)
+            newEntryUuid = newEntryViewModel.pushNewEntry(account = newEntryViewModel.createAccount(), context = localctx)
+
+        newEntryViewModel.entryCreated.value = newEntryUuid != newEntryUuidClone
+        if (newEntryUuid != newEntryUuidClone) {
+            newEntryViewModel.entryCreated.value = true
+            onSuccess()
         }
     }
 

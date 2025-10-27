@@ -42,6 +42,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
@@ -135,6 +139,7 @@ class LoginActivity: ComponentActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun LPINPad(loginViewModel: LoginViewModel) {
         val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick])
@@ -155,7 +160,11 @@ class LoginActivity: ComponentActivity() {
                     val element = padElements[index]
                     val localContext = LocalContext.current
                     Button(
-                        onClick = { loginViewModel.onLPINPadClicked(btnClicked = element.toString(), ctx = localContext) },
+                        onClick =  {
+                                     GlobalScope.launch(Dispatchers.IO) {
+                                        loginViewModel.onLPINPadClicked(btnClicked = element.toString(), ctx = localContext)
+                                    }
+                                  },
                         modifier = Modifier
                             .padding(6.dp)
                             .size(60.dp), // Set a fixed size for buttons
@@ -172,6 +181,7 @@ class LoginActivity: ComponentActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun LoginByMP(loginViewModel: LoginViewModel) {
         Column(
@@ -214,7 +224,9 @@ class LoginActivity: ComponentActivity() {
             val localContext = LocalContext.current
             Button(
                 onClick = {
-                    loginViewModel.tryLoginWithMP(mp = text.text, ctx = localContext)
+                    GlobalScope.launch(Dispatchers.IO) {
+                        loginViewModel.tryLoginWithMP(mp = text.text, ctx = localContext)
+                    }
                 },
                 enabled = true,
                 modifier = Modifier.padding(horizontal = 20.dp),

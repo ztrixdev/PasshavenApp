@@ -13,17 +13,17 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 interface AccountDao {
     @Query("select * from account")
-    fun getALl(): List<Account>
+    suspend fun getALl(): List<Account>
 
     @Query("select * from account where uuid like :accountUuid limit 1")
-    fun getAccountByUuid(accountUuid: Uuid): Account?
+    suspend fun getAccountByUuid(accountUuid: Uuid): Account?
 
     @Insert
-    fun insert(vararg acc: Account)
+    suspend fun insert(vararg acc: Account)
 
     @Update
-    fun update(vararg acc: Account)
+    suspend fun update(vararg acc: Account)
 
     @Delete
-    fun delete(vararg acc: Account)
+    suspend fun delete(vararg acc: Account)
 }
