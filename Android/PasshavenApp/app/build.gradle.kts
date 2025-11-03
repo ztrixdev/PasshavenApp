@@ -88,6 +88,7 @@ dependencies {
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.symbol.processing.api)

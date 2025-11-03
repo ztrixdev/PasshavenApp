@@ -63,6 +63,8 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewEntryViewModel
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import kotlin.uuid.Uuid
 
 
@@ -73,7 +75,8 @@ class NewEntryActivity: ComponentActivity()  {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent() {
-            MaterialTheme {
+            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier

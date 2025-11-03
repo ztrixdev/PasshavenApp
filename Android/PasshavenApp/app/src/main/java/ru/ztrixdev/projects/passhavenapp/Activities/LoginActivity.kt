@@ -51,6 +51,8 @@ import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.ViewModels.LoginViewModel
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class LoginActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,18 +62,20 @@ class LoginActivity: ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = this.applicationContext
-
-            if (loginViewModel.loginMethod.value == LoginMethods.ByPIN) {
-                LoginByPIN(loginViewModel)
-            } else if (loginViewModel.loginMethod.value == LoginMethods.ByMP) {
-                LoginByMP(loginViewModel)
-            }
-            LaunchedEffect(loginViewModel.loginSuccessful.value) {
-                if (loginViewModel.loginSuccessful.value) {
-                    context.startActivity(
-                        Intent(context, VaultOverviewActivity::class.java)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
+            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+                if (loginViewModel.loginMethod.value == LoginMethods.ByPIN) {
+                    LoginByPIN(loginViewModel)
+                } else if (loginViewModel.loginMethod.value == LoginMethods.ByMP) {
+                    LoginByMP(loginViewModel)
+                }
+                LaunchedEffect(loginViewModel.loginSuccessful.value) {
+                    if (loginViewModel.loginSuccessful.value) {
+                        context.startActivity(
+                            Intent(context, VaultOverviewActivity::class.java)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
                 }
             }
         }

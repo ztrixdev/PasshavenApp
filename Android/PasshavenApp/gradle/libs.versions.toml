@@ -18,8 +18,10 @@ materialIconsCore = "1.7.3"
 symbolProcessingApi = "2.2.20-2.0.4"
 uiText = "1.9.3"
 ui = "1.9.4"
+uiTextGoogleFonts = "1.9.4"
 
 [libraries]
+androidx-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitDialogsCompose" }
 googleauth = { module = "com.warrenstrange:googleauth", version.ref = "googleauth" }

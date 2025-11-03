@@ -60,6 +60,8 @@ import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewFolderViewModel
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class NewFolderActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +82,8 @@ class NewFolderActivity: ComponentActivity() {
                 }
             }
 
-            MaterialTheme {
+            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

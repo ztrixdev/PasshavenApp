@@ -36,6 +36,8 @@ import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class VaultOverviewActivity: ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -46,7 +48,8 @@ class VaultOverviewActivity: ComponentActivity() {
         setContent()
         {
             // this some raw shii, don't mind it, its really ugly
-            MaterialTheme {
+            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
                 var gotoNEA by remember { mutableStateOf(false) }
                 var gotoNFA by remember { mutableStateOf(false) }
                 val ctx = LocalContext.current

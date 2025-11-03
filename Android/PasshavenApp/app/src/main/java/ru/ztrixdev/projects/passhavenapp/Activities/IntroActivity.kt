@@ -55,6 +55,8 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.ViewModels.IntroViewModel
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class IntroActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +66,8 @@ class IntroActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val localctx = LocalContext.current
-            MaterialTheme {
+            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
                 when (introViewModel.currentStage.value) {
                     IntroStages.Greeting -> IntroPartGreeting(introViewModel)
                     IntroStages.PINCreation -> IntroPartCreatePIN(introViewModel)
