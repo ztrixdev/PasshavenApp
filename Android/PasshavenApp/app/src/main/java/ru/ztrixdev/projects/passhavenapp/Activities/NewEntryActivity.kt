@@ -57,6 +57,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
@@ -75,8 +76,7 @@ class NewEntryActivity: ComponentActivity()  {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent() {
-            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier
@@ -222,6 +222,7 @@ class NewEntryActivity: ComponentActivity()  {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                .padding(all = 10.dp)
         ) {
             IconButton(
                 onClick = {
@@ -243,7 +244,7 @@ class NewEntryActivity: ComponentActivity()  {
             Text(
                 text = stringResource(R.string.newentryactivity_titlebar),
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
                     .padding(start = 40.dp)
             )
@@ -253,11 +254,6 @@ class NewEntryActivity: ComponentActivity()  {
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newEntryViewModel: NewEntryViewModel) {
-        Box(
-            Modifier
-                .height(30.dp)
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-        )
         Titlebar()
         Spacer(
             modifier = Modifier.height(40.dp)

@@ -56,6 +56,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
@@ -82,8 +83,7 @@ class NewFolderActivity: ComponentActivity() {
                 }
             }
 
-            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,11 +98,6 @@ class NewFolderActivity: ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newFolderViewModel: NewFolderViewModel) {
-        Box(
-            Modifier
-                .height(30.dp)
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-        )
         Titlebar()
         Spacer(
             modifier = Modifier.height(20.dp)
@@ -164,6 +159,7 @@ class NewFolderActivity: ComponentActivity() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                .padding(all = 10.dp)
         ) {
             IconButton(
                 onClick = {
@@ -185,7 +181,7 @@ class NewFolderActivity: ComponentActivity() {
             Text(
                 text = stringResource(R.string.newfolderactivity_titlebar),
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
                     .padding(start = 40.dp)
             )

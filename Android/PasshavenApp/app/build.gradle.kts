@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
     val lazyVersion = "5.2.0"
     val jnaVersion = "5.17.0"
     val roomVersion = "2.8.3"

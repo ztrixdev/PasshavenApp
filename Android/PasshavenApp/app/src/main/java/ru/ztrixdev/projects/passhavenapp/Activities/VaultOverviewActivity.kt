@@ -34,6 +34,7 @@ import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.Handlers.ExportTemplates
 import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
@@ -48,10 +49,10 @@ class VaultOverviewActivity: ComponentActivity() {
         setContent()
         {
             // this some raw shii, don't mind it, its really ugly
-            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current))  {
                 var gotoNEA by remember { mutableStateOf(false) }
                 var gotoNFA by remember { mutableStateOf(false) }
+                var gotoSA by remember { mutableStateOf(false) }
                 val ctx = LocalContext.current
 
                 LaunchedEffect(gotoNEA) {
@@ -66,6 +67,14 @@ class VaultOverviewActivity: ComponentActivity() {
                     if (gotoNFA) {
                         ctx .startActivity(
                             Intent(ctx, NewFolderActivity::class.java)
+                                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                    }
+                }
+                LaunchedEffect(gotoSA) {
+                    if (gotoSA) {
+                        ctx .startActivity(
+                            Intent(ctx, SettingsActivity::class.java)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
                     }
@@ -124,6 +133,14 @@ class VaultOverviewActivity: ComponentActivity() {
                             modifier = Modifier.padding(all = 30.dp)
                         ) {
                             Text("Go to New Folder Activity")
+                        }
+                        Button(
+                            onClick = {
+                                gotoSA = true
+                            },
+                            modifier = Modifier.padding(all = 30.dp)
+                        ) {
+                            Text("Go to Settings")
                         }
                     }
                     else {

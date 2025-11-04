@@ -46,6 +46,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
@@ -62,8 +63,8 @@ class LoginActivity: ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val context = this.applicationContext
-            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+
+            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
                 if (loginViewModel.loginMethod.value == LoginMethods.ByPIN) {
                     LoginByPIN(loginViewModel)
                 } else if (loginViewModel.loginMethod.value == LoginMethods.ByMP) {

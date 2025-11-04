@@ -1,72 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">passhaven</string>
-    <string name="login_label">вход | passhaven</string>
-    <string name="intro_label">добро пожаловать | passhaven</string>
-    <string name="intro_part_greeting_text_welcome">" добро пожаловать в passhaven"</string>
-    <string name="intro_part_greeting_text_description_p1">passhaven это полностью открытый, только-локальный менеджер паролей и секретов который внушает доверие.</string>
-    <string name="intro_part_greeting_text_description_p2">никаких серверов и ментов, ваши секреты никогда не покидают устройство.</string>
-    <string name="intro_part_greeting_button_get_started">начать</string>
-    <string name="mp_creation_title">создайте мастер-пароль</string>
-    <string name="mp_creation_text_description_p1">мастер-пароль используется для создания ключа шифрования для вашего хранилища. он никак не хранится.</string>
-    <string name="mp_creation_text_description_p2">пароль состоит из последовательности слов (на английском). сохраните его в безопасном месте. вы потеряете доступ к хранилищу при утере.</string>
-    <string name="mp_creation_regen_button_text">перегенерировать</string>
-    <string name="click_regenerate_once">нажмите перегенерировать хоть раз</string>
-    <string name="mp_creation_man_enter_mp">введите желаемый МП</string>
-    <string name="mp_creation_checkbox_special_chars">содержит 2 или более спецсимволов (например: !, @, $)</string>
-    <string name="mp_creation_checkbox_digits">содержит 2 или более цифр (например: 1, 2, 3)</string>
-    <string name="mp_creation_checkbox_length">содержит более 8 символов</string>
-    <string name="mp_creation_checkbox_uppercase">содержит 2 или более заглавных букв (например: А, Б, В)</string>
-    <string name="mp_creation_man_start">я введу свой МП вручную</string>
-    <string name="continue_button">продолжить</string>
-    <string name="pin_creation_title">создайте PIN</string>
-    <string name="pin_creation_description">PIN будет использован как альтернативный способ входа в хранилище. он должен содержать не менее 6 цифр и не более 12</string>
-    <string name="pin_creation_enter_pin">введите желаемый PIN</string>
-    <string name="pin_creation_enter_pin_again">введите ваш PIN еще раз</string>
-    <string name="login_to_passhaven">войти в ваше хранилище</string>
-    <string name="login_with_mp_instead">Я войду используя свой мастер-пароль</string>
-    <string name="login_enter_mp">введите свой МП</string>
-    <string name="login_incorrect_mp">неправильный МП! попробуйте еще раз!!</string>
-    <string name="login_incorrect_pin">неправильный PIN! попробуйте еще раз!!</string>
-    <string name="select_folder">выберите папку:</string>
-    <string name="unfoldered">без папки</string>
-    <string name="select_type">выберите тип:</string>
-    <string name="account">👥 аккаунт</string>
-    <string name="card">💳 банковская карта</string>
-    <string name="newentryactivity_titlebar">новая запись…</string>
+    <string name="app_name">Passhaven</string>
+    <string name="login_label">Вход | Passhaven</string>
+    <string name="intro_label">Добро пожаловать | Passhaven</string>
+    <string name="intro_part_greeting_text_welcome">Добро пожаловать в Passhaven!</string>
+    <string name="intro_part_greeting_text_description_p1">Passhaven — это полностью открытый, локальный менеджер паролей и секретов, который внушает доверие.</string>
+    <string name="intro_part_greeting_text_description_p2">Никаких серверов и посредников — ваши секреты никогда не покидают устройство.</string>
+    <string name="intro_part_greeting_button_get_started">Начать</string>
+
+    <string name="mp_creation_title">Создайте мастер-пароль</string>
+    <string name="mp_creation_text_description_p1">Мастер-пароль используется для создания ключа шифрования вашего хранилища. Он никак не сохраняется.</string>
+    <string name="mp_creation_text_description_p2">Пароль состоит из последовательности слов (на английском). Сохраните его в безопасном месте — при утере вы потеряете доступ к хранилищу.</string>
+    <string name="mp_creation_regen_button_text">Перегенерировать</string>
+    <string name="click_regenerate_once">Нажмите «Перегенерировать» хотя бы один раз</string>
+    <string name="mp_creation_man_enter_mp">Введите желаемый МП</string>
+    <string name="mp_creation_checkbox_special_chars">Содержит 2 или более спецсимволов (например: !, @, $)</string>
+    <string name="mp_creation_checkbox_digits">Содержит 2 или более цифр (например: 1, 2, 3)</string>
+    <string name="mp_creation_checkbox_length">Содержит более 8 символов</string>
+    <string name="mp_creation_checkbox_uppercase">Содержит 2 или более заглавных букв (например: А, Б, В)</string>
+    <string name="mp_creation_man_start">Я введу свой МП вручную</string>
+    <string name="continue_button">Продолжить</string>
+
+    <string name="pin_creation_title">Создайте PIN</string>
+    <string name="pin_creation_description">PIN будет использоваться как альтернативный способ входа в хранилище. Он должен содержать не менее 6 и не более 12 цифр.</string>
+    <string name="pin_creation_enter_pin">Введите желаемый PIN</string>
+    <string name="pin_creation_enter_pin_again">Введите PIN ещё раз</string>
+
+    <string name="login_to_passhaven">Войти в хранилище</string>
+    <string name="login_with_mp_instead">Я войду, используя мастер-пароль</string>
+    <string name="login_enter_mp">Введите МП</string>
+    <string name="login_incorrect_mp">Неправильный МП! Попробуйте ещё раз!</string>
+    <string name="login_incorrect_pin">Неправильный PIN! Попробуйте ещё раз!</string>
+
+    <string name="select_folder">Выберите папку:</string>
+    <string name="unfoldered">Без папки</string>
+    <string name="select_type">Выберите тип:</string>
+    <string name="account">👥 Аккаунт</string>
+    <string name="card">💳 Банковская карта</string>
+
+    <string name="newentryactivity_titlebar">Новая запись</string>
     <string name="card_number_placeholder">4242 4242 4242 4242</string>
     <string name="card_mm_yy_placeholder">ММ/ГГ</string>
     <string name="card_cvc_cvv_placeholder">CVC/CVV</string>
     <string name="cardholder_name_placeholder">ДМИТРИЙ ИЦКОВ</string>
-    <string name="error_card_number_invalid">такого номера не существует</string>
-    <string name="error_card_number_too_short">номер карты слишком короток</string>
-    <string name="error_card_number_too_long">номер карты слишком дилнный</string>
-    <string name="error_card_expdate_invalid">такой даты окончания действия не бывает</string>
-    <string name="error_card_cvccvv_invalid">такого CVC/CVV не бывает</string>
-    <string name="cards_brand">"бренд карты: "</string>
-    <string name="new_entry_name">имя*</string>
-    <string name="name_cannot_be_empty">имя не может быть пустым</string>
-    <string name="additional_note">заметка</string>
-    <string name="username">имя пользователя (логин/e-mail)</string>
-    <string name="password">пароль</string>
-    <string name="mfa_secret">секретный ключ 2FA</string>
-    <string name="recovery_codes">коды восстановления</string>
-    <string name="card_number">номер карты</string>
-    <string name="card_expdate">дата истечения</string>
-    <string name="cardholder_name">имя держателя</string>
+
+    <string name="error_card_number_invalid">Такого номера не существует</string>
+    <string name="error_card_number_too_short">Номер карты слишком короткий</string>
+    <string name="error_card_number_too_long">Номер карты слишком длинный</string>
+    <string name="error_card_expdate_invalid">Некорректная дата окончания действия</string>
+    <string name="error_card_cvccvv_invalid">Некорректный CVC/CVV</string>
+
+    <string name="cards_brand">Бренд карты:</string>
+
+    <string name="new_entry_name">Имя*</string>
+    <string name="name_cannot_be_empty">Имя не может быть пустым</string>
+    <string name="additional_note">Заметка</string>
+    <string name="username">Имя пользователя (логин/e-mail)</string>
+    <string name="password">Пароль</string>
+    <string name="mfa_secret">Секретный ключ 2FA</string>
+    <string name="recovery_codes">Коды восстановления</string>
+    <string name="card_number">Номер карты</string>
+    <string name="card_expdate">Дата истечения</string>
+    <string name="cardholder_name">Имя держателя</string>
+
     <string name="username_placeholder">ПоклейщикЦыпочек2010</string>
-    <string name="fill_this_field_up_pls">пожалуйста, заполните это поле.</string>
-    <string name="mfa_secret_supporting_text">ключ 2FA обычно выглядит так: HB3DEITWNDAFTDJTBRQNPONCXGTPK3N</string>
-    <string name="mfa_secret_invalid">секрет 2FA не проходит проверку на подлинность, проверьте его.</string>
-    <string name="generate_password_for_me">сгенерируйте пароль для меня, пожалуйста</string>
-    <string name="recovery_code_label">код восстановления #</string>
-    <string name="add_another_recovery_code">добавить код восстановления</string>
-    <string name="newfolderactivity_titlebar">новая папка</string>
-    <string name="folder_name_placeholder">напр. Социальные сети</string>
-    <string name="folder_name_label">имя папки*</string>
-    <string name="sort_by_type">по типу</string>
-    <string name="sort_by_alphabet">по алфавиту</string>
-    <string name="sort_by_date">по дате</string>
-    <string name="reverse_sorting">в обратном порядке?</string>
-    <string name="sort">сортировка…</string>
+    <string name="fill_this_field_up_pls">Пожалуйста, заполните это поле.</string>
+    <string name="mfa_secret_supporting_text">Ключ 2FA обычно выглядит так: HB3DEITWNDAFTDJTBRQNPONCXGTPK3N</string>
+    <string name="mfa_secret_invalid">Секрет 2FA не прошёл проверку подлинности. Проверьте его.</string>
+    <string name="generate_password_for_me">Сгенерировать пароль для меня</string>
+    <string name="recovery_code_label">Код восстановления №</string>
+    <string name="add_another_recovery_code">Добавить код восстановления</string>
+
+    <string name="newfolderactivity_titlebar">Новая папка</string>
+    <string name="folder_name_placeholder">Напр. Социальные сети</string>
+    <string name="folder_name_label">Имя папки*</string>
+
+    <string name="sort_by_type">По типу</string>
+    <string name="sort_by_alphabet">По алфавиту</string>
+    <string name="sort_by_date">По дате</string>
+    <string name="reverse_sorting">В обратном порядке?</string>
+    <string name="sort">Сортировка…</string>
+    <string name="appearance_setting">Внешний вид</string>
+    <string name="export_backup_setting">Экспорт / Резервн. копирование</string>
+    <string name="import_setting">Импорт / Восстановление</string>
+    <string name="security_setting">Безопасность</string>
+    <string name="info_setting">О Passhaven</string>
+    <string name="settings_titlebar">Настройки</string>
+    <string name="theme">Тема приложения</string>
+    <string name="theme_name_mint">Мята</string>
+    <string name="theme_name_ubuntu">Убунту</string>
+    <string name="dark_theme">Темная тема</string>
 </resources>

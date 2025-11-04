@@ -7,6 +7,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_ABSOLUTE_LENGTH
@@ -17,6 +18,7 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_UPPERCASE_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
+import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 
 class IntroViewModel() : ViewModel() {
     private val masterPassword = MasterPassword
@@ -56,7 +58,7 @@ class IntroViewModel() : ViewModel() {
     var currentMP = mutableStateOf("")
 
     fun generateMP() {
-        currentMP.value = masterPassword.genMP(6)
+        currentMP.value = masterPassword.genMP(8)
     }
 
 
@@ -106,6 +108,8 @@ class IntroViewModel() : ViewModel() {
     }
 
     suspend fun tryCreateVault(ctx: Context) {
+        ThemePrefs.saveSelectedTheme(ctx, AppThemeType.W10)
+        ThemePrefs.saveDarkThemeBool(ctx, true)
         val vh = VaultHandler()
         if (masterPassword.verify(currentMP.value) && masterPassword.verifyPIN(secondPromptPin.value)) {
             vh.createVault(currentMP.value, secondPromptPin.value,ctx)
