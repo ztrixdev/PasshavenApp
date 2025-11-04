@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -101,7 +102,7 @@ class SettingsActivity : ComponentActivity() {
                     } else if (settingsViewModel.openImports.value) {
                         ImportsSettings()
                     } else if (settingsViewModel.openInfo.value) {
-                        Info()
+                        Info(settingsViewModel = settingsViewModel)
                     } else {
                         SettingsTitlebar()
                         Spacer(
@@ -159,10 +160,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+ 
                     .clickable(true, onClick = {
                         settingsViewModel.openAppearance.value = true
                     })
@@ -194,10 +192,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+ 
                     .clickable(true, onClick = {
                         settingsViewModel.openSecurity.value = true
                     })
@@ -229,10 +224,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+ 
                     .clickable(true, onClick = {
                         settingsViewModel.openExports.value = true
                     })
@@ -264,10 +256,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+ 
                     .clickable(true, onClick = {
                         settingsViewModel.openImports.value = true
                     })
@@ -299,10 +288,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
+ 
                     .clickable(true, onClick = {
                         settingsViewModel.openInfo.value = true
                     })
@@ -535,8 +521,182 @@ class SettingsActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun Info() {
+    private fun Info(settingsViewModel: SettingsViewModel) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                .padding(all = 10.dp)
+        ) {
+            IconButton(
+                onClick = {
+                    settingsViewModel.openInfo.value = false
+                },
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "An arrow facing backwards, damnit",
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+            Text(
+                text = stringResource(R.string.info_setting),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier
+                    .padding(start = 40.dp)
+            )
+        }
 
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(20.dp),
+        ) {
+            Column {
+                Text(
+                    text = "Passhaven",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.displayLarge
+                )
+                Text(
+                    text = stringResource(R.string.developed_by),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.ph_desc),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Column {
+                Text(
+                    text = stringResource(R.string.ph_credits),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Column(Modifier.padding(start = 8.dp)) {
+                    Text(
+                        text = stringResource(R.string.aegis_respect),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.rossman_respect),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.andy_respect),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.fam_respect),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.me_respect),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+        val uriHandler = LocalUriHandler.current
+        Spacer(modifier = Modifier.height(8.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(24.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.source_code),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://codeberg.org/ztrixdev/PasshavenApp")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.codeberg), contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://github.com/ztrixdev/PasshavenApp")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.github_light),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://gitlab.com/Faulhaj/PasshavenApp")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.gitlab), contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            }
+            Text(
+                text = stringResource(R.string.ztrix_socials),
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://bsky.app/profile/ztrixvalo.bsky.social")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.bluesky), contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://t.me/ztrixdev")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.telegram), contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        uriHandler.openUri("https://www.youtube.com/@ztrix-eu")
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.youtube), contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            }
+        }
     }
 
 }

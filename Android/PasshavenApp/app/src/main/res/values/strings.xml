@@ -91,4 +91,16 @@
     <string name="theme_name_osxlion" translatable="false">macOS X Lion</string>
     <string name="theme_name_w81" translatable="false">Windows 8.1</string>
     <string name="dark_theme">Dark theme</string>
+    <string name="developed_by">Developed with fierce hatred by ztrix &lt;\3&#179;</string>
+    <string name="ph_desc">Passhaven is a fully open-source secret management solution. \n The main feature is the absence of a remote server.
+    Even if the whole world blackouts tomorrow, your secrets will be safe with you and with you only. There should not be a person who can delete or view your sensitive information. \n
+    Passhaven never reaches any server, it doesn\'t need an internet connection to run. It is designed to be your fortress since day 1.</string>
+    <string name="ph_credits">Credit goes to:</string>
+    <string name="aegis_respect">Aegis team - you guys made the GOATed 2FA app</string>
+    <string name="rossman_respect">Louis Rossman - the man who inspired me to believe in software freedom</string>
+    <string name="andy_respect">The Greatest Technician That\'s Ever Lived - idk, he\'s just a really cool dude</string>
+    <string name="fam_respect">My family and friends - the people who kept me working on this project</string>
+    <string name="me_respect">The Greatest Informatician That\'s Ever Lived... oh, that\'s me myself :3</string>
+    <string name="source_code">Source code</string>
+    <string name="ztrix_socials">ztrix\'s socials</string>
 </resources>

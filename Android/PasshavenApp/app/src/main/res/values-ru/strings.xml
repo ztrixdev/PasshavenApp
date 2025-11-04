@@ -90,4 +90,17 @@
     <string name="theme_name_mint">Мята</string>
     <string name="theme_name_ubuntu">Убунту</string>
     <string name="dark_theme">Темная тема</string>
+
+    <string name="developed_by">Разработан ztrix\'ом с лютой ненавистью &lt;\3\u00B3</string>
+    <string name="ph_desc">Passhaven — это свободное решение для управления секретами с открытым исходным кодом. \n
+Основная особенность — отсутствие удалённого сервера. Даже если завтра весь мир лишится электроэнергии, ваши секреты останутся с вами и только с вами. Не должно существовать человека, который мог бы удалить или просмотреть вашу конфиденциальную информацию. \n
+Passhaven никогда не обращается к серверам и не требует подключения к интернету. Он создан, чтобы быть вашей опорой в цифровой безопасности.</string>
+    <string name="ph_credits">Благодарности:</string>
+    <string name="aegis_respect">Команде Aegis — вы сделали лучшее приложение для 2FA</string>
+    <string name="rossman_respect">Луису Россману — человеку, который вдохновил меня поверить в свободу программного обеспечения</string>
+    <string name="andy_respect"> Энди из Salem Techsperts — не знаю, он просто юомрной и чилловый типок</string>
+    <string name="fam_respect">Моей семье и друзьям — людям, которые поддерживали меня во время работы над этим проектом</string>
+    <string name="me_respect">The Greatest Informatician That\'s Ever Lived, о, так это же я сам :3</string>
+    <string name="source_code">Исходный код</string>
+    <string name="ztrix_socials">Соцсети ztrix\'а</string>
 </resources>
