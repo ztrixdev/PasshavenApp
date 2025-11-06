@@ -15,7 +15,7 @@ public class PasswordGenerator {
     private static final Integer DEFAULT_ALLOW_CYRILLIC = 0;
     private static final Integer MAX_PASSWORD_LENGTH = 196;
 
-    private static final Map<PasswordGeneratorSettings, Integer> _defaultOptions = new HashMap<>() {
+    public static final Map<PasswordGeneratorSettings, Integer> defaultOptions = new HashMap<>() {
         {
             put(PasswordGeneratorSettings.Length, DEFAULT_PASSWORD_LENGTH);
             put(PasswordGeneratorSettings.AllowDigits, DEFAULT_ALLOW_DIGITS);
@@ -30,14 +30,14 @@ public class PasswordGenerator {
     private Map<PasswordGeneratorSettings, Integer> _options = new HashMap<>() {};
 
     public void setDefaultOptions() {
-        _options = _defaultOptions;
+        _options = defaultOptions;
     }
 
     private Map<PasswordGeneratorSettings, Integer> validateOptions(Map<PasswordGeneratorSettings, Integer> customOptions) {
         Map<PasswordGeneratorSettings, Integer> validatedOptions;
 
         // Sets non-specified settings to default values
-        validatedOptions = _defaultOptions;
+        validatedOptions = defaultOptions;
         for (PasswordGeneratorSettings setting : customOptions.keySet()) {
             if (customOptions.containsKey(setting)) {
                 validatedOptions.replace(setting, customOptions.get(setting));

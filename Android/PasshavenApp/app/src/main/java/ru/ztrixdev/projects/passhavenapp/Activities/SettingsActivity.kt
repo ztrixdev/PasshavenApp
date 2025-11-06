@@ -505,8 +505,37 @@ class SettingsActivity : ComponentActivity() {
         }
     }
 
+    @Preview
     @Composable
     private fun SecuritySettings() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+                .padding(all = 10.dp)
+        ) {
+            IconButton(
+                onClick = {
+                },
+                modifier = Modifier
+                    .padding(start = 10.dp)
+                    .size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "An arrow facing backwards, damnit",
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+            Text(
+                text = stringResource(R.string.security_setting),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier
+                    .padding(start = 40.dp)
+            )
+        }
+
 
     }
 

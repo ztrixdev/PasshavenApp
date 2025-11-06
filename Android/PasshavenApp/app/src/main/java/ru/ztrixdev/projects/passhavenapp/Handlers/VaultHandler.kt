@@ -123,6 +123,44 @@ class VaultHandler {
         return loginResult
     }
 
+    suspend fun changePIN(newPIN: String, context: Context): Boolean {
+        // If the new PIN doesn't match the requirements, the function exits immediately without changing anything
+        if (!MasterPassword.verifyPIN(newPIN))
+            return false
+
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
+        // Generate a new key to protect the PIN's hash.
+        Keygen.generateAndroidKey(pinHashProtectingKeyName)
+        val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
+            ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
+
+        val encryptedPIN = AndroidCrypto.encrypt(newPIN.toByteArray(), pinHashProtectingKey as SecretKey)
+        // Won't proceed if the encryption failed.
+        if (encryptedPIN[CryptoNames.cipher] == null || encryptedPIN[CryptoNames.iv] == null)
+            return false
+
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        var vault = vaultDao.getVault()[0]
+        // saving the old PIN for a fail safe.
+        val oldPin = listOf(vault.pinHash, vault.pinHashIv)
+
+        vault.pinHash = encryptedPIN[CryptoNames.cipher] as ByteArray
+        vault.pinHashIv = encryptedPIN[CryptoNames.iv] as ByteArray
+
+        vaultDao.update(vault)
+        // the fail safe:
+        if (!loginByPIN(newPIN, context)) {
+            vault = vaultDao.getVault()[0]
+            vault.pinHash = oldPin[0]
+            vault.pinHashIv = oldPin[1]
+            vaultDao.update(vault)
+
+            return false
+        }
+
+        return !false        // you can't deny this looks badass.
+    }
+
     suspend fun selfDestroy(dao: VaultDao): Boolean {
         var vaults = dao.getVault()
         while (vaults != emptyList<Vault>()) {
