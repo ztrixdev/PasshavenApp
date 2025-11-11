@@ -103,4 +103,7 @@
     <string name="me_respect">The Greatest Informatician That\'s Ever Lived... oh, that\'s me myself :3</string>
     <string name="source_code">Source code</string>
     <string name="ztrix_socials">ztrix\'s socials</string>
+    <string name="change_pin_btn">Change PIN</string>
+    <string name="change_pin_desc">If you change your PIN, you\'ll no longer be able to login with the previous PIN.</string>
+    <string name="enter_current_pin">Enter your current PIN</string>
 </resources>

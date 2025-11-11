@@ -129,12 +129,14 @@ class VaultHandler {
             return false
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
+        // Fixes an android.security.KeyStoreException
+        keystore.deleteEntry(pinHashProtectingKeyName)
         // Generate a new key to protect the PIN's hash.
         Keygen.generateAndroidKey(pinHashProtectingKeyName)
         val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
-        val encryptedPIN = AndroidCrypto.encrypt(newPIN.toByteArray(), pinHashProtectingKey as SecretKey)
+        val encryptedPIN = AndroidCrypto.encrypt(Checksum.keccak512(newPIN), pinHashProtectingKey as SecretKey)
         // Won't proceed if the encryption failed.
         if (encryptedPIN[CryptoNames.cipher] == null || encryptedPIN[CryptoNames.iv] == null)
             return false

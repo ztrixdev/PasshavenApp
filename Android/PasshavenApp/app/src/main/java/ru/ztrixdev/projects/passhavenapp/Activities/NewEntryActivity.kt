@@ -58,6 +58,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
@@ -216,45 +217,13 @@ class NewEntryActivity: ComponentActivity()  {
         }
     }
 
-    @Composable
-    private fun Titlebar() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    val intent = Intent(this@NewEntryActivity, VaultOverviewActivity::class.java)
-                    this@NewEntryActivity.startActivity(intent)
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    // f#ck me sideways, I hate content descriptions, as if we still have phones that can't withstand a freaking ICON.
-                    // however it is probably mostly used so that devs don't get lost in their drawables. I don't know what happened to cmd+click but ok, ig?
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.newentryactivity_titlebar),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
-        }
-    }
-
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newEntryViewModel: NewEntryViewModel) {
-        Titlebar()
+        QuickComposables.Titlebar(stringResource(R.string.newentryactivity_titlebar)) {
+            val intent = Intent(this@NewEntryActivity, VaultOverviewActivity::class.java)
+            this@NewEntryActivity.startActivity(intent)
+        }
         Spacer(
             modifier = Modifier.height(40.dp)
         )

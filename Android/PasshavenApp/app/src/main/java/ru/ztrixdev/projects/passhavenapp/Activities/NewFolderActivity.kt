@@ -57,6 +57,7 @@ import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
@@ -98,7 +99,10 @@ class NewFolderActivity: ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(newFolderViewModel: NewFolderViewModel) {
-        Titlebar()
+        QuickComposables.Titlebar(stringResource(R.string.newfolderactivity_titlebar)) {
+            val intent = Intent(this@NewFolderActivity, VaultOverviewActivity::class.java)
+            this@NewFolderActivity.startActivity(intent)
+        }
         Spacer(
             modifier = Modifier.height(20.dp)
         )
@@ -150,42 +154,6 @@ class NewFolderActivity: ComponentActivity() {
         Spacer(
             modifier = Modifier.height(80.dp)
         )
-    }
-
-    @Preview
-    @Composable
-    private fun Titlebar() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    val intent = Intent(this@NewFolderActivity, VaultOverviewActivity::class.java)
-                    this@NewFolderActivity.startActivity(intent)
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    // f#ck me sideways, I hate content descriptions, as if we still have phones that can't withstand a freaking ICON.
-                    // however it is probably mostly used so that devs don't get lost in their drawables. I don't know what happened to cmd+click but ok, ig?
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.newfolderactivity_titlebar),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
-        }
     }
 
     @Composable

@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,42 +19,48 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
+import ru.ztrixdev.projects.passhavenapp.ViewModels.IntroViewModel
 import ru.ztrixdev.projects.passhavenapp.ViewModels.SettingsViewModel
+import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionDarkScheme
@@ -89,63 +94,47 @@ class SettingsActivity : ComponentActivity() {
                         .background(MaterialTheme.colorScheme.background)
                         .fillMaxHeight()
                 ) {
-                    if (settingsViewModel.openAppearance.value) {
-                        AppearanceSettings(
-                            settingsViewModel = settingsViewModel,
-                            themeChanged = {newTheme -> selectedTheme = newTheme},
-                            darkBoolChanged = {newBool -> darkTheme = newBool}
-                        )
-                    } else if (settingsViewModel.openSecurity.value) {
-                        SecuritySettings()
-                    } else if (settingsViewModel.openExports.value) {
-                        ExportsSettings()
-                    } else if (settingsViewModel.openImports.value) {
-                        ImportsSettings()
-                    } else if (settingsViewModel.openInfo.value) {
-                        Info(settingsViewModel = settingsViewModel)
-                    } else {
-                        SettingsTitlebar()
-                        Spacer(
-                            Modifier.height(16.dp)
-                        )
-                        SettingsList(settingsViewModel)
+                    when {
+                        settingsViewModel.openAppearance.value -> {
+                            AppearanceSettings(
+                                settingsViewModel = settingsViewModel,
+                                themeChanged = { newTheme -> selectedTheme = newTheme },
+                                darkBoolChanged = { newBool -> darkTheme = newBool }
+                            )
+                        }
+
+                        settingsViewModel.openSecurity.value -> {
+                            if (settingsViewModel.openPINChange.value) {
+                                ChangePIN(settingsViewModel = settingsViewModel)
+                            }
+                            else {
+                                SecuritySettings(settingsViewModel)
+                            }
+                        }
+
+                        settingsViewModel.openExports.value -> {
+                            ExportsSettings()
+                        }
+
+                        settingsViewModel.openImports.value -> {
+                            ImportsSettings()
+                        }
+
+                        settingsViewModel.openInfo.value -> {
+                            Info(settingsViewModel = settingsViewModel)
+                        }
+
+                        else -> {
+                            QuickComposables.Titlebar(stringResource(R.string.settings_titlebar)) {
+                                val intent = Intent(this@SettingsActivity, VaultOverviewActivity::class.java)
+                                this@SettingsActivity.startActivity(intent)
+                            }
+                            Spacer(Modifier.height(16.dp))
+                            SettingsList(settingsViewModel)
+                        }
                     }
                 }
             }
-        }
-    }
-
-
-    @Composable
-    private fun SettingsTitlebar() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    val intent = Intent(this@SettingsActivity, VaultOverviewActivity::class.java)
-                    this@SettingsActivity.startActivity(intent)
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.settings_titlebar),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
         }
     }
 
@@ -321,34 +310,8 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun AppearanceSettings(settingsViewModel: SettingsViewModel, themeChanged: (AppThemeType) -> Unit, darkBoolChanged: (Boolean) -> Unit) {
-        // Appearance titlebar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    settingsViewModel.openAppearance.value = false
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.appearance_setting),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
+        QuickComposables.Titlebar(stringResource(R.string.appearance_setting)) {
+            settingsViewModel.openAppearance.value = false
         }
 
         // Theme selection
@@ -505,38 +468,160 @@ class SettingsActivity : ComponentActivity() {
         }
     }
 
-    @Preview
     @Composable
-    private fun SecuritySettings() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.security_setting),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
+    private fun SecuritySettings(settingsViewModel: SettingsViewModel) {
+        QuickComposables.Titlebar(stringResource(R.string.security_setting)) {
+            settingsViewModel.openSecurity.value = false
         }
 
+        Column() {
+            Button (
+                onClick = {
+                    settingsViewModel.openPINChange.value = true
+                },
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                    disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.change_pin_btn),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
 
+        }
+    }
+
+    @Composable
+    private fun ChangePIN(settingsViewModel: SettingsViewModel) {
+        CPINInfo(settingsViewModel)
+        CPINDigits(settingsViewModel)
+        CPINPad(settingsViewModel)
+    }
+
+    @Composable
+    private fun CPINInfo(settingsViewModel: SettingsViewModel) {
+        IconButton(
+            onClick = {
+                settingsViewModel.openPINChange.value = false
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .size(36.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "An arrow facing backwards, damnit",
+                tint = MaterialTheme.colorScheme.primaryContainer
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.change_pin_btn),
+                modifier = Modifier.padding(bottom = 24.dp),
+                style = MaterialTheme.typography.displaySmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Icon(
+                painter = painterResource(R.drawable.pin_48px),
+                contentDescription = "PIN material icon lol",
+                modifier = Modifier
+                    .size(128.dp)
+                    .padding(bottom = 24.dp),
+                tint = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = stringResource(R.string.change_pin_desc),
+                modifier = Modifier.padding(bottom = 24.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text =
+                    when {
+                        !settingsViewModel.currentPINConfirmed.value -> stringResource(R.string.enter_current_pin)
+                        !settingsViewModel.firstPromptDone.value -> stringResource(R.string.pin_creation_enter_pin)
+                        !settingsViewModel.secondPromptDone.value -> stringResource(R.string.pin_creation_enter_pin_again)
+                        else -> "How the hell can this happen xd?"
+                    },
+                modifier = Modifier.padding(bottom = 24.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+
+    @Composable
+    private fun CPINDigits(settingsViewModel: SettingsViewModel) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                for (i in 0 until settingsViewModel.getCurrentlyEditedPINsLen()) {
+                    Box(
+                        modifier = Modifier
+                            .size(22.dp) // Set the size of the circle
+                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun CPINPad(settingsViewModel: SettingsViewModel) {
+        val localctx = LocalContext.current
+        val padElements = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", specialCharacters[SpecialCharNames.Backspace].toString(), "0", specialCharacters[SpecialCharNames.Tick].toString())
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(padElements.size) { index ->
+                    val element = padElements[index]
+                    Button(
+                        onClick = {
+                            lifecycleScope.launch {
+                                settingsViewModel.onCPINPadClick(btnClicked = element, ctx = localctx)
+                                } },
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .size(60.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                    ) {
+                        Text(
+                            text = element,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontSize = 24.sp
+                        )
+                    }
+                }
+            }
+        }
     }
 
     @Composable
@@ -551,33 +636,8 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun Info(settingsViewModel: SettingsViewModel) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
-        ) {
-            IconButton(
-                onClick = {
-                    settingsViewModel.openInfo.value = false
-                },
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-            Text(
-                text = stringResource(R.string.info_setting),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier
-                    .padding(start = 40.dp)
-            )
+        QuickComposables.Titlebar(stringResource(R.string.info_setting)) {
+            settingsViewModel.openInfo.value = false
         }
 
         Column(

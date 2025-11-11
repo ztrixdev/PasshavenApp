@@ -103,4 +103,7 @@ Passhaven никогда не обращается к серверам и не �
     <string name="me_respect">The Greatest Informatician That\'s Ever Lived, о, так это же я сам :3</string>
     <string name="source_code">Исходный код</string>
     <string name="ztrix_socials">Соцсети ztrix\'а</string>
+    <string name="change_pin_btn">Изменить PIN</string>
+    <string name="change_pin_desc">Если вы измените PIN, то вы больше не сможете войти с прошлым PIN</string>
+    <string name="enter_current_pin">Введите нышений PIN</string>
 </resources>
