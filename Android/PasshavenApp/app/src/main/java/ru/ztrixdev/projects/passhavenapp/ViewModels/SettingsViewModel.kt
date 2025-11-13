@@ -8,6 +8,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
@@ -30,6 +31,14 @@ class SettingsViewModel: ViewModel() {
     val firstPromptPin = mutableStateOf("")
     val secondPromptDone = mutableStateOf(false)
     val secondPromptPin = mutableStateOf("")
+
+    var pinLastChanged = mutableStateOf(0L)
+    var mpLastChanged = mutableStateOf(0L)
+
+    fun onSecurityOpened(context: Context) {
+        pinLastChanged.value = SecurityPrefs.getLastPINChange(context)
+        mpLastChanged.value  = SecurityPrefs.getLastMPChange(context)
+    }
 
     @OptIn(ExperimentalStdlibApi::class, ExperimentalComposeUiApi::class)
     suspend fun onCPINPadClick(btnClicked: Any, ctx: Context) {
@@ -79,6 +88,10 @@ class SettingsViewModel: ViewModel() {
     }
 
 
+    suspend fun _setSelectedFlabs(flabs: Int, context: Context) {
+        VaultHandler().updateFlabs(flabs, context)
+    }
+
     fun getCurrentlyEditedPINsLen(): Int {
         return when {
             !currentPINConfirmed.value -> currentPIN.value.length
@@ -90,6 +103,7 @@ class SettingsViewModel: ViewModel() {
 
     suspend fun changePIN(ctx: Context) {
         VaultHandler().changePIN(secondPromptPin.value, ctx)
+        SecurityPrefs.saveLastPINChange(System.currentTimeMillis(), ctx)
     }
 
 

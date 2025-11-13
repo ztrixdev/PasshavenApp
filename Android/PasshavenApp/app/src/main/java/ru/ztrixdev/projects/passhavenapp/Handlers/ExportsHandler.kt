@@ -56,7 +56,7 @@ object ExportsHandler {
         were so gallantly streaming?
         🇺🇸 🦅 💯
          */
-        val today = DateTimeProcessor().convertForFIlename(System.currentTimeMillis())
+        val today = DateTimeProcessor.convertForFIlename(System.currentTimeMillis())
         val filename = "$_export_filename_part_1${today}$_export_filename_part_2"
 
         val file = File(path.path, filename)

@@ -12,7 +12,7 @@ public class DateTimeProcessor {
                     .withZone(ZoneId.systemDefault())
                     .withLocale(Locale.getDefault());
 
-    public String convertToHumanReadable(long currentTimeMillis) {
+    public static String convertToHumanReadable(long currentTimeMillis) {
         Instant instant = Instant.ofEpochMilli(currentTimeMillis);
         return HRFORMATTER.format(instant);
     }
@@ -22,7 +22,7 @@ public class DateTimeProcessor {
             DateTimeFormatter.ofPattern("MM_dd_yyyy_HH_mm_ss")
                     .withZone(ZoneId.systemDefault());
 
-    public String convertForFIlename(long currentTimeMillis) {
+    public static String convertForFIlename(long currentTimeMillis) {
         Instant instant = Instant.ofEpochMilli(currentTimeMillis);
         return FNFORMATTER.format(instant);
     }

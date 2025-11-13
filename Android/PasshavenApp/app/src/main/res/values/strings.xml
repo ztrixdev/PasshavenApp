@@ -106,4 +106,8 @@
     <string name="change_pin_btn">Change PIN</string>
     <string name="change_pin_desc">If you change your PIN, you\'ll no longer be able to login with the previous PIN.</string>
     <string name="enter_current_pin">Enter your current PIN</string>
+    <string name="pin_changed_ago">✅ PIN changed on</string>
+    <string name="pin_never_changed">❌ PIN was never changed</string>
+    <string name="flabs_explanation_part_1">Delete my vault after</string>
+    <string name="flabs_explanation_part_2">failed login attempts</string>
 </resources>

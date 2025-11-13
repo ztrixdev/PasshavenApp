@@ -3,6 +3,8 @@ package ru.ztrixdev.projects.passhavenapp.Handlers
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
@@ -194,5 +196,24 @@ class VaultHandler {
             ?: throw RuntimeException("Cannot retrieve the $mpProtectingKeyName key! A $mpProtectingKeyName key might not have been generated...")
 
         return AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpKey, CryptoNames.iv to vault[0].mpIv), mpProtectingKey as SecretKey)
+    }
+
+    suspend fun getFlabsAndFlabsr(context: Context): Pair<Int, Int> {
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()
+        println(Pair(vault[0].flabs, vault[0].flabsr))
+        return Pair(vault[0].flabs, vault[0].flabsr)
+    }
+
+    suspend fun updateFlabs(flabs: Int, context: Context) {
+        if (flabs !in 10..30) return
+
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()[0]
+
+        vault.flabs = flabs
+        vault.flabsr = flabs
+
+        vaultDao.update(vault)
     }
 }

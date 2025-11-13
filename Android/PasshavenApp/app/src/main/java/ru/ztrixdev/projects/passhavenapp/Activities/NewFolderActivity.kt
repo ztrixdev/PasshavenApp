@@ -376,8 +376,8 @@ class NewFolderActivity: ComponentActivity() {
                     Text(
                         text =
                             when (entry) {
-                                is Card -> DateTimeProcessor().convertToHumanReadable(entry.dateCreated)
-                                is Account -> DateTimeProcessor().convertToHumanReadable(entry.dateCreated)
+                                is Card -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
+                                is Account -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
                                 else -> "ERR_UNRECOGNIZABLE_TYPE"
                             },
                         style = MaterialTheme.typography.bodySmall,
