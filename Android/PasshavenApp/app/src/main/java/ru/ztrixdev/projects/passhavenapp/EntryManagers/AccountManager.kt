@@ -6,12 +6,10 @@ import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.Room.decrypt
 import ru.ztrixdev.projects.passhavenapp.Room.encrypt
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
-import java.security.AccessControlContext
 import kotlin.uuid.Uuid
 
 object AccountManager {
     suspend fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray): Uuid {
-        account.uuid = Uuid.random()
         account.encrypt(encryptionKey)
 
         database.accountDao().insert(account)
@@ -27,9 +25,7 @@ object AccountManager {
     }
 
     suspend fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid): Account? {
-        val account = database.accountDao().getAccountByUuid(accountUuid = uuid)
-        if (account == null)
-            return null
+        val account = database.accountDao().getAccountByUuid(accountUuid = uuid) ?: return null
 
         return account
     }

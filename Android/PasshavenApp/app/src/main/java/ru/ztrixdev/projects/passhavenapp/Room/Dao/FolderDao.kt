@@ -3,6 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.Room.Dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
@@ -21,7 +22,7 @@ interface FolderDao {
     @Query("update folder set entries=:newEntryList where uuid like :folderUUID")
     suspend fun resetEntryList(newEntryList: List<Uuid>, folderUUID: Uuid)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg fld: Folder)
 
     @Update

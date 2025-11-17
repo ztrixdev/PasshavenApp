@@ -66,6 +66,10 @@ object FolderManager {
         return db.folderDao().getALl()
     }
 
+    suspend fun getFolders(database: AppDatabase): List<Folder> {
+        return database.folderDao().getALl()
+    }
+
     suspend fun getFolderByUuid(context: Context, uuid: Uuid): Folder? {
         val db = DatabaseProvider.getDatabase(context = context)
         return db.folderDao().getFolderByUuid(uuid)
@@ -73,6 +77,12 @@ object FolderManager {
 
     suspend fun createFolder(db: AppDatabase, newFolder: Folder) {
         db.folderDao().insert(newFolder)
+    }
+
+    suspend fun deleteFolderByUuid(context: Context, uuid: Uuid) {
+        val db = DatabaseProvider.getDatabase(context = context)
+        val fld = db.folderDao().getFolderByUuid(uuid) ?: return
+        db.folderDao().delete(fld)
     }
 }
 

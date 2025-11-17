@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,7 +36,6 @@ import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
-import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class VaultOverviewActivity: ComponentActivity() {
@@ -87,27 +85,25 @@ class VaultOverviewActivity: ComponentActivity() {
                     var key = byteArrayOf()
                     val folders = remember { mutableStateListOf<Folder>() }
                     val entries = remember { mutableStateListOf<Any>() }
-                    val isABackupDue = remember { mutableStateOf<Boolean>(false) }
-                    val areAllJobsDone = remember { mutableStateOf<Boolean>(false) }
+                    val isABackupDue = remember { mutableStateOf(false) }
+                    val areAllJobsDone = remember { mutableStateOf(false) }
+                    val export = ExportsHandler.getExport(ExportTemplates.Passhaven, entries, folders)
                     LaunchedEffect(Unit) {
                         key = VaultHandler().getEncryptionKey(localctx)
                         folders.addAll(FolderManager.getFolders(localctx))
                         entries.addAll(EntryManager.getAllEntriesForUI(db, key))
                         isABackupDue.value = ExportsHandler.checkIfABackupIsDue(localctx)
-                        areAllJobsDone.value = true
+                       areAllJobsDone.value = true
                     }
 
                     if (areAllJobsDone.value) {
-                        Text(text = entries.toString(), color = Color.White, style = TextStyle.Default)
-                        val export = ExportsHandler.getExport(ExportTemplates.Passhaven, entries, folders)
-                        Text(text = export, color = Color.White, style = TextStyle.Default)
                         Text(text = "Is a backup due atm: ${isABackupDue.value}", color = Color.White, style = TextStyle.Default)
                         val resolver = this@VaultOverviewActivity.contentResolver
                         val launcher = rememberDirectoryPickerLauncher { directory ->
                             GlobalScope.launch(Dispatchers.IO) {
                                 val uri = directory.toString().toUri()
                                 VaultHandler().setBackupFolder(uri, localctx)
-                                ExportsHandler.exportToFolder(resolver,export, localctx)
+                                ExportsHandler.exportToFolder(resolver, export, localctx)
                             }
                         }
                         Button(

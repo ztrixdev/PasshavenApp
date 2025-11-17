@@ -1,7 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.Preferences;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 public class SecurityPrefs {
     private static final String PREFS_NAME = "security_prefs";

@@ -12,7 +12,7 @@ class StringListConverter {
     }
 
     @TypeConverter
-    fun jsonToList(json: String): List<String>? {
+    fun jsonToList(json: String): List<String> {
         return gson.fromJson(json, Array<String>::class.java).toList()
     }
 }

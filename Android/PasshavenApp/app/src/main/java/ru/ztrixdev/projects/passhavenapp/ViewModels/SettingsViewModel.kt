@@ -1,21 +1,17 @@
 package ru.ztrixdev.projects.passhavenapp.ViewModels
 
 import android.content.Context
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
-import ru.ztrixdev.projects.passhavenapp.Room.Vault
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
-import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
-import kotlin.math.PI
 
 class SettingsViewModel: ViewModel() {
     val openAppearance = mutableStateOf(false)
@@ -32,12 +28,12 @@ class SettingsViewModel: ViewModel() {
     val secondPromptDone = mutableStateOf(false)
     val secondPromptPin = mutableStateOf("")
 
-    var pinLastChanged = mutableStateOf(0L)
-    var mpLastChanged = mutableStateOf(0L)
+    var pinLastChanged = mutableLongStateOf(0L)
+    var mpLastChanged = mutableLongStateOf(0L)
 
     fun onSecurityOpened(context: Context) {
-        pinLastChanged.value = SecurityPrefs.getLastPINChange(context)
-        mpLastChanged.value  = SecurityPrefs.getLastMPChange(context)
+        pinLastChanged.longValue = SecurityPrefs.getLastPINChange(context)
+        mpLastChanged.longValue = SecurityPrefs.getLastMPChange(context)
     }
 
     @OptIn(ExperimentalStdlibApi::class, ExperimentalComposeUiApi::class)

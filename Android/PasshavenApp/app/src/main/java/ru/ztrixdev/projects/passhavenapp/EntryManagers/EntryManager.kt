@@ -3,6 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.EntryManagers
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.Room.Card
+import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import kotlin.uuid.Uuid
 
 object EntryManager {
@@ -28,6 +29,14 @@ object EntryManager {
         return null
     }
 
+    suspend fun deleteEntry(database: AppDatabase, entry: Any) {
+        when (entry) {
+            is Card -> database.cardDao().delete(entry)
+            is Account -> database.accountDao().delete(entry)
+            is Folder -> database.folderDao().delete(entry)
+        }
+    }
+
     suspend fun getAllEntriesForUI(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
         val allEntries = emptyList<Any>().toMutableList()
         allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))
@@ -37,6 +46,15 @@ object EntryManager {
         allEntries.forEach { desecretified.add(desecretify(it)) }
 
         return desecretified
+    }
+
+    suspend fun getAllEntriesForExport(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
+        val allEntries = emptyList<Any>().toMutableList()
+        allEntries.addAll(FolderManager.getFolders(database))
+        allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))
+        allEntries.addAll(CardManager.getAllCards(database, encryptionKey))
+
+        return allEntries
     }
 
     fun desecretify(entry: Any): Any {

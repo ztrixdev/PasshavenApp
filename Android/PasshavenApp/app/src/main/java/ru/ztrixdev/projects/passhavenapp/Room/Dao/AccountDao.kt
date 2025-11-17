@@ -3,6 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.Room.Dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import ru.ztrixdev.projects.passhavenapp.Room.Account
@@ -18,7 +19,7 @@ interface AccountDao {
     @Query("select * from account where uuid like :accountUuid limit 1")
     suspend fun getAccountByUuid(accountUuid: Uuid): Account?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg acc: Account)
 
     @Update

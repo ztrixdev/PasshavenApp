@@ -45,6 +45,6 @@ object MasterPassword {
     }
 
     fun verifyPIN(PIN: String): Boolean {
-        return PIN.length >= PIN_LENGTH_MINIMUM && PIN.length <= PIN_LENGTH_LIMIT && !PIN.contains("1234") && !PIN.contains("4321")
+        return PIN.length in PIN_LENGTH_MINIMUM..PIN_LENGTH_LIMIT && !PIN.contains("1234") && !PIN.contains("4321")
     }
 }

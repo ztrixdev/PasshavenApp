@@ -34,7 +34,7 @@ class IntroViewModel() : ViewModel() {
     fun checkMP() {
         if (currentMP.value.length < MP_LENGTH_MINIMUM)
             containsEnoughLettersOverall.value = false
-        if (currentMP.value.length > MP_LENGTH_MINIMUM && currentMP.value.length < MP_ABSOLUTE_LENGTH)
+        if (currentMP.value.length in 9..<MP_ABSOLUTE_LENGTH)
             containsEnoughLettersOverall.value = true
         if (currentMP.value.length >= MP_ABSOLUTE_LENGTH)
             containsEnoughLettersOverall.value = true

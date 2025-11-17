@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
@@ -31,7 +29,6 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -49,7 +46,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -62,7 +58,6 @@ import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewFolderViewModel
-import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class NewFolderActivity: ComponentActivity() {
@@ -162,7 +157,7 @@ class NewFolderActivity: ComponentActivity() {
 
         OutlinedTextField(
             value = newFolderViewModel.newFolderName.value,
-            onValueChange = { it ->
+            onValueChange = {
                 foldernameIsEmptyProblem = it.text.isEmpty()
                 newFolderViewModel.newFolderName.value = it
             },

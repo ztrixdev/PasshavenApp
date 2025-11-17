@@ -12,7 +12,7 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class LoginViewModel(private val vaultHandler: VaultHandler = VaultHandler()) : ViewModel() {
-    val loginMethod = mutableStateOf<LoginMethods>(LoginMethods.ByPIN)
+    val loginMethod = mutableStateOf(LoginMethods.ByPIN)
     val loginSuccessful = mutableStateOf(false)
     private val pin = mutableStateOf("")
     val pinLength = mutableIntStateOf(pin.value.length)

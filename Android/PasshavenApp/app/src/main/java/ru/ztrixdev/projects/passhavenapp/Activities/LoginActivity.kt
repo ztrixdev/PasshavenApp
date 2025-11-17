@@ -52,7 +52,6 @@ import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.ViewModels.LoginViewModel
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
-import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class LoginActivity: ComponentActivity() {

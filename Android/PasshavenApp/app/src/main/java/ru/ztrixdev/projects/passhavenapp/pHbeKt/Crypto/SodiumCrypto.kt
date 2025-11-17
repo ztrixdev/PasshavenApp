@@ -21,7 +21,7 @@ object SodiumCrypto {
             throw invalidCipherTextException
         }
         val nonce = cipherText.substring(cipherText.length - NONCE_HEXED_LENGTH, cipherText.length)
-        val text = cipherText.substring(0, cipherText.length - NONCE_HEXED_LENGTH)
+        val text = cipherText.dropLast(NONCE_HEXED_LENGTH)
 
         val decrypted =
             sodium.cryptoSecretBoxOpenEasy(text, sodium.sodiumHex2Bin(nonce), Key.fromBytes(key))

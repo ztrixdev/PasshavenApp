@@ -1,7 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.Preferences;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType;
 

@@ -34,7 +34,8 @@ class NewEntryViewModel: ViewModel() {
     }
 
     suspend fun getFolders(context: Context): List<Folder> {
-        return FolderManager.getFolders(context)
+        val folders = FolderManager.getFolders(context)
+        return folders
     }
 
     suspend fun getSelectedFolder(context: Context): Folder? {
@@ -58,7 +59,7 @@ class NewEntryViewModel: ViewModel() {
     var mfaSecret by mutableStateOf(TextFieldValue(""))
 
     var recoveryCodesAmount by mutableIntStateOf(1)
-    var recoveryCodes = mutableStateListOf<TextFieldValue>(TextFieldValue(""))
+    var recoveryCodes = mutableStateListOf(TextFieldValue(""))
 
     fun generatePassword() {
         val passwordGenerator = PasswordGenerator()
@@ -168,13 +169,13 @@ class NewEntryViewModel: ViewModel() {
             CardCredentials.ExpirationDate -> {
                 // a normal expir. date should look like this: 08/28
                 // checks if the first two symbols are digits
-                if (text.length > 1 && !text.substring(0, 1).isDigitsOnly())
+                if (text.length > 1 && !text[1].isDigitsOnly())
                     return false
                 // checks if the third symbol, if exists, is a slash or a backslash
                 if (text.length > 2 && (text[2] != '/'  && text[2] != '\\'))
                     return false
                 // checks if the last two symbols are digits
-                if (text.length == 5 && !text.substring(3, 4).isDigitsOnly())
+                if (text.length == 5 && !text[3].isDigitsOnly())
                     return false
                 if (text.length > 5)
                     return false

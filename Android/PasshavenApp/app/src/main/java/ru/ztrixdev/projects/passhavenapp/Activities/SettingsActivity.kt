@@ -2,7 +2,6 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -49,7 +48,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -66,8 +64,6 @@ import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
-import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.ViewModels.IntroViewModel
 import ru.ztrixdev.projects.passhavenapp.ViewModels.SettingsViewModel
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
@@ -489,8 +485,8 @@ class SettingsActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Text(
-                    text = if (settingsViewModel.pinLastChanged.value != 0L) {
-                        "${stringResource(R.string.pin_changed_ago)} ${DateTimeProcessor.convertToHumanReadable(settingsViewModel.pinLastChanged.value)}"
+                    text = if (settingsViewModel.pinLastChanged.longValue != 0L) {
+                        "${stringResource(R.string.pin_changed_ago)} ${DateTimeProcessor.convertToHumanReadable(settingsViewModel.pinLastChanged.longValue)}"
                     } else {
                         stringResource(R.string.pin_never_changed)
                     },
@@ -553,7 +549,7 @@ class SettingsActivity : ComponentActivity() {
         val flabsVariants = listOf(10, 15, 20, 25, 30)
         var selectedFlabsIndex by remember { mutableIntStateOf(0) }
 
-        var localctx = LocalContext.current
+        val localctx = LocalContext.current
         LaunchedEffect(Unit) {
             val result = VaultHandler().getFlabsAndFlabsr(localctx)
             selectedFlabsIndex = flabsVariants.indexOf(result.first)

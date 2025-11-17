@@ -19,6 +19,12 @@ import java.io.File
 
 
 object ExportsHandler {
+    data class ExportWrapper(
+        val Folder: List<Folder>?,
+        val Card: List<Card>?,
+        val Account: List<Account>?
+    )
+
     fun getExport(template: ExportTemplates, entries: List<Any>, folders: List<Folder>): String {
         when (template) {
             ExportTemplates.Passhaven -> {
@@ -32,8 +38,8 @@ object ExportsHandler {
         return ""
     }
 
-    private val _export_filename_part_1 = "export_";
-    private val _export_filename_part_2 = "_full.phbckp"
+    private const val _export_filename_part_1 = "export_"
+    private const val _export_filename_part_2 = "_full.phbckp"
     suspend fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
 
@@ -100,10 +106,10 @@ object ExportsHandler {
     // The final blob looks like this:
     // {beginsalt}HEX_SALT_STRING{endsalt}
     // ENCRYPTED_EXPORT_HEX_STRING
-    private val _beginSaltStr = "{beginsalt}"
-    private val _endSaltStr = "{endsalt}"
+    private const val _beginSaltStr = "{beginsalt}"
+    private const val _endSaltStr = "{endsalt}"
     fun protectExport(export: String, password: String): String {
-        var blob = "${_beginSaltStr}"
+        var blob = _beginSaltStr
         val keyFromPWD = Keygen.deriveKeySaltPairFromMP(password)
         if (keyFromPWD[CryptoNames.key] != null) {
             val encryptedExport = SodiumCrypto.encrypt(export, keyFromPWD[CryptoNames.key] as ByteArray)

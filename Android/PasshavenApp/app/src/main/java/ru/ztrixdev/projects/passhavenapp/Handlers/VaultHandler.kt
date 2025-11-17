@@ -3,8 +3,6 @@ package ru.ztrixdev.projects.passhavenapp.Handlers
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
@@ -89,7 +87,7 @@ class VaultHandler {
             if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
-        val mpHashProtectingKey: Key? = keystore.getKey(mpHashProtectingKeyName, null)
+        val mpHashProtectingKey: Key = keystore.getKey(mpHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $mpHashProtectingKeyName key! A $mpHashProtectingKeyName key might not have been generated...")
 
         val decryptedMPHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpHash, CryptoNames.iv to vault[0].mpHashIv), mpHashProtectingKey as SecretKey)
@@ -112,7 +110,7 @@ class VaultHandler {
             if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
-        val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
+        val pinHashProtectingKey: Key = keystore.getKey(pinHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
         val decryptedPINHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
@@ -135,7 +133,7 @@ class VaultHandler {
         keystore.deleteEntry(pinHashProtectingKeyName)
         // Generate a new key to protect the PIN's hash.
         Keygen.generateAndroidKey(pinHashProtectingKeyName)
-        val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
+        val pinHashProtectingKey: Key = keystore.getKey(pinHashProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might not have been generated...")
 
         val encryptedPIN = AndroidCrypto.encrypt(Checksum.keccak512(newPIN), pinHashProtectingKey as SecretKey)
@@ -192,7 +190,7 @@ class VaultHandler {
             throw RuntimeException("No vault found!")
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
-        val mpProtectingKey: Key? = keystore.getKey(mpProtectingKeyName, null)
+        val mpProtectingKey: Key = keystore.getKey(mpProtectingKeyName, null)
             ?: throw RuntimeException("Cannot retrieve the $mpProtectingKeyName key! A $mpProtectingKeyName key might not have been generated...")
 
         return AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpKey, CryptoNames.iv to vault[0].mpIv), mpProtectingKey as SecretKey)

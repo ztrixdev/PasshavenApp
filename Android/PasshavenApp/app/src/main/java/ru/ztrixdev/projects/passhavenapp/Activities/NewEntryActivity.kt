@@ -23,8 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenu
@@ -41,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -65,7 +64,6 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.ViewModels.NewEntryViewModel
-import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import kotlin.uuid.Uuid
 
@@ -76,7 +74,7 @@ class NewEntryActivity: ComponentActivity()  {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent() {
+        setContent {
             PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
                 val scrollState = rememberScrollState()
                 Column(
@@ -103,9 +101,13 @@ class NewEntryActivity: ComponentActivity()  {
             mutableIntStateOf(-1)
         }
 
-        var folders = emptyList<Folder>()
+        // how in the world did this bug appear????
+        // it was just a list before... i remember it worked smh
+        val folders = remember {
+            mutableStateListOf<Folder>()
+        }
         LaunchedEffect(Unit) {
-           folders = newEntryViewModel.getFolders(localctx)
+           folders.addAll(newEntryViewModel.getFolders(localctx))
         }
 
 
@@ -259,7 +261,7 @@ class NewEntryActivity: ComponentActivity()  {
             var nameIsEmptyProblem by remember { mutableStateOf(false) }
             OutlinedTextField(
                 value = newEntryViewModel.newEntryName,
-                onValueChange = { it ->
+                onValueChange = {
                     nameIsEmptyProblem = false
                     if (it.text.isEmpty())
                         nameIsEmptyProblem = true
@@ -303,7 +305,7 @@ class NewEntryActivity: ComponentActivity()  {
 
             OutlinedTextField(
                 value = newEntryViewModel.additionalNote,
-                onValueChange = { it ->
+                onValueChange = {
                     newEntryViewModel.additionalNote = it
                 },
                 label = {
@@ -377,7 +379,7 @@ class NewEntryActivity: ComponentActivity()  {
             // Username textfield
             OutlinedTextField(
                 value = newEntryViewModel.username,
-                onValueChange = { it ->
+                onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
                     newEntryViewModel.username = it
                     newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
@@ -410,7 +412,7 @@ class NewEntryActivity: ComponentActivity()  {
             // Password textfield
             OutlinedTextField(
                 value = newEntryViewModel.password,
-                onValueChange = { it ->
+                onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
                     newEntryViewModel.password = it
                     newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
@@ -456,7 +458,7 @@ class NewEntryActivity: ComponentActivity()  {
             // MFA textfield
             OutlinedTextField(
                 value = newEntryViewModel.mfaSecret,
-                onValueChange = { it ->
+                onValueChange = {
                     mfaSecretIsInvalidProblem = !MFAHandler().verifySecret(it.text)
                     newEntryViewModel.mfaSecret = it
                     newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
@@ -499,7 +501,7 @@ class NewEntryActivity: ComponentActivity()  {
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
                                 value = newEntryViewModel.recoveryCodes[index],
-                                onValueChange = { it ->
+                                onValueChange = {
                                     newEntryViewModel.recoveryCodes[index] = it
                                 },
                                 label = {
@@ -589,8 +591,8 @@ class NewEntryActivity: ComponentActivity()  {
             // Card Number Field
             OutlinedTextField(
                 value = newEntryViewModel.cardNumber,
-                onValueChange = { it ->
-                        try {
+                onValueChange = {
+                    try {
                             cardNumberTooLongProblem = !newEntryViewModel.validateCardCredentials(CardCredentials.Number, it.text)
                             cardNumberInvalidProblem = false
                             cardNumberTooShortProblem = false
@@ -644,7 +646,7 @@ class NewEntryActivity: ComponentActivity()  {
                 // Expiration MM/YY Field
                 OutlinedTextField(
                     value = newEntryViewModel.expirationMMYY,
-                    onValueChange = { it ->
+                    onValueChange = {
                         try {
                               cardExpirationDateInvalidProblem = !newEntryViewModel.validateCardCredentials(CardCredentials.ExpirationDate, it.text)
                         } catch (e: IllegalArgumentException) {
@@ -679,7 +681,7 @@ class NewEntryActivity: ComponentActivity()  {
                 // CVC/CVV Field
                 OutlinedTextField(
                     value = newEntryViewModel.cvcCVV,
-                    onValueChange = { it ->
+                    onValueChange = {
                         try {
                                 cardCvcCvvInvalidProblem = !newEntryViewModel.validateCardCredentials(CardCredentials.CVC_CVV, it.text)
                         } catch (e: IllegalArgumentException) {
@@ -724,7 +726,7 @@ class NewEntryActivity: ComponentActivity()  {
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 singleLine = true,
-                onValueChange = { it ->
+                onValueChange = {
                     newEntryViewModel.cardholderName = it
                     newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                 },

@@ -1,8 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
 import com.goterl.lazysodium.exceptions.SodiumException
-import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager.retrieveAccountByUuid
-import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.decrypt
@@ -12,7 +10,6 @@ import kotlin.uuid.Uuid
 
 object CardManager {
     suspend fun createCard(database: AppDatabase, card: Card, encryptionKey: ByteArray): Uuid {
-        card.uuid = Uuid.random()
         card.encrypt(encryptionKey)
 
         database.cardDao().insert(card)
@@ -21,9 +18,7 @@ object CardManager {
     }
 
     suspend fun retrieveCardByUuid(database: AppDatabase, uuid: Uuid): Card? {
-        val card = database.cardDao().getCardByUuid(cardUuid = uuid)
-        if (card == null)
-            return null
+        val card = database.cardDao().getCardByUuid(cardUuid = uuid) ?: return null
 
         return card
     }
