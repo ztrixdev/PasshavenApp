@@ -1,8 +1,16 @@
 package ru.ztrixdev.projects.passhavenapp.Handlers
 
 import android.content.Context
+import android.icu.text.CaseMap
 import android.net.Uri
+import androidx.compose.foundation.AndroidEmbeddedExternalSurface
+import androidx.compose.runtime.key
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.core.net.toUri
+import androidx.savedstate.serialization.encodeToSavedState
+import org.apache.commons.codec.digest.Crypt
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
@@ -19,6 +27,7 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
+import kotlin.math.exp
 import kotlin.uuid.Uuid
 
 class VaultHandler {
@@ -161,6 +170,90 @@ class VaultHandler {
         }
 
         return !false        // you can't deny this looks badass.
+    }
+
+    suspend fun changeMP(newMP: String, context: Context): List<Vault> {
+        // Alright, so this will be done in steps, come on, you know the drill)
+
+        val db = DatabaseProvider.getDatabase(context)
+        val currentKey = getEncryptionKey(context)
+        val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
+
+        // Step 0: exit immediately if a backup wasn't done recently
+        val NO_BACKUP_EXCEPTION = Exception("A backup hasn't been done in the last 8 hours, cannot continue.")
+        if (db.vaultDao().getVault()[0].backupFolder == "".toUri())
+            throw NO_BACKUP_EXCEPTION
+        if ((System.currentTimeMillis() - db.vaultDao().getVault()[0].lastBackup) > TimeInMillis.EightHours)
+            throw NO_BACKUP_EXCEPTION
+
+        // Step 1: get a full vault export
+        val entries = EntryManager.getAllEntriesForExport(database = db, encryptionKey = currentKey)
+        val folders = FolderManager.getFolders(context = context)
+        val export = ExportsHandler.getExport(template = ExportTemplates.Passhaven, entries = entries, folders = folders)
+
+        // Step 1.5: get the keys
+        val mpProtectingKey: Key? = keystore.getKey(mpProtectingKeyName, null)
+        val mpHashProtectingKey: Key? = keystore.getKey(mpHashProtectingKeyName, null)
+        val pinHashProtectingKey: Key? = keystore.getKey(pinHashProtectingKeyName, null)
+        if (mpProtectingKey == null)
+            throw RuntimeException("Cannot retrieve the $mpProtectingKeyName key! A $mpProtectingKeyName key might not have been generated...")
+        if (mpHashProtectingKey == null)
+            throw RuntimeException("Cannot retrieve the $mpHashProtectingKeyName key! A $mpHashProtectingKeyName key might not have been generated...")
+        if (pinHashProtectingKey == null)
+            throw RuntimeException("Cannot retrieve the $pinHashProtectingKeyName key! A $pinHashProtectingKeyName key might nott have been generated...")
+
+        // Step 2: get the PIN hash
+        val vault = db.vaultDao().getVault()[0]
+        val pinHash = AndroidCrypto.decrypt(encryptionResults = mapOf(
+            CryptoNames.cipher to vault.pinHash,
+            CryptoNames.iv to vault.pinHashIv
+        ), pinHashProtectingKey as SecretKey)
+
+        // Step 3: purge the vault
+        for (entry in entries) {
+            EntryManager.deleteEntry(database = db, entry = entry)
+        } ; for (folder in folders) {
+            EntryManager.deleteEntry(database = db, entry = folder)
+        }
+        selfDestroy(db.vaultDao())
+
+        // Step 4: derive a key salt pair from an MP, encrypt credentials
+        val mpDerivedKeySaltPair = Keygen.deriveKeySaltPairFromMP(newMP)
+
+        val key = mpDerivedKeySaltPair[CryptoNames.key]
+        val salt = mpDerivedKeySaltPair[CryptoNames.salt]
+        val encryptedKeyCipherAndIV = AndroidCrypto.encrypt(key, mpProtectingKey as SecretKey)
+
+        val mpHash = Checksum.keccak512(newMP)
+        val encryptedMPHashCipherAndIV = AndroidCrypto.encrypt(mpHash, mpHashProtectingKey as SecretKey)
+        val encryptedPINHashCipherAndIV = AndroidCrypto.encrypt(pinHash, pinHashProtectingKey)
+
+        // Step 5: get a new vault!!
+        val newVault = Vault(
+            uuid = Uuid.random(),
+            mpKey = encryptedKeyCipherAndIV[CryptoNames.cipher]!!,
+            mpSalt = salt!!,
+            mpIv = encryptedKeyCipherAndIV[CryptoNames.iv]!!,
+            mpHash = encryptedMPHashCipherAndIV[CryptoNames.cipher]!!,
+            mpHashIv = encryptedMPHashCipherAndIV[CryptoNames.iv]!!,
+            pinHash = encryptedPINHashCipherAndIV[CryptoNames.cipher]!!,
+            pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!,
+            flabs = vault.flabs,
+            flabsr = vault.flabsr,
+            backupFolder = vault.backupFolder,
+            lastBackup = vault.lastBackup,
+            backupEvery = vault.backupEvery
+        )
+
+        db.vaultDao().insert(newVault)
+        val import = ImportsHandler.getImport(template = ExportTemplates.Passhaven, import = export)
+        ImportsHandler.apply(
+            entries = import,
+            db = db,
+            encryptionKey = key!!
+        )
+
+        return db.vaultDao().getVault()
     }
 
     suspend fun selfDestroy(dao: VaultDao): Boolean {

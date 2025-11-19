@@ -50,7 +50,6 @@ object EntryManager {
 
     suspend fun getAllEntriesForExport(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
         val allEntries = emptyList<Any>().toMutableList()
-        allEntries.addAll(FolderManager.getFolders(database))
         allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))
         allEntries.addAll(CardManager.getAllCards(database, encryptionKey))
 
