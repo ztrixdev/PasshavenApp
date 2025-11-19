@@ -110,4 +110,21 @@
     <string name="pin_never_changed">❌ PIN was never changed</string>
     <string name="flabs_explanation_part_1">Delete my vault after</string>
     <string name="flabs_explanation_part_2">failed login attempts</string>
+    <string name="eight_hrs">8 hours</string>
+    <string name="twelve_hrs">12 hours</string>
+    <string name="day">24 hours</string>
+    <string name="week">week</string>
+    <string name="three_days">3 days</string>
+    <string name="month">month</string>
+    <string name="backup_every">Create a backup of my vault every</string>
+    <string name="never">never</string>
+    <string name="backup_folder">Backup folder</string>
+    <string name="backup_folder_never_set">Not set</string>
+    <string name="set">Set</string>
+    <string name="change">Change</string>
+    <string name="open_in_finder">Open</string>
+    <string name="enter_backup_password">Enter your desired backup password</string>
+    <string name="cancel">Cancel</string>
+    <string name="backup_password">Backup password</string>
+    <string name="open_backup_password_dialog">Set/change backup password</string>
 </resources>

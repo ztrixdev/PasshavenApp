@@ -169,13 +169,13 @@ class NewEntryViewModel: ViewModel() {
             CardCredentials.ExpirationDate -> {
                 // a normal expir. date should look like this: 08/28
                 // checks if the first two symbols are digits
-                if (text.length > 1 && !text[1].isDigitsOnly())
+                if (text.length > 1 && !text[1].toString().isDigitsOnly())
                     return false
                 // checks if the third symbol, if exists, is a slash or a backslash
                 if (text.length > 2 && (text[2] != '/'  && text[2] != '\\'))
                     return false
                 // checks if the last two symbols are digits
-                if (text.length == 5 && !text[3].isDigitsOnly())
+                if (text.length == 5 && !text[3].toString().isDigitsOnly())
                     return false
                 if (text.length > 5)
                     return false

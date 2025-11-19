@@ -1,7 +1,9 @@
 package ru.ztrixdev.projects.passhavenapp.Activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -39,6 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,22 +52,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
+import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
+import ru.ztrixdev.projects.passhavenapp.TimeInMillis
 import ru.ztrixdev.projects.passhavenapp.ViewModels.SettingsViewModel
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
@@ -78,6 +91,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
+import kotlin.collections.indexOf
 
 class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -119,7 +133,7 @@ class SettingsActivity : ComponentActivity() {
                         }
 
                         settingsViewModel.openExports.value -> {
-                            ExportsSettings()
+                            ExportsSettings(settingsViewModel = settingsViewModel)
                         }
 
                         settingsViewModel.openImports.value -> {
@@ -493,7 +507,7 @@ class SettingsActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
-                        .widthIn(100.dp, 200.dp)
+                        .widthIn(100.dp, 160.dp)
                 )
 
                 Button (
@@ -528,9 +542,9 @@ class SettingsActivity : ComponentActivity() {
                     modifier = Modifier
                         .widthIn(60.dp, 140.dp)
                 )
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(20.dp))
                 FLABSDropdown(settingsViewModel = settingsViewModel)
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(20.dp))
                 Text(
                     text = stringResource(R.string.flabs_explanation_part_2),
                     style = MaterialTheme.typography.bodyLarge,
@@ -571,25 +585,25 @@ class SettingsActivity : ComponentActivity() {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primaryContainer
             )
-        }
-        DropdownMenu(
-            expanded = isDropDownExpanded,
-            onDismissRequest = {
-                isDropDownExpanded = false
-            }) {
-            flabsVariants.forEachIndexed { index, variant ->
-                DropdownMenuItem(
-                    text = {
-                        Text(text = variant.toString())
-                    },
-                    onClick = {
-                        isDropDownExpanded = false
-                        selectedFlabsIndex = index
-                        lifecycleScope.launch {
-                            settingsViewModel._setSelectedFlabs(variant, localctx)
+            DropdownMenu(
+                expanded = isDropDownExpanded,
+                onDismissRequest = {
+                    isDropDownExpanded = false
+                }) {
+                flabsVariants.forEachIndexed { index, variant ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = variant.toString())
+                        },
+                        onClick = {
+                            isDropDownExpanded = false
+                            selectedFlabsIndex = index
+                            lifecycleScope.launch {
+                                settingsViewModel._setSelectedFlabs(variant, localctx)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
@@ -723,7 +737,254 @@ class SettingsActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ExportsSettings() {
+    private fun ExportsSettings(settingsViewModel: SettingsViewModel) {
+        QuickComposables.Titlebar(
+            text = stringResource(R.string.export_backup_setting),
+            onBackButtonClickAction = {settingsViewModel.openExports.value = false}
+        )
+        val localctx = LocalContext.current
+        var backupData by remember { mutableStateOf<Triple<Uri, Long, Long>?>(null) }
+        LaunchedEffect(Unit) {
+            backupData = VaultHandler().getBackupInfo(localctx)
+        }
+        Column(
+            Modifier.padding(all = 16.dp)
+        ) {
+            if (backupData == null) {
+                Text("Please wait...")
+            } else {
+                BackupEverySetting(settingsViewModel = settingsViewModel, backupEveryValue = backupData!!.second)
+                Spacer(modifier = Modifier.height(20.dp))
+                BackupFolderSetting(settingsViewModel = settingsViewModel, backupFolder = backupData!!.first)
+            }
+        }
+    }
+
+
+    @OptIn(DelicateCoroutinesApi::class)
+    @Composable
+    private fun BackupFolderSetting(settingsViewModel: SettingsViewModel, backupFolder: Uri) {
+        val localctx = LocalContext.current
+        var bfolderChanged by remember { mutableStateOf(false) }
+        val launcher = rememberDirectoryPickerLauncher { directory ->
+            GlobalScope.launch(Dispatchers.IO) {
+                val uri = directory.toString().toUri()
+                VaultHandler().setBackupFolder(uri, localctx)
+                settingsViewModel._backupFolder.value = uri
+                bfolderChanged = true
+            }
+        }
+        Column {
+            if (!bfolderChanged) {
+                settingsViewModel._backupFolder.value = backupFolder
+            }
+            Row {
+                Text(
+                    text = stringResource(R.string.backup_folder),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text =
+                        if (settingsViewModel._backupFolder.value == "".toUri()) {
+                            stringResource(R.string.backup_folder_never_set)
+                        } else {
+                            settingsViewModel._backupFolder.value.toString().split("%").last().substring(2)
+                        },
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row (
+                Modifier.padding(start = 12.dp)
+            ){
+                Button (
+                    onClick = {
+                        launcher.launch()
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier
+                        .widthIn(70.dp, 200.dp)
+                ) {
+                    Text(
+                        text = if (settingsViewModel._backupFolder.value == "".toUri()) {
+                            stringResource(R.string.set) } else {
+                            stringResource(R.string.change)
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+                Spacer(modifier = Modifier.width(20.dp))
+                if (backupFolder != "".toUri()) {
+                    Button (
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            val uri: Uri = settingsViewModel._backupFolder.value
+                            intent.setDataAndType(uri, "*/*")
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            if (intent.resolveActivity(localctx.packageManager) != null) {
+                                localctx.startActivity(intent)
+                            }
+                        },
+                        colors = ButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        modifier = Modifier
+                            .widthIn(70.dp, 200.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.open_in_finder),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun BackupEverySetting(settingsViewModel: SettingsViewModel, backupEveryValue: Long) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.backup_every),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .widthIn(200.dp, 250.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            BackupEveryDropdown(settingsViewModel = settingsViewModel, backupEveryValue = backupEveryValue)
+            Spacer(modifier = Modifier.width(10.dp))
+        }
+    }
+
+    @Composable
+    private fun BackupEveryDropdown(settingsViewModel: SettingsViewModel, backupEveryValue: Long) {
+        var isDropDownExpanded by remember { mutableStateOf(false) }
+
+        val timeVariantsMillisToText = mapOf(
+            0L to stringResource(R.string.never),
+            TimeInMillis.EightHours to stringResource(R.string.eight_hrs),
+            TimeInMillis.TwelveHours to stringResource(R.string.twelve_hrs),
+            TimeInMillis.Day to stringResource(R.string.day),
+            TimeInMillis.ThreeDays to stringResource(R.string.three_days),
+            TimeInMillis.Week to stringResource(R.string.week),
+            TimeInMillis.Month to stringResource(R.string.month)
+        )
+        var selectedTVIndex by remember { mutableIntStateOf(0) }
+
+        val localctx = LocalContext.current
+        var tvChanged by remember { mutableStateOf(false) }
+        if (!tvChanged) {
+            selectedTVIndex = timeVariantsMillisToText.keys.indexOf(backupEveryValue)
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable {
+                isDropDownExpanded = true
+            }
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.arrow_drop_down_24px),
+                tint = MaterialTheme.colorScheme.primaryContainer,
+                contentDescription = "Dropdown arrow lol :3"
+            )
+            if (selectedTVIndex == -1) {
+                "loadin"
+            } else {
+                timeVariantsMillisToText[timeVariantsMillisToText.keys.elementAt(selectedTVIndex)]
+            }?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                )
+            }
+            DropdownMenu(
+                expanded = isDropDownExpanded,
+                onDismissRequest = {
+                    isDropDownExpanded = false
+                }) {
+                timeVariantsMillisToText.forEach { (millis, text) ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(text = text)
+                        },
+                        onClick = {
+                            isDropDownExpanded = false
+                            tvChanged = true
+                            selectedTVIndex = timeVariantsMillisToText.keys.indexOf(millis)
+                            lifecycleScope.launch {
+                                settingsViewModel._setSelectedTV(millis, localctx)
+                            }
+
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+
+    @Composable
+    private fun PasswordDialog() {
+        var isDialogOpen by remember { mutableStateOf(false) }
+        var textState by remember { mutableStateOf(TextFieldValue()) }
+
+        Button(onClick = { isDialogOpen = true }) {
+            Text(stringResource(R.string.open_backup_password_dialog))
+        }
+
+        if (isDialogOpen) {
+            AlertDialog(
+                onDismissRequest = { isDialogOpen = false },
+                title = { Text(stringResource(R.string.backup_password)) },
+                text = {
+                    TextField(
+                        value = textState,
+                        onValueChange = { textState = it },
+                        label = { Text(stringResource(R.string.enter_backup_password)) }
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            // todo: set password
+                            isDialogOpen = false
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { isDialogOpen = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+    }
+
+
+    @Composable
+    private fun BackupPassowrdSetting(settingsViewModel: SettingsViewModel) {
+
 
     }
 

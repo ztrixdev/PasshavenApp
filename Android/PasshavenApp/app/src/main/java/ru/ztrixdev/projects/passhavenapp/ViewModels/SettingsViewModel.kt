@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
@@ -88,6 +89,16 @@ class SettingsViewModel: ViewModel() {
         VaultHandler().updateFlabs(flabs, context)
     }
 
+    val _selectedTimeVariant = mutableLongStateOf(0L)
+
+    val _backupFolder = mutableStateOf("".toUri())
+
+    suspend fun _setSelectedTV(timeVariant: Long, context: Context) {
+        VaultHandler().updateTV(timeVariant, context)
+        _selectedTimeVariant.longValue = timeVariant
+    }
+
+
     fun getCurrentlyEditedPINsLen(): Int {
         return when {
             !currentPINConfirmed.value -> currentPIN.value.length
@@ -102,6 +113,9 @@ class SettingsViewModel: ViewModel() {
         SecurityPrefs.saveLastPINChange(System.currentTimeMillis(), ctx)
     }
 
+    fun setPasswordd(input: String, context: Context) {
+        // TODO
+    }
 
     fun resetPIN() {
         currentPINConfirmed.value = false

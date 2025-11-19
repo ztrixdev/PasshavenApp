@@ -110,4 +110,21 @@ Passhaven никогда не обращается к серверам и не �
     <string name="pin_never_changed">❌ PIN пока не менялся</string>
     <string name="flabs_explanation_part_1">Удалите мое хранилище после</string>
     <string name="flabs_explanation_part_2">неудачных попыток входа</string>
+    <string name="eight_hrs">8 часов</string>
+    <string name="twelve_hrs">12 часов</string>
+    <string name="day">24 часа</string>
+    <string name="week">неделю</string>
+    <string name="three_days">3 дня</string>
+    <string name="month">месяц</string>
+    <string name="backup_every">Создавать резервную копию моего хранилища раз в</string>
+    <string name="never">никогда</string>
+    <string name="backup_folder">Папка для резервных копий</string>
+    <string name="backup_folder_never_set">Не установлена</string>
+    <string name="set">Установить</string>
+    <string name="change">Изменить</string>
+    <string name="open_in_finder">Открыть</string>
+    <string name="enter_backup_password">Введите желаемый пароль для рез. копий</string>
+    <string name="cancel">Отмена</string>
+    <string name="backup_password">Пароль для резервных копий</string>
+    <string name="open_backup_password_dialog">Установить/изменить парполь для резервных копий</string>
 </resources>

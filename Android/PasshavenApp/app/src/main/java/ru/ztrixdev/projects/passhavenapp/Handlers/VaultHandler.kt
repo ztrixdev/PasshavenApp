@@ -307,4 +307,20 @@ class VaultHandler {
 
         vaultDao.update(vault)
     }
+
+    suspend fun getBackupInfo(context: Context): Triple<Uri, Long, Long> {
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()[0]
+
+        return Triple(vault.backupFolder, vault.backupEvery, vault.lastBackup)
+    }
+
+    suspend fun updateTV(timeVariant: Long, context: Context) {
+        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
+        val vault = vaultDao.getVault()[0]
+
+        vault.backupEvery = timeVariant
+        vaultDao.update(vault)
+    }
+
 }
