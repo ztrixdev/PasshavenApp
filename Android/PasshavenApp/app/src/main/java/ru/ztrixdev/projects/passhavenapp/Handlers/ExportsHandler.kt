@@ -2,8 +2,8 @@ package ru.ztrixdev.projects.passhavenapp.Handlers
 
 import android.content.ContentResolver
 import android.content.Context
-import android.net.Uri
-import android.provider.DocumentsContract
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.goterl.lazysodium.exceptions.SodiumException
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
@@ -15,7 +15,6 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.CryptoNames
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.Keygen
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
-import java.io.File
 
 
 object ExportsHandler {
@@ -46,6 +45,8 @@ object ExportsHandler {
         val vault = vaultDao.getVault()[0]
 
         val path = vault.backupFolder
+        if (path == "".toUri())
+            return false
         // The filename looks like this
         // export_05_22_2025_17_45_31_full.phbckp
         // for a backup made on May 22nd 2025
@@ -65,17 +66,20 @@ object ExportsHandler {
         val today = DateTimeProcessor.convertForFIlename(System.currentTimeMillis())
         val filename = "$_export_filename_part_1${today}$_export_filename_part_2"
 
-        val file = File(path.path, filename)
-        if (file.exists())
+        val directory = DocumentFile.fromTreeUri(context, path)
+        if (directory?.findFile(filename)?.exists() == true) {
             return false
+        }
 
-        val newFileUri: Uri? = DocumentsContract.createDocument(resolver, path, "application/octet-stream", filename)
+        val newFile: DocumentFile? = directory?.createFile("application/octet-stream", filename)
 
-        if (newFileUri != null) {
-            resolver.openOutputStream(newFileUri)?.use { outputStream ->
+        if (newFile != null) {
+            resolver.openOutputStream(newFile.uri)?.use { outputStream ->
                 outputStream.write(export.toByteArray())
                 outputStream.flush()
             }
+        } else {
+            return false
         }
 
         vault.lastBackup = System.currentTimeMillis()

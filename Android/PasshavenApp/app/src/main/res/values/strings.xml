@@ -127,4 +127,8 @@
     <string name="cancel">Cancel</string>
     <string name="backup_password">Backup password</string>
     <string name="open_backup_password_dialog">Set/change backup password</string>
+    <string name="make_backup_now">Make a backup now</string>
+    <string name="set_backup_password">Set a backup password</string>
+    <string name="change_backup_password">Change the backup password</string>
+    <string name="last_backup_date">Date of the last backup:</string>
 </resources>

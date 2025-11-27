@@ -6,7 +6,7 @@ const val PIN_LENGTH_MINIMUM = 6
 
 // mp-related constants
 const val MP_LENGTH_MINIMUM = 8
-const val MP_DIGITS_MINIMUM = 3
+const val MP_DIGITS_MINIMUM = 2
 const val MP_SPECCHARS_MINIMUM = 2
 const val MP_UPPERCASE_MINIMUM = 2
 const val MP_ABSOLUTE_LENGTH = 18

@@ -85,6 +85,7 @@ dependencies {
     val jnaVersion = "5.17.0"
     val roomVersion = "2.8.3"
 
+    implementation(libs.androidx.documentfile)
     implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")

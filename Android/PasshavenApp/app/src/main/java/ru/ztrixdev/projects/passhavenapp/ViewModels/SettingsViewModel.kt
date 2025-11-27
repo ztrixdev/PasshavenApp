@@ -7,9 +7,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
+import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
+import ru.ztrixdev.projects.passhavenapp.Handlers.ExportTemplates
+import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
+import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
@@ -113,8 +119,28 @@ class SettingsViewModel: ViewModel() {
         SecurityPrefs.saveLastPINChange(System.currentTimeMillis(), ctx)
     }
 
-    fun setPasswordd(input: String, context: Context) {
-        // TODO
+    suspend fun setBackupPassword(password: String, context: Context) {
+        val encryptedPassword = SodiumCrypto.encrypt(password, VaultHandler().getEncryptionKey(context))
+        SecurityPrefs.saveBackupPassword(encryptedPassword, context)
+    }
+
+    suspend fun export(context: Context): Boolean {
+        val key = VaultHandler().getEncryptionKey(context)
+
+        var password = SecurityPrefs.getBackupPassword(context)
+        val noPasswordSet = password.contentEquals("")
+        if (!noPasswordSet)
+            password = SodiumCrypto.decrypt(password, key)
+
+        val entries = EntryManager.getAllEntriesForExport(database = DatabaseProvider.getDatabase(context), encryptionKey = key)
+        val folders = FolderManager.getFolders(context = context)
+        var export = ExportsHandler.getExport(ExportTemplates.Passhaven, entries = entries, folders = folders)
+        if (!noPasswordSet) // Protects the export if a password is set, will be changed later.
+            export = ExportsHandler.protectExport(export = export, password = password)
+
+        ExportsHandler.exportToFolder(context.contentResolver, export, context)
+
+        return true
     }
 
     fun resetPIN() {

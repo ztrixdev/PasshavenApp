@@ -3,10 +3,11 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +34,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,6 +45,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,32 +56,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
-import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
-import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
+import ru.ztrixdev.projects.passhavenapp.QuickComposables.FolderNameFromUri
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.TimeInMillis
 import ru.ztrixdev.projects.passhavenapp.ViewModels.SettingsViewModel
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_DIGITS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_LENGTH_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_SPECCHARS_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_UPPERCASE_MINIMUM
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
@@ -91,7 +98,6 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
-import kotlin.collections.indexOf
 
 class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -755,24 +761,80 @@ class SettingsActivity : ComponentActivity() {
             } else {
                 BackupEverySetting(settingsViewModel = settingsViewModel, backupEveryValue = backupData!!.second)
                 Spacer(modifier = Modifier.height(20.dp))
+                PasswordDialog(settingsViewModel = settingsViewModel)
+                Spacer(modifier = Modifier.height(20.dp))
                 BackupFolderSetting(settingsViewModel = settingsViewModel, backupFolder = backupData!!.first)
+                Spacer(modifier = Modifier.height(20.dp))
+                LastBackupBackupNow(settingsViewModel = settingsViewModel, lastBackup = backupData!!.third)
             }
         }
     }
 
+    @Composable
+    private fun LastBackupBackupNow(settingsViewModel: SettingsViewModel, lastBackup: Long) {
+        val localctx = LocalContext.current
+        var exportingNow by remember { mutableStateOf(false) }
+        var exportDone by remember { mutableStateOf(false) }
+
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier =
+                Modifier.widthIn(120.dp, 300.dp)
+            ){
+                Text(
+                    text = "${stringResource(R.string.last_backup_date)}: ${DateTimeProcessor.convertToHumanReadable(lastBackup)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Row {
+                Button(
+                    onClick = {
+                        lifecycleScope.launch {
+                            val exportRes = settingsViewModel.export(localctx)
+                        }
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
+                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.make_backup_now),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+        }
+    }
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun BackupFolderSetting(settingsViewModel: SettingsViewModel, backupFolder: Uri) {
         val localctx = LocalContext.current
         var bfolderChanged by remember { mutableStateOf(false) }
-        val launcher = rememberDirectoryPickerLauncher { directory ->
-            GlobalScope.launch(Dispatchers.IO) {
-                val uri = directory.toString().toUri()
-                VaultHandler().setBackupFolder(uri, localctx)
-                settingsViewModel._backupFolder.value = uri
-                bfolderChanged = true
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocumentTree()
+        ) { directoryUri: Uri? ->
+            if (directoryUri == null) {
+                return@rememberLauncherForActivityResult
             }
+
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            contentResolver.takePersistableUriPermission(directoryUri, flags)
+
+            GlobalScope.launch(Dispatchers.IO) {
+                VaultHandler().setBackupFolder(directoryUri, localctx)
+            }
+            settingsViewModel._backupFolder.value = directoryUri
+            bfolderChanged = true
         }
         Column {
             if (!bfolderChanged) {
@@ -785,16 +847,16 @@ class SettingsActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.width(10.dp))
-                Text(
-                    text =
-                        if (settingsViewModel._backupFolder.value == "".toUri()) {
-                            stringResource(R.string.backup_folder_never_set)
-                        } else {
-                            settingsViewModel._backupFolder.value.toString().split("%").last().substring(2)
-                        },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                val folderUri = settingsViewModel._backupFolder.value
+                if (folderUri == "".toUri()) {
+                    Text(
+                        text = stringResource(R.string.backup_folder_never_set),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    FolderNameFromUri(uri = folderUri)
+                }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row (
@@ -802,7 +864,7 @@ class SettingsActivity : ComponentActivity() {
             ){
                 Button (
                     onClick = {
-                        launcher.launch()
+                        launcher.launch(null)
                     },
                     colors = ButtonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -943,29 +1005,131 @@ class SettingsActivity : ComponentActivity() {
 
 
     @Composable
-    private fun PasswordDialog() {
+    private fun PasswordDialog(settingsViewModel: SettingsViewModel) {
         var isDialogOpen by remember { mutableStateOf(false) }
         var textState by remember { mutableStateOf(TextFieldValue()) }
 
-        Button(onClick = { isDialogOpen = true }) {
-            Text(stringResource(R.string.open_backup_password_dialog))
+        val localctx = LocalContext.current
+
+        TextButton (
+            onClick = {
+                isDialogOpen = true
+            },
+            modifier = Modifier
+                .widthIn(200.dp, 300.dp)
+        )  {
+            Text(
+                text =
+                    if (SecurityPrefs.getBackupPassword(localctx).contentEquals(""))
+                        stringResource(R.string.set_backup_password)
+                    else
+                        stringResource(R.string.change_backup_password),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
 
         if (isDialogOpen) {
+            var digitNumber = 0; var specialCharNumber = 0; var uppercaseNumber = 0
             AlertDialog(
                 onDismissRequest = { isDialogOpen = false },
                 title = { Text(stringResource(R.string.backup_password)) },
                 text = {
-                    TextField(
-                        value = textState,
-                        onValueChange = { textState = it },
-                        label = { Text(stringResource(R.string.enter_backup_password)) }
-                    )
+                    Column {
+                        Column {
+                            TextField(
+                                value = textState,
+                                onValueChange = { textState = it
+                                    val specialCharacters = listOf('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', ';', ':', '\'', '"', '\\', '|', ',', '<', '.', '>', '/', '?')
+                                    specialCharNumber = 0; digitNumber = 0; uppercaseNumber = 0;
+                                    for (char: Char in textState.text) {
+                                        if (char.isDigit())
+                                            digitNumber++
+                                        if (specialCharacters.contains(char))
+                                            specialCharNumber++
+                                        if (char.isUpperCase())
+                                            uppercaseNumber++
+                                    }},
+                                label = { Text(stringResource(R.string.enter_backup_password)) }
+                            )
+                        }
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = specialCharNumber >= MP_SPECCHARS_MINIMUM,
+                                    onCheckedChange = null,
+                                    enabled = false,
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                                Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = digitNumber >= MP_DIGITS_MINIMUM,
+                                    onCheckedChange = null,
+                                    enabled = false,
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                                Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = uppercaseNumber >= MP_UPPERCASE_MINIMUM,
+                                    onCheckedChange = null,
+                                    enabled = false,
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                                Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.onBackground,  fontSize =12.sp)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = textState.text.length >= MP_LENGTH_MINIMUM,
+                                    onCheckedChange = null,
+                                    enabled = false,
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                )
+                                Text(stringResource(R.string.mp_creation_checkbox_length),
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize =12.sp)
+                            }
+                        }
+                    }
                 },
                 confirmButton = {
                     Button(
+                        enabled = MasterPassword.verify(textState.text),
                         onClick = {
-                            // todo: set password
+                            lifecycleScope.launch {
+                                settingsViewModel.setBackupPassword(textState.text, localctx)
+                            }
                             isDialogOpen = false
                         }
                     ) {

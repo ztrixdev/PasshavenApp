@@ -1,5 +1,9 @@
 package ru.ztrixdev.projects.passhavenapp
 
+import android.content.ContentResolver
+import android.content.Context
+import android.net.Uri
+import android.provider.DocumentsContract
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,8 +18,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 object QuickComposables {
     @Composable
@@ -51,5 +67,61 @@ object QuickComposables {
         }
     }
 
+
+    @Composable
+    fun FolderNameFromUri(uri: Uri) {
+        val localctx = LocalContext.current
+        val contentResolver = localctx.contentResolver
+
+        var folderName by remember(uri) {
+            mutableStateOf<String?>(null)
+        }
+
+        LaunchedEffect(uri) {
+            launch(Dispatchers.IO) {
+                val resolvedName = getFolderName(uri, localctx, contentResolver)
+                withContext(Dispatchers.Main) {
+                    folderName = resolvedName
+                }
+            }
+        }
+
+        Text(
+            text = folderName ?: "",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+
+    private fun getFolderName(uri: Uri, context: Context, contentResolver: ContentResolver): String? {
+        // Don't try to query an empty or invalid URI
+        if (uri.toString().isEmpty() || uri == "".toUri()) {
+            return null
+        }
+
+        val docUri = DocumentFile.fromTreeUri(context, uri)
+        if (docUri == null) {
+            return null
+        }
+
+        val cursor = contentResolver.query(
+            docUri.uri,
+            arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME), // We only need the display name
+            null,
+            null,
+            null
+        )
+
+        var displayName: String? = null
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                if (nameIndex != -1) {
+                    displayName = it.getString(nameIndex)
+                }
+            }
+        }
+        return displayName
+    }
 
 }
