@@ -459,7 +459,7 @@ class NewEntryActivity: ComponentActivity()  {
             OutlinedTextField(
                 value = newEntryViewModel.mfaSecret,
                 onValueChange = {
-                    mfaSecretIsInvalidProblem = !MFAHandler().verifySecret(it.text)
+                    mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
                     newEntryViewModel.mfaSecret = it
                     newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                 },

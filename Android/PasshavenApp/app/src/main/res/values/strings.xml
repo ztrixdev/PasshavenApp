@@ -131,4 +131,5 @@
     <string name="set_backup_password">Set a backup password</string>
     <string name="change_backup_password">Change the backup password</string>
     <string name="last_backup_date">Date of the last backup:</string>
+    <string name="backing_up_wait">Backing up, please wait...</string>
 </resources>

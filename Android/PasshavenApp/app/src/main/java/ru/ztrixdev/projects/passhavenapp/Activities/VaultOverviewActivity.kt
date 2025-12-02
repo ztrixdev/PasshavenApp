@@ -23,6 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -32,18 +35,30 @@ import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.Handlers.ExportTemplates
 import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
+import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
+
 class VaultOverviewActivity: ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val barcodeLauncher = registerForActivityResult(
+            ScanContract()
+        ) { result: ScanIntentResult ->
+            if (result.contents != null) {
+               val qr = MFAHandler.processQR(result.contents)
+                println(qr.issuer)
+                println(qr.label)
+                println(qr.secret)
+            }
 
+        }
         setContent()
         {
             // this some raw shii, don't mind it, its really ugly
@@ -138,6 +153,28 @@ class VaultOverviewActivity: ComponentActivity() {
                         ) {
                             Text("Go to Settings")
                         }
+                        Button(
+                            onClick = {
+                                println(MFAHandler.getTotpCode("JBSWY3DPEHPK3PXP"))
+                            },
+                            modifier = Modifier.padding(all = 30.dp)
+                        ) {
+                            Text("Print a TOTP")
+                        }
+                        Button(
+                            onClick = {
+                                val options = ScanOptions().apply {
+                                    setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                                    setPrompt("Scan a QR code")
+                                    setCameraId(0)
+                                    setBeepEnabled(true)
+                                }
+
+                                barcodeLauncher.launch(options)
+                            }
+                        ) {
+                            Text("scan qr")
+                        }
                     }
                     else {
                         Text(text = "Please wait until your vault finishes loading.", color = Color.White, style = TextStyle.Default)
@@ -146,4 +183,6 @@ class VaultOverviewActivity: ComponentActivity() {
             }
         }
     }
+
+
 }

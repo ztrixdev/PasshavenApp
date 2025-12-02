@@ -17,7 +17,7 @@ android {
     }
     defaultConfig {
         applicationId = "ru.ztrixdev.projects.passhavenapp"
-        minSdk = 26
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -90,6 +90,8 @@ dependencies {
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
     implementation(libs.androidx.compose.ui.text.google.fonts)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

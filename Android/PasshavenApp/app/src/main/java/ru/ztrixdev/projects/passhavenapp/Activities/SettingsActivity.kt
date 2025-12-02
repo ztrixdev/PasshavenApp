@@ -70,6 +70,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
@@ -98,6 +99,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
+
 
 class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
@@ -175,7 +177,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
- 
+
                     .clickable(true, onClick = {
                         settingsViewModel.openAppearance.value = true
                     })
@@ -207,7 +209,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
- 
+
                     .clickable(true, onClick = {
                         settingsViewModel.openSecurity.value = true
                     })
@@ -239,7 +241,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
- 
+
                     .clickable(true, onClick = {
                         settingsViewModel.openExports.value = true
                     })
@@ -271,7 +273,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
- 
+
                     .clickable(true, onClick = {
                         settingsViewModel.openImports.value = true
                     })
@@ -303,7 +305,7 @@ class SettingsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .padding(top = 2.dp)
- 
+
                     .clickable(true, onClick = {
                         settingsViewModel.openInfo.value = true
                     })
@@ -695,7 +697,10 @@ class SettingsActivity : ComponentActivity() {
                     Box(
                         modifier = Modifier
                             .size(22.dp) // Set the size of the circle
-                            .background(MaterialTheme.colorScheme.secondaryContainer, shape = CircleShape)
+                            .background(
+                                MaterialTheme.colorScheme.secondaryContainer,
+                                shape = CircleShape
+                            )
                     )
                 }
             }
@@ -756,16 +761,18 @@ class SettingsActivity : ComponentActivity() {
         Column(
             Modifier.padding(all = 16.dp)
         ) {
-            if (backupData == null) {
+            if (backupData == null) { // Loading state
                 Text("Please wait...")
             } else {
-                BackupEverySetting(settingsViewModel = settingsViewModel, backupEveryValue = backupData!!.second)
-                Spacer(modifier = Modifier.height(20.dp))
-                PasswordDialog(settingsViewModel = settingsViewModel)
-                Spacer(modifier = Modifier.height(20.dp))
-                BackupFolderSetting(settingsViewModel = settingsViewModel, backupFolder = backupData!!.first)
-                Spacer(modifier = Modifier.height(20.dp))
-                LastBackupBackupNow(settingsViewModel = settingsViewModel, lastBackup = backupData!!.third)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    BackupEverySetting(settingsViewModel = settingsViewModel, backupEveryValue = backupData!!.second)
+                    PasswordDialog(settingsViewModel = settingsViewModel)
+                    BackupFolderSetting(settingsViewModel = settingsViewModel, backupFolder = backupData!!.first)
+                    LastBackupBackupNow(settingsViewModel = settingsViewModel, lastBackup = backupData!!.third)
+                }
             }
         }
     }
@@ -773,28 +780,54 @@ class SettingsActivity : ComponentActivity() {
     @Composable
     private fun LastBackupBackupNow(settingsViewModel: SettingsViewModel, lastBackup: Long) {
         val localctx = LocalContext.current
-        var exportingNow by remember { mutableStateOf(false) }
         var exportDone by remember { mutableStateOf(false) }
 
-        Column {
+        var lastBackupForUI by remember { mutableStateOf(lastBackup) }
+        LaunchedEffect(exportDone) {
+            if (exportDone) {
+                val newTimestamp = withContext(Dispatchers.IO) {
+                    VaultHandler().getBackupInfo(localctx).third
+                }
+                lastBackupForUI = newTimestamp
+            }
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier =
-                Modifier.widthIn(120.dp, 300.dp)
+                horizontalArrangement = Arrangement.SpaceBetween, // Pushes items to ends
+                modifier = Modifier.fillMaxWidth()
             ){
                 Text(
-                    text = "${stringResource(R.string.last_backup_date)}: ${DateTimeProcessor.convertToHumanReadable(lastBackup)}",
+                    text = "${stringResource(R.string.last_backup_date)}:",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
+                Text(
+                    text = DateTimeProcessor.convertToHumanReadable(lastBackupForUI),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.End,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            var showWaitDialog by remember { mutableStateOf(false) }
+            if (showWaitDialog) {
+                QuickComposables.WaitingDialog(
+                    stringResource(R.string.backing_up_wait)
+                )
+            }
             Row {
                 Button(
                     onClick = {
                         lifecycleScope.launch {
-                            val exportRes = settingsViewModel.export(localctx)
+                            try {
+                                showWaitDialog = true
+                                withContext(Dispatchers.IO) {
+                                    settingsViewModel.export(localctx)
+                                }
+                            } finally {
+                                showWaitDialog = false
+                                exportDone = !exportDone
+                            }
                         }
                     },
                     colors = ButtonColors(
@@ -836,17 +869,20 @@ class SettingsActivity : ComponentActivity() {
             settingsViewModel._backupFolder.value = directoryUri
             bfolderChanged = true
         }
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (!bfolderChanged) {
                 settingsViewModel._backupFolder.value = backupFolder
             }
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
                     text = stringResource(R.string.backup_folder),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer(Modifier.width(10.dp))
                 val folderUri = settingsViewModel._backupFolder.value
                 if (folderUri == "".toUri()) {
                     Text(
@@ -855,12 +891,14 @@ class SettingsActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.primary
                     )
                 } else {
-                    FolderNameFromUri(uri = folderUri)
+                    // Aligns the folder name to the right
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                        FolderNameFromUri(uri = folderUri)
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(4.dp))
             Row (
-                Modifier.padding(start = 12.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 Button (
                     onClick = {
@@ -872,8 +910,6 @@ class SettingsActivity : ComponentActivity() {
                         disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
-                    modifier = Modifier
-                        .widthIn(70.dp, 200.dp)
                 ) {
                     Text(
                         text = if (settingsViewModel._backupFolder.value == "".toUri()) {
@@ -884,14 +920,18 @@ class SettingsActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
-                Spacer(modifier = Modifier.width(20.dp))
+                /*
                 if (backupFolder != "".toUri()) {
                     Button (
                         onClick = {
+                            val treeUri: Uri = settingsViewModel._backupFolder.value
+                            val treeDocumentId = DocumentsContract.getTreeDocumentId(treeUri)
+                            val docUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, treeDocumentId)
+
                             val intent = Intent(Intent.ACTION_VIEW)
-                            val uri: Uri = settingsViewModel._backupFolder.value
-                            intent.setDataAndType(uri, "*/*")
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            intent.setDataAndType(docUri, DocumentsContract.Document.MIME_TYPE_DIR)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
                             if (intent.resolveActivity(localctx.packageManager) != null) {
                                 localctx.startActivity(intent)
                             }
@@ -902,8 +942,6 @@ class SettingsActivity : ComponentActivity() {
                             disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
-                        modifier = Modifier
-                            .widthIn(70.dp, 200.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.open_in_finder),
@@ -911,7 +949,8 @@ class SettingsActivity : ComponentActivity() {
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
-                }
+}
+                 */
             }
         }
     }
@@ -919,19 +958,16 @@ class SettingsActivity : ComponentActivity() {
     @Composable
     private fun BackupEverySetting(settingsViewModel: SettingsViewModel, backupEveryValue: Long) {
         Row(
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween, // This will push items to the ends
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.backup_every),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier
-                    .widthIn(200.dp, 250.dp)
+                color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.width(10.dp))
             BackupEveryDropdown(settingsViewModel = settingsViewModel, backupEveryValue = backupEveryValue)
-            Spacer(modifier = Modifier.width(10.dp))
         }
     }
 
@@ -1011,15 +1047,14 @@ class SettingsActivity : ComponentActivity() {
 
         val localctx = LocalContext.current
 
-        TextButton (
-            onClick = {
-                isDialogOpen = true
-            },
-            modifier = Modifier
-                .widthIn(200.dp, 300.dp)
-        )  {
-            Text(
-                text =
+        Column {
+            TextButton (
+                onClick = {
+                    isDialogOpen = true
+                }
+            )  {
+                Text(
+                    text =
                     if (SecurityPrefs.getBackupPassword(localctx).contentEquals(""))
                         stringResource(R.string.set_backup_password)
                     else
@@ -1027,8 +1062,8 @@ class SettingsActivity : ComponentActivity() {
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.bodyLarge
             )
+            }
         }
-
         if (isDialogOpen) {
             var digitNumber = 0; var specialCharNumber = 0; var uppercaseNumber = 0
             AlertDialog(
