@@ -23,9 +23,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanIntentResult
-import com.journeyapps.barcodescanner.ScanOptions
 import io.github.vinceglb.filekit.dialogs.compose.rememberDirectoryPickerLauncher
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -48,17 +45,6 @@ class VaultOverviewActivity: ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val barcodeLauncher = registerForActivityResult(
-            ScanContract()
-        ) { result: ScanIntentResult ->
-            if (result.contents != null) {
-               val qr = MFAHandler.processQR(result.contents)
-                println(qr.issuer)
-                println(qr.label)
-                println(qr.secret)
-            }
-
-        }
         setContent()
         {
             // this some raw shii, don't mind it, its really ugly
@@ -163,14 +149,8 @@ class VaultOverviewActivity: ComponentActivity() {
                         }
                         Button(
                             onClick = {
-                                val options = ScanOptions().apply {
-                                    setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-                                    setPrompt("Scan a QR code")
-                                    setCameraId(0)
-                                    setBeepEnabled(true)
-                                }
 
-                                barcodeLauncher.launch(options)
+
                             }
                         ) {
                             Text("scan qr")

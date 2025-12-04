@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -51,8 +52,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
@@ -69,9 +73,18 @@ import kotlin.uuid.Uuid
 
 
 class NewEntryActivity: ComponentActivity()  {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val newEntryViewModel: NewEntryViewModel by viewModels()
+    val newEntryViewModel: NewEntryViewModel by viewModels()
 
+    val qrScanLauncher = registerForActivityResult(
+        ScanContract()
+    ) { result: ScanIntentResult ->
+        if (result.contents != null) {
+            val qr = MFAHandler.processQR(result.contents)
+            newEntryViewModel.mfaSecret = TextFieldValue(qr.secret)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -456,39 +469,60 @@ class NewEntryActivity: ComponentActivity()  {
             }
 
             // MFA textfield
-            OutlinedTextField(
-                value = newEntryViewModel.mfaSecret,
-                onValueChange = {
-                    mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
-                    newEntryViewModel.mfaSecret = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
-                },
-                label = {
-                    Text(text = stringResource(R.string.mfa_secret))
-                },
-                singleLine = true,
-                isError = mfaSecretIsInvalidProblem,
-                supportingText = @Composable {
-                    if (mfaSecretIsInvalidProblem)
-                        Text(text = stringResource(R.string.mfa_secret_invalid),
-                            style = MaterialTheme.typography.bodySmall)
-                    else
-                        Text(
-                            text = stringResource(R.string.mfa_secret_supporting_text),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                OutlinedTextField(
+                    value = newEntryViewModel.mfaSecret,
+                    onValueChange = {
+                        mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
+                        newEntryViewModel.mfaSecret = it
+                        newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                    },
+                    label = {
+                        Text(text = stringResource(R.string.mfa_secret))
+                    },
+                    singleLine = true,
+                    isError = mfaSecretIsInvalidProblem,
+                    supportingText = @Composable {
+                        if (mfaSecretIsInvalidProblem)
+                            Text(text = stringResource(R.string.mfa_secret_invalid),
+                                style = MaterialTheme.typography.bodySmall)
+                        else
+                            Text(
+                                text = stringResource(R.string.mfa_secret_supporting_text),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                        focusedContainerColor = MaterialTheme.colorScheme.background,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                        errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                    )
                 )
-            )
+                IconButton(
+                    onClick = {
+                        qrScanLauncher.launch(newEntryViewModel.defaultQRScanOpts)
+                    },
+                    modifier = Modifier
+                        .widthIn(20.dp, 30.dp)
+                        .padding(top = 20.dp),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.qr_code_scanner_24px),
+                        contentDescription = "QR button.",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+            }
+
 
             // Recovery codes section
             Column {

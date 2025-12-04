@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.CardManager
@@ -25,6 +26,12 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
 class NewEntryViewModel: ViewModel() {
+    val defaultQRScanOpts = ScanOptions().apply {
+        setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+        setCameraId(0)
+        setBeepEnabled(false)
+    }
+
     val entryCreated = mutableStateOf(false)
 
     var selectedFolderUuid by mutableStateOf<Uuid?>(null)
