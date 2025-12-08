@@ -150,7 +150,6 @@ class VaultOverviewActivity: ComponentActivity() {
                         Button(
                             onClick = {
 
-
                             }
                         ) {
                             Text("scan qr")

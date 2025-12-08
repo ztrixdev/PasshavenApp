@@ -46,4 +46,6 @@ public class Utils {
             throw new AssertionError(ex);
         }
     }
+
+    public static final int UUID_ALPHANUMERIC_STRING_LENGTH = 36;
 }
