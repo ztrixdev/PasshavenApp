@@ -165,6 +165,7 @@ class NewEntryActivity: ComponentActivity()  {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
                                 newEntryViewModel.setSelectedFolder(folder)
+                                newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                             }
                         )
                     }
@@ -224,6 +225,7 @@ class NewEntryActivity: ComponentActivity()  {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
                                 newEntryViewModel._setSelectedEntryType(typeStringsToEntryTypes[typeStringsToEntryTypes.keys.toList()[itemPosition.intValue]] as EntryTypes)
+                                newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                             }
                         )
                     }
@@ -458,6 +460,7 @@ class NewEntryActivity: ComponentActivity()  {
             // Generate password button
             TextButton(
                 onClick = {
+                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                     newEntryViewModel.generatePassword()
                 }
             ) {
@@ -507,6 +510,8 @@ class NewEntryActivity: ComponentActivity()  {
                 )
                 IconButton(
                     onClick = {
+
+                        newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                         qrScanLauncher.launch(newEntryViewModel.defaultQRScanOpts)
                     },
                     modifier = Modifier
@@ -553,7 +558,9 @@ class NewEntryActivity: ComponentActivity()  {
                             )
                             if (newEntryViewModel.recoveryCodes.size > 1) {
                                 IconButton(
-                                    onClick = {newEntryViewModel.deleteRecoveryCode(index = index)},
+                                    onClick = {
+                                        newEntryViewModel.deleteRecoveryCode(index = index)
+                                        newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()},
                                     modifier = Modifier.padding(start = 4.dp)
                                 ) {
                                     Icon(
@@ -569,6 +576,7 @@ class NewEntryActivity: ComponentActivity()  {
                     Spacer(modifier = Modifier.height(8.dp)) // Add some space before the button
                     TextButton(
                         onClick = {
+                            newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
                             newEntryViewModel.addRecoveryCode()
                         },
                     ) {

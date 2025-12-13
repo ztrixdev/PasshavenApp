@@ -94,6 +94,10 @@ class EditEntryActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
+            val localctx = LocalContext.current
+            LaunchedEffect(Unit) {
+                editEntryViewModel.getCurrentData(localctx)
+            }
             PasshavenTheme(
                 themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
                 darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)
@@ -130,6 +134,12 @@ class EditEntryActivity : ComponentActivity() {
         }
         LaunchedEffect(Unit) {
             folders.addAll(editEntryViewModel.getFolders(localctx))
+        }
+
+        LaunchedEffect(editEntryViewModel.dataFetchDone) {
+            if (editEntryViewModel.inFolder != null) {
+                itemPosition.intValue = folders.indexOf(editEntryViewModel.inFolder)
+            }
         }
 
 
@@ -174,6 +184,7 @@ class EditEntryActivity : ComponentActivity() {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
                                 editEntryViewModel.setSelectedFolder(folder)
+                                editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
                             }
                         )
                     }
@@ -185,7 +196,7 @@ class EditEntryActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
     private fun MainBody(editEntryViewModel: EditEntryViewModel) {
-        QuickComposables.Titlebar(stringResource(R.string.newentryactivity_titlebar)) {
+        QuickComposables.Titlebar(stringResource(R.string.editentryactivity_titlebar)) {
             val intent = Intent(this@EditEntryActivity, VaultOverviewActivity::class.java)
             this@EditEntryActivity.startActivity(intent)
         }
@@ -397,6 +408,7 @@ class EditEntryActivity : ComponentActivity() {
             // Generate password button
             TextButton(
                 onClick = {
+                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
                     editEntryViewModel.generatePassword()
                 }
             ) {
@@ -447,6 +459,7 @@ class EditEntryActivity : ComponentActivity() {
                 IconButton(
                     onClick = {
                         qrScanLauncher.launch(editEntryViewModel.defaultQRScanOpts)
+                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
                     },
                     modifier = Modifier
                         .widthIn(20.dp, 30.dp)
@@ -492,7 +505,9 @@ class EditEntryActivity : ComponentActivity() {
                             )
                             if (editEntryViewModel.recoveryCodes.size > 1) {
                                 IconButton(
-                                    onClick = {editEntryViewModel.deleteRecoveryCode(index = index)},
+                                    onClick = {
+                                        editEntryViewModel.deleteRecoveryCode(index = index)
+                                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()},
                                     modifier = Modifier.padding(start = 4.dp)
                                 ) {
                                     Icon(
@@ -508,6 +523,7 @@ class EditEntryActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(8.dp)) // Add some space before the button
                     TextButton(
                         onClick = {
+                            editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
                             editEntryViewModel.addRecoveryCode()
                         },
                     ) {

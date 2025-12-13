@@ -35,6 +35,8 @@ import ru.ztrixdev.projects.passhavenapp.Handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.Room.Account
+import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
@@ -51,6 +53,7 @@ class VaultOverviewActivity: ComponentActivity() {
             PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current))  {
                 var gotoNEA by remember { mutableStateOf(false) }
                 var gotoNFA by remember { mutableStateOf(false) }
+                var gotoEA by remember { mutableStateOf(false) }
                 var gotoSA by remember { mutableStateOf(false) }
                 val ctx = LocalContext.current
 
@@ -77,6 +80,21 @@ class VaultOverviewActivity: ComponentActivity() {
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
                     }
+                }
+                LaunchedEffect(gotoEA) {
+                    if (gotoEA) {
+                        val entry = EntryManager.getAllEntriesForUI(database = DatabaseProvider.getDatabase(ctx), encryptionKey = VaultHandler().getEncryptionKey(ctx))[0]
+                        var uuid = ""
+                        if (entry is Card)
+                            uuid = entry.uuid.toString()
+                        if (entry is Account)
+                            uuid = entry.uuid.toString()
+
+                        println(uuid)
+                        ctx .startActivity(
+                        Intent(ctx, EditEntryActivity::class.java)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY, uuid)
+                    )}
                 }
                 Column(
                     Modifier.verticalScroll(rememberScrollState())
@@ -149,7 +167,7 @@ class VaultOverviewActivity: ComponentActivity() {
                         }
                         Button(
                             onClick = {
-
+                                gotoEA = true
                             }
                         ) {
                             Text("scan qr")

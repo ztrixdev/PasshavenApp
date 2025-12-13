@@ -38,7 +38,7 @@ class EditEntryViewModel : ViewModel() {
 
     var entryUuid: String? = ""
 
-    var inFolder: Folder? = null
+    var inFolder by mutableStateOf<Folder?>(null)
     var selectedFolderUuid by mutableStateOf<Uuid?>(null)
 
     fun setSelectedFolder(folder: Folder) {
@@ -49,6 +49,7 @@ class EditEntryViewModel : ViewModel() {
         return FolderManager.getFolderByUuid(context, selectedFolderUuid as Uuid)
     }
 
+    var dataFetchDone by mutableStateOf(false)
 
     var newEntryName by mutableStateOf(TextFieldValue(""))
     var additionalNote by mutableStateOf(TextFieldValue(""))
@@ -112,6 +113,7 @@ class EditEntryViewModel : ViewModel() {
                 entry.mfaSecret?.let { mfaSecret = TextFieldValue(it) }
                 password = TextFieldValue(entry.password)
                 entry.recoveryCodes?.let {
+                    recoveryCodes.removeAt(0)
                     recoveryCodesAmount = it.size
                     it.forEach { code ->
                         recoveryCodes.add(TextFieldValue(code))
@@ -128,6 +130,8 @@ class EditEntryViewModel : ViewModel() {
                 inFolder = folder
             }
         }
+
+        dataFetchDone = true
     }
 
     fun generatePassword() {
