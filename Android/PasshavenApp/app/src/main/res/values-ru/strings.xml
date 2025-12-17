@@ -133,4 +133,6 @@ Passhaven никогда не обращается к серверам и не �
     <string name="last_backup_date">Дата последнего бэкапа:</string>
     <string name="backing_up_wait">Создается рез. копия, подождите...</string>
     <string name="editentryactivity_titlebar">Изменение записи</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="edit">Редактировать</string>
 </resources>

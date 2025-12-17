@@ -24,8 +24,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,10 +60,10 @@ import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
-import ru.ztrixdev.projects.passhavenapp.ViewModels.EditEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
+import ru.ztrixdev.projects.passhavenapp.ViewModels.ViewEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import kotlin.uuid.Uuid
 
@@ -76,27 +72,27 @@ const val EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY = "entry_uuid"
 const val EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY = "previous_activity"
 
 class EditEntryActivity : ComponentActivity() {
-    val editEntryViewModel: EditEntryViewModel by viewModels()
+    val viewEntryViewModel: ViewEntryViewModel by viewModels()
 
     val qrScanLauncher = registerForActivityResult(
         ScanContract()
     ) { result: ScanIntentResult ->
         if (result.contents != null) {
             val qr = MFAHandler.processQR(result.contents)
-            editEntryViewModel.mfaSecret = TextFieldValue(qr.secret)
+            viewEntryViewModel.mfaSecret = TextFieldValue(qr.secret)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val receivedIntent = intent
-        editEntryViewModel.entryUuid = receivedIntent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY)
+        viewEntryViewModel.entryUuid = receivedIntent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY)
 
         enableEdgeToEdge()
         setContent {
             val localctx = LocalContext.current
             LaunchedEffect(Unit) {
-                editEntryViewModel.getCurrentData(localctx)
+                viewEntryViewModel.getCurrentData(localctx)
             }
             PasshavenTheme(
                 themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
@@ -109,14 +105,14 @@ class EditEntryActivity : ComponentActivity() {
                         .background(MaterialTheme.colorScheme.background)
                         .verticalScroll(scrollState)
                 ) {
-                    MainBody(editEntryViewModel)
+                    MainBody(viewEntryViewModel)
                 }
             }
         }
     }
 
     @Composable
-    private fun FolderSelectionDropdown(editEntryViewModel: EditEntryViewModel) {
+    private fun FolderSelectionDropdown(viewEntryViewModel: ViewEntryViewModel) {
         val localctx = LocalContext.current
 
         val isDropDownExpanded = remember {
@@ -133,12 +129,12 @@ class EditEntryActivity : ComponentActivity() {
             mutableStateListOf<Folder>()
         }
         LaunchedEffect(Unit) {
-            folders.addAll(editEntryViewModel.getFolders(localctx))
+            folders.addAll(viewEntryViewModel.getFolders(localctx))
         }
 
-        LaunchedEffect(editEntryViewModel.dataFetchDone) {
-            if (editEntryViewModel.inFolder != null) {
-                itemPosition.intValue = folders.indexOf(editEntryViewModel.inFolder)
+        LaunchedEffect(viewEntryViewModel.dataFetchDone) {
+            if (viewEntryViewModel.inFolder != null) {
+                itemPosition.intValue = folders.indexOf(viewEntryViewModel.inFolder)
             }
         }
 
@@ -152,7 +148,7 @@ class EditEntryActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.clickable {
-                        isDropDownExpanded.value = true
+                        isDropDownExpanded.value = viewEntryViewModel.editMode
                     }
                 ) {
                     Icon(
@@ -183,8 +179,8 @@ class EditEntryActivity : ComponentActivity() {
                             onClick = {
                                 isDropDownExpanded.value = false
                                 itemPosition.intValue = index
-                                editEntryViewModel.setSelectedFolder(folder)
-                                editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                                viewEntryViewModel.setSelectedFolder(folder)
+                                viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                             }
                         )
                     }
@@ -195,13 +191,63 @@ class EditEntryActivity : ComponentActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    private fun MainBody(editEntryViewModel: EditEntryViewModel) {
+    private fun MainBody(viewEntryViewModel: ViewEntryViewModel) {
         QuickComposables.Titlebar(stringResource(R.string.editentryactivity_titlebar)) {
             val intent = Intent(this@EditEntryActivity, VaultOverviewActivity::class.java)
             this@EditEntryActivity.startActivity(intent)
         }
         Spacer(
-            modifier = Modifier.height(40.dp)
+            modifier = Modifier.height(20.dp)
+        )
+        val localctx = LocalContext.current
+        TextButton(onClick = {
+            viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+            if (viewEntryViewModel.editMode) {
+                lifecycleScope.launch {
+                    finish(localctx, viewEntryViewModel) {
+                        viewEntryViewModel.editMode = false
+                    }
+                }
+            } else {
+                viewEntryViewModel.editMode = true
+            }
+        },
+            enabled = if (viewEntryViewModel.editMode) viewEntryViewModel.allRequiredFieldsAreFilled else true,
+            modifier = Modifier
+                .padding(start = 16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (viewEntryViewModel.editMode) {
+                    Icon(
+                        painter = painterResource(R.drawable.check_24px),
+                        contentDescription = "Check icon.",
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.confirm),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.edit_24px),
+                        contentDescription = "Edit icon.",
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.edit),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+        Spacer(
+            modifier = Modifier.height(10.dp)
         )
         Column(
             modifier = Modifier
@@ -218,22 +264,23 @@ class EditEntryActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 6.dp))
-                FolderSelectionDropdown(editEntryViewModel = editEntryViewModel)
+                FolderSelectionDropdown(viewEntryViewModel = viewEntryViewModel)
             }
 
             var nameIsEmptyProblem by remember { mutableStateOf(false) }
             OutlinedTextField(
-                value = editEntryViewModel.newEntryName,
+                value = viewEntryViewModel.newEntryName,
                 onValueChange = {
                     nameIsEmptyProblem = false
                     if (it.text.isEmpty())
                         nameIsEmptyProblem = true
-                    editEntryViewModel.newEntryName = it
-                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                    viewEntryViewModel.newEntryName = it
+                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                 },
                 label = {
                     Text(text = stringResource(R.string.new_entry_name))
                 },
+                enabled = viewEntryViewModel.editMode,
                 singleLine = true,
                 isError = nameIsEmptyProblem,
                 supportingText = @Composable {
@@ -243,97 +290,75 @@ class EditEntryActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
+                colors = QuickComposables.uniformTextFieldColors()
+            )
+
+            if (!viewEntryViewModel.editMode) {
+                Spacer(
+                    modifier = Modifier.height(4.dp)
                 )
-            )
+            } else {
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+            }
 
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
-
-            when (editEntryViewModel.type) {
-                EntryTypes.Account -> AccountSpecificFields(editEntryViewModel)
-                EntryTypes.Card -> CardSpecificFields(editEntryViewModel)
+            when (viewEntryViewModel.type) {
+                EntryTypes.Account -> AccountSpecificFields(viewEntryViewModel)
+                EntryTypes.Card -> CardSpecificFields(viewEntryViewModel)
                 EntryTypes.Folder -> {}
             }
 
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
+            if (!viewEntryViewModel.editMode) {
+                Spacer(
+                    modifier = Modifier.height(4.dp)
+                )
+            } else {
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+            }
+
 
             OutlinedTextField(
-                value = editEntryViewModel.additionalNote,
+                value = viewEntryViewModel.additionalNote,
                 onValueChange = {
-                    editEntryViewModel.additionalNote = it
+                    viewEntryViewModel.additionalNote = it
                 },
                 label = {
                     Text(text = stringResource(R.string.additional_note))
                 },
                 singleLine = false,
+                enabled = viewEntryViewModel.editMode,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                )
+                colors = QuickComposables.uniformTextFieldColors()
             )
-
-            val localctx = LocalContext.current
-            Button(
-                onClick = {
-                    lifecycleScope.launch {
-                        finish(localctx, editEntryViewModel) {
-                            val intent = Intent(localctx, VaultOverviewActivity::class.java)
-                            localctx.startActivity(intent)
-                        }
-                    }
-                },
-                enabled = editEntryViewModel.allRequiredFieldsAreFilled,
-                colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = Color.LightGray,
-                    disabledContentColor = Color.DarkGray
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            ) {
-                Text(stringResource(R.string.continue_button))
-            }
             Spacer(
                 modifier = Modifier.height(80.dp)
             )
         }
     }
 
-    private suspend fun finish(localctx: Context, editEntryViewModel: EditEntryViewModel, onSuccess: () -> Unit) {
+    private suspend fun finish(localctx: Context, viewEntryViewModel: ViewEntryViewModel, onSuccess: () -> Unit) {
         var editEntryUuid = Uuid.random()
         val editEntryUuidClone = editEntryUuid
 
-        if (editEntryViewModel.type == EntryTypes.Card)
-            editEntryUuid = editEntryViewModel.updateEntry(card = editEntryViewModel.createCard(), context =  localctx)
-        if (editEntryViewModel.type == EntryTypes.Account)
-            editEntryUuid = editEntryViewModel.updateEntry(account = editEntryViewModel.createAccount(), context = localctx)
+        if (viewEntryViewModel.type == EntryTypes.Card)
+            editEntryUuid = viewEntryViewModel.updateEntry(card = viewEntryViewModel.createCard(), context =  localctx)
+        if (viewEntryViewModel.type == EntryTypes.Account)
+            editEntryUuid = viewEntryViewModel.updateEntry(account = viewEntryViewModel.createAccount(), context = localctx)
 
-        editEntryViewModel.entryUpdated = editEntryUuid != editEntryUuidClone
+        viewEntryViewModel.entryUpdated = editEntryUuid != editEntryUuidClone
         if (editEntryUuid != editEntryUuidClone) {
-            editEntryViewModel.entryUpdated = true
+            viewEntryViewModel.entryUpdated = true
             onSuccess()
         }
     }
 
     @Composable
-    private fun AccountSpecificFields(editEntryViewModel: EditEntryViewModel) {
+    private fun AccountSpecificFields(viewEntryViewModel: ViewEntryViewModel) {
         var usernameIsEmptyProblem by remember { mutableStateOf(false) }
         var passwordIsEmptyProblem by remember { mutableStateOf(false) }
         var mfaSecretIsInvalidProblem by remember { mutableStateOf(false) }
@@ -341,11 +366,11 @@ class EditEntryActivity : ComponentActivity() {
         Column {
             // Username textfield
             OutlinedTextField(
-                value = editEntryViewModel.username,
+                value = viewEntryViewModel.username,
                 onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
-                    editEntryViewModel.username = it
-                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                    viewEntryViewModel.username = it
+                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                 },
                 label = {
                     Text(text = stringResource(R.string.username))
@@ -360,25 +385,20 @@ class EditEntryActivity : ComponentActivity() {
                         Text(text = stringResource(R.string.fill_this_field_up_pls),
                             style = MaterialTheme.typography.bodySmall)
                 },
+                enabled = viewEntryViewModel.editMode,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                )
+                colors = QuickComposables.uniformTextFieldColors()
             )
 
             // Password textfield
             OutlinedTextField(
-                value = editEntryViewModel.password,
+                value = viewEntryViewModel.password,
                 onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
-                    editEntryViewModel.password = it
-                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                    viewEntryViewModel.password = it
+                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                 },
                 label = {
                     Text(text = stringResource(R.string.password))
@@ -386,6 +406,7 @@ class EditEntryActivity : ComponentActivity() {
                 placeholder = {
                     Text(text = stringResource(R.string.password_placeholder))
                 },
+                enabled = viewEntryViewModel.editMode,
                 singleLine = true,
                 isError = passwordIsEmptyProblem,
                 supportingText = @Composable {
@@ -396,27 +417,24 @@ class EditEntryActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                )
+                colors = QuickComposables.uniformTextFieldColors()
             )
 
             // Generate password button
-            TextButton(
-                onClick = {
-                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
-                    editEntryViewModel.generatePassword()
+            if (viewEntryViewModel.editMode) {
+                TextButton(
+                    onClick = {
+                        viewEntryViewModel.allRequiredFieldsAreFilled =
+                            viewEntryViewModel.checkRequiredFields()
+                        viewEntryViewModel.generatePassword()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.generate_password_for_me),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
-            ) {
-                Text(
-                    text = stringResource(R.string.generate_password_for_me),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
 
             // MFA textfield
@@ -424,16 +442,17 @@ class EditEntryActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 OutlinedTextField(
-                    value = editEntryViewModel.mfaSecret,
+                    value = viewEntryViewModel.mfaSecret,
                     onValueChange = {
                         mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
-                        editEntryViewModel.mfaSecret = it
-                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                        viewEntryViewModel.mfaSecret = it
+                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                     },
                     label = {
                         Text(text = stringResource(R.string.mfa_secret))
                     },
                     singleLine = true,
+                    enabled = viewEntryViewModel.editMode,
                     isError = mfaSecretIsInvalidProblem,
                     supportingText = @Composable {
                         if (mfaSecretIsInvalidProblem)
@@ -448,71 +467,64 @@ class EditEntryActivity : ComponentActivity() {
                     modifier = Modifier
                         .padding(top = 8.dp),
 
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        focusedContainerColor = MaterialTheme.colorScheme.background,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                        errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                    )
+                    colors = QuickComposables.uniformTextFieldColors()
                 )
-                IconButton(
-                    onClick = {
-                        qrScanLauncher.launch(editEntryViewModel.defaultQRScanOpts)
-                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
-                    },
-                    modifier = Modifier
-                        .widthIn(20.dp, 30.dp)
-                        .padding(top = 20.dp),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.qr_code_scanner_24px),
-                        contentDescription = "QR button.",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(36.dp)
-                    )
+                if (viewEntryViewModel.editMode) {
+                    IconButton(
+                        onClick = {
+                            qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                            viewEntryViewModel.allRequiredFieldsAreFilled =
+                                viewEntryViewModel.checkRequiredFields()
+                        },
+                        modifier = Modifier
+                            .widthIn(20.dp, 30.dp)
+                            .padding(top = 20.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.qr_code_scanner_24px),
+                            contentDescription = "QR button",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
                 }
-
             }
 
 
             // Recovery codes section
             Column {
-                if (!editEntryViewModel.recoveryCodes.isEmpty()) {
-                    repeat(editEntryViewModel.recoveryCodes.size) { index ->
+                if (!viewEntryViewModel.recoveryCodes.isEmpty()) {
+                    repeat(viewEntryViewModel.recoveryCodes.size) { index ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = editEntryViewModel.recoveryCodes[index],
+                                value = viewEntryViewModel.recoveryCodes[index],
                                 onValueChange = {
-                                    editEntryViewModel.recoveryCodes[index] = it
+                                    viewEntryViewModel.recoveryCodes[index] = it
                                 },
                                 label = {
                                     // recovery code #i
                                     Text(text = "${stringResource(R.string.recovery_code_label)}${index}")
                                 },
                                 singleLine = true,
-                                colors = TextFieldDefaults.colors(
-                                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                                )
+                                enabled = viewEntryViewModel.editMode,
+                                colors = QuickComposables.uniformTextFieldColors()
                             )
-                            if (editEntryViewModel.recoveryCodes.size > 1) {
+                            if (viewEntryViewModel.editMode && viewEntryViewModel.recoveryCodes.size > 1) {
                                 IconButton(
                                     onClick = {
-                                        editEntryViewModel.deleteRecoveryCode(index = index)
-                                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()},
+                                        viewEntryViewModel.deleteRecoveryCode(index)
+                                        viewEntryViewModel.allRequiredFieldsAreFilled =
+                                            viewEntryViewModel.checkRequiredFields()
+                                    },
                                     modifier = Modifier.padding(start = 4.dp)
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.delete_24px),
-                                        contentDescription = "Trash bin icon. Do we really need content descriptions? I am thinking of putting some rap lyrics or Exotic Butters into a CD soon. ," ,
+                                        contentDescription = "Delete recovery code",
                                         tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(18.dp)
                                     )
@@ -521,20 +533,23 @@ class EditEntryActivity : ComponentActivity() {
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp)) // Add some space before the button
-                    TextButton(
-                        onClick = {
-                            editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
-                            editEntryViewModel.addRecoveryCode()
-                        },
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.add_24px),
-                            contentDescription = "Add button.",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp)) // Space between icon and text
-                        Text(text = stringResource(R.string.add_another_recovery_code))
+                    if (viewEntryViewModel.editMode) {
+                        TextButton(
+                            onClick = {
+                                viewEntryViewModel.allRequiredFieldsAreFilled =
+                                    viewEntryViewModel.checkRequiredFields()
+                                viewEntryViewModel.addRecoveryCode()
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.add_24px),
+                                contentDescription = "Add recovery code",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = stringResource(R.string.add_another_recovery_code))
+                        }
                     }
                 }
             }
@@ -543,7 +558,7 @@ class EditEntryActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun CardSpecificFields(editEntryViewModel: EditEntryViewModel) {
+    private fun CardSpecificFields(viewEntryViewModel: ViewEntryViewModel) {
         var cardNumberInvalidProblem by remember { mutableStateOf(false) }
         var cardNumberTooShortProblem by remember { mutableStateOf(false) }
         var cardNumberTooLongProblem by remember { mutableStateOf(false) }
@@ -571,7 +586,7 @@ class EditEntryActivity : ComponentActivity() {
                     )
                     Spacer(modifier = Modifier.padding(horizontal = 6.dp))
                     Text(
-                        text = brandStringsToBrands.filterValues { it == editEntryViewModel.selectedCardBrand }.keys.first(),
+                        text = brandStringsToBrands.filterValues { it == viewEntryViewModel.selectedCardBrand }.keys.first(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -579,18 +594,18 @@ class EditEntryActivity : ComponentActivity() {
             }
             // Card Number Field
             OutlinedTextField(
-                value = editEntryViewModel.cardNumber,
+                value = viewEntryViewModel.cardNumber,
                 onValueChange = {
                     try {
-                        cardNumberTooLongProblem = !editEntryViewModel.validateCardCredentials(CardCredentials.Number, it.text)
+                        cardNumberTooLongProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.Number, it.text)
                         cardNumberInvalidProblem = false
                         cardNumberTooShortProblem = false
                     } catch (e: IllegalArgumentException) {
-                        if (e.message.contentEquals(editEntryViewModel.CARD_NUMBER_TOO_SHORT_EXCEPTION.message))
+                        if (e.message.contentEquals(viewEntryViewModel.CARD_NUMBER_TOO_SHORT_EXCEPTION.message))
                             cardNumberTooShortProblem = true
                     } finally {
-                        editEntryViewModel.cardNumber = it
-                        editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                        viewEntryViewModel.cardNumber = it
+                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                     }
                 },
                 label = {
@@ -600,6 +615,7 @@ class EditEntryActivity : ComponentActivity() {
                     Text(text = stringResource(R.string.card_number_placeholder))
                 },
                 singleLine = true,
+                enabled = viewEntryViewModel.editMode,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = cardNumberInvalidProblem || cardNumberTooShortProblem || cardNumberTooLongProblem,
                 supportingText = @Composable {
@@ -618,13 +634,7 @@ class EditEntryActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                )
+                colors = QuickComposables.uniformTextFieldColors()
             )
             Row(
                 modifier = Modifier
@@ -634,15 +644,15 @@ class EditEntryActivity : ComponentActivity() {
             ) {
                 // Expiration MM/YY Field
                 OutlinedTextField(
-                    value = editEntryViewModel.expirationMMYY,
+                    value = viewEntryViewModel.expirationMMYY,
                     onValueChange = {
                         try {
-                            cardExpirationDateInvalidProblem = !editEntryViewModel.validateCardCredentials(CardCredentials.ExpirationDate, it.text)
+                            cardExpirationDateInvalidProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.ExpirationDate, it.text)
                         } catch (e: IllegalArgumentException) {
                             // have no idea how would this happen, considering that exceptions are only meant to happen with card numbers inside of that function, xd :^
                             println(e)
                         } finally {
-                            editEntryViewModel.expirationMMYY = it
+                            viewEntryViewModel.expirationMMYY = it
                         } },
                     label = {
                         Text(text = stringResource(R.string.card_expdate))
@@ -652,39 +662,37 @@ class EditEntryActivity : ComponentActivity() {
                     },
                     modifier = Modifier.weight(1f),
                     isError = cardExpirationDateInvalidProblem,
+                    singleLine = true,
+                    enabled = viewEntryViewModel.editMode,
                     supportingText = @Composable {
                         if (cardExpirationDateInvalidProblem) {
                             Text(text = stringResource(R.string.error_card_expdate_invalid),
                                 style = MaterialTheme.typography.bodySmall)
                         }
                     },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        focusedContainerColor = MaterialTheme.colorScheme.background,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                        errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                    )
+                    colors = QuickComposables.uniformTextFieldColors()
                 )
 
                 // CVC/CVV Field
                 OutlinedTextField(
-                    value = editEntryViewModel.cvcCVV,
+                    value = viewEntryViewModel.cvcCVV,
                     onValueChange = {
                         try {
-                            cardCvcCvvInvalidProblem = !editEntryViewModel.validateCardCredentials(CardCredentials.CVC_CVV, it.text)
+                            cardCvcCvvInvalidProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.CVC_CVV, it.text)
                         } catch (e: IllegalArgumentException) {
                             // Justin Case: Prepared for anything.
                             // https://youtube.com/shorts/h7EZR6ppVR8?si=EqTZ2WWq2sQnUJSN
                             println(e)
                         } finally {
-                            editEntryViewModel.cvcCVV = it
-                            editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                            viewEntryViewModel.cvcCVV = it
+                            viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                         }
                     },
                     label = {
                         Text(text = stringResource(R.string.card_cvc_cvv_placeholder))
                     },
+                    singleLine = true,
+                    enabled = viewEntryViewModel.editMode,
                     modifier = Modifier.weight(1f),
                     isError = cardCvcCvvInvalidProblem,
                     supportingText = @Composable {
@@ -693,18 +701,12 @@ class EditEntryActivity : ComponentActivity() {
                                 style = MaterialTheme.typography.bodySmall)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                        focusedContainerColor = MaterialTheme.colorScheme.background,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                        errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                    )
+                    colors = QuickComposables.uniformTextFieldColors()
                 )
             }
             // Cardholder Name Field
             OutlinedTextField(
-                value = editEntryViewModel.cardholderName,
+                value = viewEntryViewModel.cardholderName,
                 label = {
                     Text(text = stringResource(R.string.cardholder_name))
                 },
@@ -715,18 +717,13 @@ class EditEntryActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 singleLine = true,
+                enabled = viewEntryViewModel.editMode,
                 onValueChange = {
-                    editEntryViewModel.cardholderName = it
-                    editEntryViewModel.allRequiredFieldsAreFilled = editEntryViewModel.checkRequiredFields()
+                    viewEntryViewModel.cardholderName = it
+                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                 },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-                    focusedContainerColor = MaterialTheme.colorScheme.background,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                    errorSupportingTextColor = MaterialTheme.colorScheme.error,
-                )
+                colors = QuickComposables.uniformTextFieldColors()
             )
         }
     }

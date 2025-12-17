@@ -21,7 +21,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -143,7 +145,10 @@ object QuickComposables {
                 modifier = Modifier
                     .width(296.dp)
                     .height(80.dp)
-                    .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(8.dp)
+                    )
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -159,5 +164,22 @@ object QuickComposables {
                 }
             }
         }
+    }
+
+    @Composable
+    fun uniformTextFieldColors(): TextFieldColors {
+        val colors = OutlinedTextFieldDefaults.colors()
+        return colors.copy(
+            disabledTextColor = colors.focusedTextColor,
+            disabledLabelColor = colors.unfocusedLabelColor,
+            disabledLeadingIconColor = colors.unfocusedLeadingIconColor,
+            disabledTrailingIconColor = colors.unfocusedTrailingIconColor,
+            disabledSupportingTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            errorSupportingTextColor = MaterialTheme.colorScheme.error,
+        )
     }
 }

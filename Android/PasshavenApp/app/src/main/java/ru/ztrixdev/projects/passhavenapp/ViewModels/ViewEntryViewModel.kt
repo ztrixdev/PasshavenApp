@@ -28,7 +28,7 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
-class EditEntryViewModel : ViewModel() {
+class ViewEntryViewModel : ViewModel() {
 
     val defaultQRScanOpts = ScanOptions().apply {
         setDesiredBarcodeFormats(ScanOptions.QR_CODE)
@@ -40,6 +40,8 @@ class EditEntryViewModel : ViewModel() {
 
     var inFolder by mutableStateOf<Folder?>(null)
     var selectedFolderUuid by mutableStateOf<Uuid?>(null)
+
+    var editMode by mutableStateOf(false)
 
     fun setSelectedFolder(folder: Folder) {
         selectedFolderUuid = folder.uuid
