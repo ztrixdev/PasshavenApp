@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -45,14 +49,11 @@ import kotlinx.coroutines.withContext
 object QuickComposables {
     @Composable
     fun Titlebar(text: String, onBackButtonClickAction: () -> Unit) {
-        Box(modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .height(12.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
+                .padding(bottom = 10.dp, top= 10.dp)
         ) {
             IconButton(
                 onClick = onBackButtonClickAction,
@@ -143,7 +144,10 @@ object QuickComposables {
                 modifier = Modifier
                     .width(296.dp)
                     .height(80.dp)
-                    .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(8.dp)
+                    )
             ) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
@@ -159,5 +163,32 @@ object QuickComposables {
                 }
             }
         }
+    }
+
+    @Composable
+    fun uniformTextFieldColors(): TextFieldColors {
+        val colors = OutlinedTextFieldDefaults.colors()
+        return colors.copy(
+            disabledTextColor = colors.focusedTextColor,
+            disabledLabelColor = colors.unfocusedLabelColor,
+            disabledLeadingIconColor = colors.unfocusedLeadingIconColor,
+            disabledTrailingIconColor = colors.unfocusedTrailingIconColor,
+            disabledSupportingTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
+            errorSupportingTextColor = MaterialTheme.colorScheme.error,
+        )
+    }
+
+    @Composable
+    fun makeCopiedToast() {
+        val localctx = LocalContext.current
+        Toast.makeText(
+            localctx,
+            stringResource(R.string.copied_to_clipboard),
+            Toast.LENGTH_SHORT)
+            .show()
     }
 }

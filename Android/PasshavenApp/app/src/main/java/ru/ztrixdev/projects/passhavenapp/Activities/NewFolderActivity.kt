@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +35,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +65,7 @@ class NewFolderActivity: ComponentActivity() {
         val newFolderViewModel: NewFolderViewModel by viewModels()
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // enableEdgeToEdge()
         setContent {
             val localctx = LocalContext.current
             LaunchedEffect(Unit) {
@@ -140,9 +140,11 @@ class NewFolderActivity: ComponentActivity() {
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp,
+                .padding(
+                    top = 16.dp,
                     start = 24.dp,
-                    end = 24.dp)
+                    end = 24.dp
+                )
         ) {
             Text(stringResource(R.string.continue_button))
         }
@@ -214,8 +216,8 @@ class NewFolderActivity: ComponentActivity() {
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
                         .clickable {
-                        isDropDownExpanded.value = true
-                    }
+                            isDropDownExpanded.value = true
+                        }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.arrow_drop_down_24px),
@@ -283,106 +285,113 @@ class NewFolderActivity: ComponentActivity() {
         }
     }
 
+    // fixed the bug when checkboxes would shuffle after changing the sorting key
     @Composable
     private fun EntryTable(newFolderViewModel: NewFolderViewModel) {
+        val includedUuids = newFolderViewModel.getIncludedUuids()
+
         Column(
             Modifier
                 .heightIn(320.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            repeat(newFolderViewModel.entries.size) { index ->
-                val entry = newFolderViewModel.entries[index]
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
-                ) {
-                    val isIncludingCheckboxTicked = remember { mutableStateOf(false) }
-                    Checkbox(
-                        checked = isIncludingCheckboxTicked.value,
-                        onCheckedChange = {
-                            isIncludingCheckboxTicked.value = it
-                            when (it) {
-                                true -> when (entry) {
-                                    is Card -> newFolderViewModel.includeEntry(entry.uuid)
-                                    is Account -> newFolderViewModel.includeEntry(entry.uuid)
-                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
-                                }
+            newFolderViewModel.entries.forEach { entry ->
+                val entryId = when (entry) {
+                    is Card -> entry.uuid
+                    is Account -> entry.uuid
+                    else -> null
+                } ?: return@forEach
 
-                                false -> when (entry) {
-                                    is Card -> newFolderViewModel.removeEntry(entry.uuid)
-                                    is Account -> newFolderViewModel.removeEntry(entry.uuid)
-                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                key(entryId) {
+                    val isChecked = remember { mutableStateOf(includedUuids.contains(entryId)) }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp)
+                    ) {
+                        Checkbox(
+                            checked = isChecked.value,
+                            onCheckedChange = {
+                                isChecked.value = it
+                                if (it) {
+                                    newFolderViewModel.includeEntry(entryId)
+                                } else {
+                                    newFolderViewModel.removeEntry(entryId)
                                 }
-                            }
-                        },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = MaterialTheme.colorScheme.primaryContainer,
-                            uncheckedColor = MaterialTheme.colorScheme.secondaryContainer
-                        ),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text =
-                            when (entry) {
-                                is Card -> entry.name
-                                is Account -> entry.name
-                                else -> "ERR_UNRECOGNIZABLE_TYPE"
                             },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 8.dp
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = MaterialTheme.colorScheme.primaryContainer,
+                                uncheckedColor = MaterialTheme.colorScheme.secondaryContainer
+                            ),
+                            modifier = Modifier.size(24.dp)
                         )
-                            .width(56.dp)
-                    )
-                    Text(
-                        text =
-                            when (entry) {
-                                is Card -> stringResource(R.string.card)
-                                is Account -> stringResource(R.string.account)
-                                else -> "ERR_UNRECOGNIZABLE_TYPE"
-                            },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 8.dp
+                        Text(
+                            text =
+                                when (entry) {
+                                    is Card -> entry.name
+                                    is Account -> entry.name
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp,
+                                    top = 8.dp
+                                )
+                                .width(56.dp)
                         )
-                            .width(56.dp)
-                    )
-                    Text(
-                        text =
-                            when (entry) {
-                                is Card -> entry.number
-                                is Account -> entry.username
-                                else -> "ERR_UNRECOGNIZABLE_TYPE"
-                            },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 8.dp
+                        Text(
+                            text =
+                                when (entry) {
+                                    is Card -> stringResource(R.string.card)
+                                    is Account -> stringResource(R.string.account)
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp,
+                                    top = 8.dp
+                                )
+                                .width(56.dp)
                         )
-                            .width(64.dp)
-                    )
-                    Text(
-                        text =
-                            when (entry) {
-                                is Card -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
-                                is Account -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
-                                else -> "ERR_UNRECOGNIZABLE_TYPE"
-                            },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(
-                            start = 8.dp,
-                            top = 8.dp
+                        Text(
+                            text =
+                                when (entry) {
+                                    is Card -> entry.number
+                                    is Account -> entry.username
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp,
+                                    top = 8.dp
+                                )
+                                .width(64.dp)
                         )
-                            .width(96.dp)
-                    )
+                        Text(
+                            text =
+                                when (entry) {
+                                    is Card -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
+                                    is Account -> DateTimeProcessor.convertToHumanReadable(entry.dateCreated)
+                                    else -> "ERR_UNRECOGNIZABLE_TYPE"
+                                },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp,
+                                    top = 8.dp
+                                )
+                                .width(96.dp)
+                        )
+                    }
                 }
             }
         }

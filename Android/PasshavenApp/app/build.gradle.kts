@@ -90,6 +90,7 @@ dependencies {
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
     implementation("androidx.room:room-runtime:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.core)
     implementation(libs.zxing.android.embedded)
     implementation(libs.androidx.compose.ui.text.google.fonts)

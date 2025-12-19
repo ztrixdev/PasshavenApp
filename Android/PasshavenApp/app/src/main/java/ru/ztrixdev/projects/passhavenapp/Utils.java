@@ -1,5 +1,11 @@
 package ru.ztrixdev.projects.passhavenapp;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -46,4 +52,12 @@ public class Utils {
             throw new AssertionError(ex);
         }
     }
+
+    public static void copyToClipboard(Context context, String text) {
+        ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("text", text);
+        clipboardManager.setPrimaryClip(clipData);
+    }
+
+    public static final int UUID_ALPHANUMERIC_STRING_LENGTH = 36;
 }

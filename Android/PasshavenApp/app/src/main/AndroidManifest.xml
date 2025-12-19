@@ -33,6 +33,12 @@
         </activity>
         <activity
             android:screenOrientation="fullUser"
+            android:name=".Activities.EditEntryActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Material3.Dark">
+        </activity>
+        <activity
+            android:screenOrientation="fullUser"
             android:name=".Activities.LoginActivity"
             android:exported="true"
             android:label="@string/login_label"

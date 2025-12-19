@@ -105,7 +105,7 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // enableEdgeToEdge()
         setContent {
             val settingsViewModel: SettingsViewModel by viewModels()
             val localctx = LocalContext.current

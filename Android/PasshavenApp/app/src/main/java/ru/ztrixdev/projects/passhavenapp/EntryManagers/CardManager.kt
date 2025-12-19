@@ -1,6 +1,5 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
-import com.goterl.lazysodium.exceptions.SodiumException
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.Room.Card
 import ru.ztrixdev.projects.passhavenapp.Room.decrypt
@@ -41,7 +40,7 @@ object CardManager {
             // If a field can be decrypted - the Card object is encrypted
             // (Card.encrypt() encrypts pretty much all the fields)
             SodiumCrypto.decrypt(editedCard.number, encryptionKey)
-        } catch (_: SodiumException) {
+        } catch (_: IllegalArgumentException) {
             isEditedCardEncrypted = false
         }
         if (!isEditedCardEncrypted)

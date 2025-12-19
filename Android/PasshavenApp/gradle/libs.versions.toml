@@ -17,6 +17,7 @@ activityCompose = "1.11.0"
 composeBom = "2025.10.00"
 material = "1.13.0"
 materialIconsCore = "1.7.3"
+navigationCompose = "2.9.6"
 symbolProcessingApi = "2.2.20-2.0.4"
 uiText = "1.9.3"
 ui = "1.9.4"
@@ -28,6 +29,7 @@ zxingAndroidEmbedded = "4.3.0"
 androidx-compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitDialogsCompose" }
 googleauth = { module = "com.warrenstrange:googleauth", version.ref = "googleauth" }

@@ -1,6 +1,5 @@
 package ru.ztrixdev.projects.passhavenapp.EntryManagers
 
-import com.goterl.lazysodium.exceptions.SodiumException
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.Room.decrypt
@@ -41,7 +40,7 @@ object AccountManager {
             // If a field can be decrypted - the Account object is encrypted
             // (Account.encrypt() encrypts pretty much all the fields)
             SodiumCrypto.decrypt(editedAccount.username, encryptionKey)
-        } catch (_: SodiumException) {
+        } catch (_: IllegalArgumentException) { // caught the wrong exception
             isEditedAccountEncrypted = false
         }
         if (!isEditedAccountEncrypted)
