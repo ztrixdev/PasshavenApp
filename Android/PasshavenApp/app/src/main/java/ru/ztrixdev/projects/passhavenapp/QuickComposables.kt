@@ -49,14 +49,11 @@ import kotlinx.coroutines.withContext
 object QuickComposables {
     @Composable
     fun Titlebar(text: String, onBackButtonClickAction: () -> Unit) {
-        Box(modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .height(12.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(all = 10.dp)
+                .padding(bottom = 10.dp, top= 10.dp)
         ) {
             IconButton(
                 onClick = onBackButtonClickAction,

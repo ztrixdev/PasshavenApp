@@ -90,7 +90,7 @@ class EditEntryActivity : ComponentActivity() {
         val receivedIntent = intent
         viewEntryViewModel.entryUuid = receivedIntent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY)
 
-        enableEdgeToEdge()
+        // enableEdgeToEdge()
         setContent {
             val localctx = LocalContext.current
             LaunchedEffect(Unit) {
