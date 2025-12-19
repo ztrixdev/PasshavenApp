@@ -15,6 +15,7 @@ import ru.ztrixdev.projects.passhavenapp.EntryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
+import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
@@ -112,7 +113,10 @@ class ViewEntryViewModel : ViewModel() {
             is Account -> {
                 newEntryName = TextFieldValue(entry.name)
                 username = TextFieldValue(entry.username)
-                entry.mfaSecret?.let { mfaSecret = TextFieldValue(it) }
+                entry.mfaSecret?.let {
+                    mfaSecret = TextFieldValue(it)
+                    currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
+                }
                 password = TextFieldValue(entry.password)
                 entry.recoveryCodes?.let {
                     recoveryCodes.removeAt(0)
@@ -134,6 +138,21 @@ class ViewEntryViewModel : ViewModel() {
         }
 
         dataFetchDone = true
+    }
+
+    var isPasswordVisible by mutableStateOf(false)
+    var currentMFAValue by mutableStateOf(TextFieldValue(""))
+
+    fun togglePasswordVisibility() {
+        isPasswordVisible = !isPasswordVisible
+    }
+
+    fun copyPassword(context: Context) {
+        Utils.copyToClipboard(context, password.text)
+    }
+
+    fun copyMFACode(context: Context) {
+        Utils.copyToClipboard(context, currentMFAValue.text)
     }
 
     fun generatePassword() {

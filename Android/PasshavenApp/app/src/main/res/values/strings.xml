@@ -132,7 +132,9 @@
     <string name="change_backup_password">Change the backup password</string>
     <string name="last_backup_date">Date of the last backup:</string>
     <string name="backing_up_wait">Backing up, please wait...</string>
-    <string name="editentryactivity_titlebar">Просмотр записи</string>
+    <string name="editentryactivity_titlebar">View entry</string>
     <string name="confirm">Confirm</string>
     <string name="edit">Edit</string>
+    <string name="copied_to_clipboard">Copied!</string>
+    <string name="mfa_code_label">TOTP code\n</string>
 </resources>

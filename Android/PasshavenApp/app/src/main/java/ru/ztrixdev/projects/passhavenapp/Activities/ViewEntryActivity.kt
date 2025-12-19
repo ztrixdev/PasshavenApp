@@ -48,7 +48,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.journeyapps.barcodescanner.ScanContract
@@ -94,6 +96,7 @@ class EditEntryActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 viewEntryViewModel.getCurrentData(localctx)
             }
+
             PasshavenTheme(
                 themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
                 darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)
@@ -210,6 +213,7 @@ class EditEntryActivity : ComponentActivity() {
                 }
             } else {
                 viewEntryViewModel.editMode = true
+                viewEntryViewModel.isPasswordVisible = true
             }
         },
             enabled = if (viewEntryViewModel.editMode) viewEntryViewModel.allRequiredFieldsAreFilled else true,
@@ -392,33 +396,86 @@ class EditEntryActivity : ComponentActivity() {
                 colors = QuickComposables.uniformTextFieldColors()
             )
 
-            // Password textfield
-            OutlinedTextField(
-                value = viewEntryViewModel.password,
-                onValueChange = {
-                    usernameIsEmptyProblem = it.text.isEmpty()
-                    viewEntryViewModel.password = it
-                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
-                },
-                label = {
-                    Text(text = stringResource(R.string.password))
-                },
-                placeholder = {
-                    Text(text = stringResource(R.string.password_placeholder))
-                },
-                enabled = viewEntryViewModel.editMode,
-                singleLine = true,
-                isError = passwordIsEmptyProblem,
-                supportingText = @Composable {
-                    if (passwordIsEmptyProblem)
-                        Text(text = stringResource(R.string.fill_this_field_up_pls),
-                            style = MaterialTheme.typography.bodySmall)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                colors = QuickComposables.uniformTextFieldColors()
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = viewEntryViewModel.password,
+                    onValueChange = {it ->
+                        if (viewEntryViewModel.isPasswordVisible) {
+                            viewEntryViewModel.password = it
+                        }
+                        passwordIsEmptyProblem = it.text.isEmpty()
+                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+                    },
+                    label = {
+                        Text(text = stringResource(R.string.password))
+                    },
+                    placeholder = {
+                        Text(text = stringResource(R.string.password_placeholder))
+                    },
+                    enabled = viewEntryViewModel.editMode,
+                    singleLine = true,
+                    visualTransformation =
+                        if (viewEntryViewModel.isPasswordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
+                    isError = passwordIsEmptyProblem,
+                    supportingText = @Composable {
+                        if (passwordIsEmptyProblem)
+                            Text(text = stringResource(R.string.fill_this_field_up_pls),
+                                style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+                    colors = QuickComposables.uniformTextFieldColors()
+                )
+                if (!viewEntryViewModel.editMode) {
+                    val localctx = LocalContext.current
+                    var showCopiedToast by mutableStateOf(false)
+
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(start = 16.dp)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                viewEntryViewModel.togglePasswordVisibility()
+                            },
+                            Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                painter =
+                                    if (viewEntryViewModel.isPasswordVisible)
+                                        painterResource(R.drawable.visibility_24px)
+                                    else
+                                        painterResource(R.drawable.visibility_off_24px),
+                                contentDescription = "Change visibility",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        IconButton(
+                            onClick = {
+                                viewEntryViewModel.copyPassword(localctx)
+                                showCopiedToast = true
+                            },
+                            Modifier.size(20.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.content_copy_24px),
+                                contentDescription = "Copy password",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        if (showCopiedToast) {
+                            QuickComposables.makeCopiedToast()
+                        }
+                    }
+
+                }
+            }
 
             // Generate password button
             if (viewEntryViewModel.editMode) {
@@ -439,18 +496,26 @@ class EditEntryActivity : ComponentActivity() {
 
             // MFA textfield
             Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = viewEntryViewModel.mfaSecret,
-                    onValueChange = {
+                    value = when {
+                        !viewEntryViewModel.editMode ->(viewEntryViewModel.currentMFAValue)
+                        else -> viewEntryViewModel.mfaSecret
+                    },
+                    onValueChange = { it: TextFieldValue ->
                         mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
                         viewEntryViewModel.mfaSecret = it
                         viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
                     },
                     label = {
-                        Text(text = stringResource(R.string.mfa_secret))
-                    },
+                        Text(
+                            text  = if (!viewEntryViewModel.editMode)
+                                    stringResource(R.string.mfa_code_label)
+                                else stringResource(R.string.mfa_secret)
+                        )
+                            },
                     singleLine = true,
                     enabled = viewEntryViewModel.editMode,
                     isError = mfaSecretIsInvalidProblem,
@@ -458,11 +523,6 @@ class EditEntryActivity : ComponentActivity() {
                         if (mfaSecretIsInvalidProblem)
                             Text(text = stringResource(R.string.mfa_secret_invalid),
                                 style = MaterialTheme.typography.bodySmall)
-                        else
-                            Text(
-                                text = stringResource(R.string.mfa_secret_supporting_text),
-                                style = MaterialTheme.typography.bodySmall
-                            )
                     },
                     modifier = Modifier
                         .padding(top = 8.dp),
@@ -478,7 +538,6 @@ class EditEntryActivity : ComponentActivity() {
                         },
                         modifier = Modifier
                             .widthIn(20.dp, 30.dp)
-                            .padding(top = 20.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.qr_code_scanner_24px),
@@ -486,6 +545,26 @@ class EditEntryActivity : ComponentActivity() {
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(36.dp)
                         )
+                    }
+                }
+                else {
+                    val localctx = LocalContext.current
+                    var showCopiedToast by mutableStateOf(false)
+                    IconButton(
+                        onClick = {
+                            viewEntryViewModel.copyMFACode(localctx)
+                            showCopiedToast = true
+                        },
+                        Modifier.size(20.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.content_copy_24px),
+                            contentDescription = "Copy password",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (showCopiedToast) {
+                        QuickComposables.makeCopiedToast()
                     }
                 }
             }

@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -181,5 +183,15 @@ object QuickComposables {
             unfocusedContainerColor = MaterialTheme.colorScheme.background,
             errorSupportingTextColor = MaterialTheme.colorScheme.error,
         )
+    }
+
+    @Composable
+    fun makeCopiedToast() {
+        val localctx = LocalContext.current
+        Toast.makeText(
+            localctx,
+            stringResource(R.string.copied_to_clipboard),
+            Toast.LENGTH_SHORT)
+            .show()
     }
 }

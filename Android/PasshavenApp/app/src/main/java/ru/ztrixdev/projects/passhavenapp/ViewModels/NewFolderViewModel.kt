@@ -22,7 +22,7 @@ class NewFolderViewModel: ViewModel() {
     var entries = mutableStateListOf<Any>()
 
     // Private, for folder creation
-    private val _includedEntriesUuid = emptyList<Uuid>().toMutableList()
+    private val _includedEntryUuids =  mutableStateOf<Set<Uuid>>(emptySet())
 
     fun setSelectedSortingKey(key: SortingKeys) {
         _selectedSortingKey.value = key
@@ -50,11 +50,15 @@ class NewFolderViewModel: ViewModel() {
     }
 
     fun includeEntry(entryUuid: Uuid) {
-        _includedEntriesUuid.add(entryUuid)
+        _includedEntryUuids.value += entryUuid
     }
 
     fun removeEntry(entryUuid: Uuid) {
-        _includedEntriesUuid.remove(entryUuid)
+        _includedEntryUuids.value -= entryUuid
+    }
+
+    fun getIncludedUuids(): Set<Uuid> {
+        return _includedEntryUuids.value
     }
 
     suspend fun createFolder(context: Context) {
@@ -63,10 +67,19 @@ class NewFolderViewModel: ViewModel() {
         val newFolder = Folder(
             uuid = Uuid.random(),
             name = newFolderName.value.text,
-            entries = _includedEntriesUuid,
+            entries = _includedEntryUuids.value.toList(),
             dateCreated = System.currentTimeMillis()
         )
 
         FolderManager.createFolder(db, newFolder)
+    }
+
+    fun toggleEntryInclusion(entryUuid: Uuid) {
+        val currentSet = _includedEntryUuids.value
+        if (currentSet.contains(entryUuid)) {
+            removeEntry(entryUuid)
+        } else {
+            includeEntry(entryUuid)
+        }
     }
 }
