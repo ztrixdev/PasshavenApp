@@ -2,11 +2,11 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -115,7 +115,11 @@ class SettingsActivity : ComponentActivity() {
             var darkTheme by remember {
                 mutableStateOf(ThemePrefs.getDarkThemeBool(localctx))
             }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = darkTheme) {
+            var dynamicColors by remember {
+                mutableStateOf(ThemePrefs.getDynamicColorsBool(localctx))
+            }
+
+            PasshavenTheme(themeType = selectedTheme, darkTheme = darkTheme,  dynamicColors = dynamicColors) {
                 Column(
                     Modifier
                         .background(MaterialTheme.colorScheme.background)
@@ -126,7 +130,8 @@ class SettingsActivity : ComponentActivity() {
                             AppearanceSettings(
                                 settingsViewModel = settingsViewModel,
                                 themeChanged = { newTheme -> selectedTheme = newTheme },
-                                darkBoolChanged = { newBool -> darkTheme = newBool }
+                                darkBoolChanged = { newBool -> darkTheme = newBool },
+                                dynamicColorsChanged = { newBool -> dynamicColors = newBool }
                             )
                         }
 
@@ -337,7 +342,11 @@ class SettingsActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AppearanceSettings(settingsViewModel: SettingsViewModel, themeChanged: (AppThemeType) -> Unit, darkBoolChanged: (Boolean) -> Unit) {
+    private fun AppearanceSettings(settingsViewModel: SettingsViewModel,
+                                   themeChanged: (AppThemeType) -> Unit,
+                                   darkBoolChanged: (Boolean) -> Unit,
+                                   dynamicColorsChanged: (Boolean) -> Unit
+    ) {
         QuickComposables.Titlebar(stringResource(R.string.appearance_setting)) {
             settingsViewModel.openAppearance.value = false
         }
@@ -379,6 +388,34 @@ class SettingsActivity : ComponentActivity() {
             LaunchedEffect(AreWeDarkThemedRn) {
                 ThemePrefs.saveDarkThemeBool(localctx, AreWeDarkThemedRn)
                 darkBoolChanged(AreWeDarkThemedRn)
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                var UsingDymanicColorsRn by remember { mutableStateOf(
+                    ThemePrefs.getDynamicColorsBool(localctx)
+                ) }
+                Row (
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                ){
+                    Text(
+                        text = stringResource(R.string.dynamic_colors),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(
+                        checked = UsingDymanicColorsRn,
+                        onCheckedChange = { UsingDymanicColorsRn = it },
+                    )
+                }
+
+                LaunchedEffect(UsingDymanicColorsRn) {
+                    ThemePrefs.saveDynamicColorsBool(localctx, AreWeDarkThemedRn)
+                    dynamicColorsChanged(UsingDymanicColorsRn)
+                }
             }
 
             val themes = listOf(

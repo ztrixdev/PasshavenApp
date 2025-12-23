@@ -79,7 +79,12 @@ class NewFolderActivity: ComponentActivity() {
                 }
             }
 
-            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
+            PasshavenTheme(
+                themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
+                darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current),
+                dynamicColors = ThemePrefs.getDynamicColorsBool(LocalContext.current),
+            )
+            {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

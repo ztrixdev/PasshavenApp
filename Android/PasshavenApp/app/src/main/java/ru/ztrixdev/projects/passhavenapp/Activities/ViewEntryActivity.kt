@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +28,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,6 +36,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +57,7 @@ import androidx.lifecycle.lifecycleScope
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
@@ -99,8 +101,10 @@ class EditEntryActivity : ComponentActivity() {
 
             PasshavenTheme(
                 themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
-                darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)
-            ) {
+                darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current),
+                dynamicColors = ThemePrefs.getDynamicColorsBool(LocalContext.current),
+            )
+            {
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier
@@ -227,7 +231,7 @@ class EditEntryActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.check_24px),
                         contentDescription = "Check icon.",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.inversePrimary,
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -239,7 +243,7 @@ class EditEntryActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.edit_24px),
                         contentDescription = "Edit icon.",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.inversePrimary,
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -374,7 +378,8 @@ class EditEntryActivity : ComponentActivity() {
                 onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
                     viewEntryViewModel.username = it
-                    viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+                    viewEntryViewModel.allRequiredFieldsAreFilled =
+                        viewEntryViewModel.checkRequiredFields()
                 },
                 label = {
                     Text(text = stringResource(R.string.username))
@@ -386,8 +391,10 @@ class EditEntryActivity : ComponentActivity() {
                 isError = usernameIsEmptyProblem,
                 supportingText = @Composable {
                     if (usernameIsEmptyProblem)
-                        Text(text = stringResource(R.string.fill_this_field_up_pls),
-                            style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = stringResource(R.string.fill_this_field_up_pls),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                 },
                 enabled = viewEntryViewModel.editMode,
                 modifier = Modifier
@@ -402,12 +409,13 @@ class EditEntryActivity : ComponentActivity() {
             ) {
                 OutlinedTextField(
                     value = viewEntryViewModel.password,
-                    onValueChange = {it ->
+                    onValueChange = { it ->
                         if (viewEntryViewModel.isPasswordVisible) {
                             viewEntryViewModel.password = it
                         }
                         passwordIsEmptyProblem = it.text.isEmpty()
-                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+                        viewEntryViewModel.allRequiredFieldsAreFilled =
+                            viewEntryViewModel.checkRequiredFields()
                     },
                     label = {
                         Text(text = stringResource(R.string.password))
@@ -425,8 +433,10 @@ class EditEntryActivity : ComponentActivity() {
                     isError = passwordIsEmptyProblem,
                     supportingText = @Composable {
                         if (passwordIsEmptyProblem)
-                            Text(text = stringResource(R.string.fill_this_field_up_pls),
-                                style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                text = stringResource(R.string.fill_this_field_up_pls),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                     },
                     modifier = Modifier
                         .padding(top = 8.dp),
@@ -434,9 +444,10 @@ class EditEntryActivity : ComponentActivity() {
                 )
                 if (!viewEntryViewModel.editMode) {
                     val localctx = LocalContext.current
-                    var showCopiedToast by mutableStateOf(false)
+                    var showCopiedToast by remember { mutableStateOf(false) }
 
-                    Row(verticalAlignment = Alignment.CenterVertically,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         IconButton(
@@ -452,7 +463,7 @@ class EditEntryActivity : ComponentActivity() {
                                     else
                                         painterResource(R.drawable.visibility_off_24px),
                                 contentDescription = "Change visibility",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.inversePrimary,
                             )
                         }
                         Spacer(Modifier.width(8.dp))
@@ -466,7 +477,7 @@ class EditEntryActivity : ComponentActivity() {
                             Icon(
                                 painter = painterResource(R.drawable.content_copy_24px),
                                 contentDescription = "Copy password",
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.inversePrimary,
                             )
                         }
                         if (showCopiedToast) {
@@ -494,79 +505,81 @@ class EditEntryActivity : ComponentActivity() {
                 }
             }
 
+            val localctx = LocalContext.current
             // MFA textfield
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(20.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
-                    value = when {
-                        !viewEntryViewModel.editMode ->(viewEntryViewModel.currentMFAValue)
-                        else -> viewEntryViewModel.mfaSecret
-                    },
-                    onValueChange = { it: TextFieldValue ->
-                        mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
-                        viewEntryViewModel.mfaSecret = it
-                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
-                    },
-                    label = {
-                        Text(
-                            text  = if (!viewEntryViewModel.editMode)
-                                    stringResource(R.string.mfa_code_label)
-                                else stringResource(R.string.mfa_secret)
-                        )
-                            },
-                    singleLine = true,
-                    enabled = viewEntryViewModel.editMode,
-                    isError = mfaSecretIsInvalidProblem,
-                    supportingText = @Composable {
-                        if (mfaSecretIsInvalidProblem)
-                            Text(text = stringResource(R.string.mfa_secret_invalid),
-                                style = MaterialTheme.typography.bodySmall)
-                    },
-                    modifier = Modifier
-                        .padding(top = 8.dp),
-
-                    colors = QuickComposables.uniformTextFieldColors()
-                )
-                if (viewEntryViewModel.editMode) {
-                    IconButton(
-                        onClick = {
-                            qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = when {
+                            !viewEntryViewModel.editMode -> viewEntryViewModel.currentMFAValue
+                            else -> viewEntryViewModel.mfaSecret
+                        },
+                        onValueChange = { it ->
+                            mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
+                            viewEntryViewModel.mfaSecret = it
                             viewEntryViewModel.allRequiredFieldsAreFilled =
                                 viewEntryViewModel.checkRequiredFields()
                         },
-                        modifier = Modifier
-                            .widthIn(20.dp, 30.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.qr_code_scanner_24px),
-                            contentDescription = "QR button",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-                }
-                else {
-                    val localctx = LocalContext.current
-                    var showCopiedToast by mutableStateOf(false)
-                    IconButton(
-                        onClick = {
-                            viewEntryViewModel.copyMFACode(localctx)
-                            showCopiedToast = true
+                        label = {
+                            Text(
+                                if (!viewEntryViewModel.editMode)
+                                    stringResource(R.string.mfa_code_label)
+                                else
+                                    stringResource(R.string.mfa_secret)
+                            )
                         },
-                        Modifier.size(20.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.content_copy_24px),
-                            contentDescription = "Copy password",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    if (showCopiedToast) {
-                        QuickComposables.makeCopiedToast()
+                        singleLine = true,
+                        enabled = viewEntryViewModel.editMode,
+                        isError = mfaSecretIsInvalidProblem,
+                        supportingText = {
+                            if (mfaSecretIsInvalidProblem) {
+                                Text(
+                                    text = stringResource(R.string.mfa_secret_invalid),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f) // 🔹 key part
+                            .padding(top = 8.dp),
+                        colors = QuickComposables.uniformTextFieldColors()
+                    )
+
+                    if (viewEntryViewModel.editMode) {
+                        IconButton(
+                            onClick = {
+                                qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                                viewEntryViewModel.allRequiredFieldsAreFilled =
+                                    viewEntryViewModel.checkRequiredFields()
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.qr_code_scanner_24px),
+                                contentDescription = "QR button",
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                viewEntryViewModel.copyMFACode(localctx)
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.content_copy_24px),
+                                tint = MaterialTheme.colorScheme.inversePrimary,
+                                contentDescription = "Copy password"
+                            )
+                        }
                     }
                 }
+
+                if (!viewEntryViewModel.editMode) MFAProgressbar()
             }
 
 
@@ -633,6 +646,29 @@ class EditEntryActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    @Composable
+    fun MFAProgressbar() {
+        var currentProgress by remember { mutableFloatStateOf(0f) }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                for (i in 1..300) {
+                    currentProgress = i / 300f
+                    delay(100)
+                }
+                currentProgress = 0f
+                viewEntryViewModel.updateMFA()
+            }
+        }
+        LinearProgressIndicator(
+            progress = { currentProgress },
+            modifier = Modifier
+                .widthIn(100.dp, 400.dp)
+                .padding(bottom = 12.dp),
+            color = MaterialTheme.colorScheme.inversePrimary
+        )
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

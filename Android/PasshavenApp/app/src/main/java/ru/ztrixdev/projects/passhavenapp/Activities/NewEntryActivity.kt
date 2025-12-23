@@ -87,7 +87,12 @@ class NewEntryActivity: ComponentActivity()  {
         super.onCreate(savedInstanceState)
         // enableEdgeToEdge()
         setContent {
-            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
+            PasshavenTheme(
+                themeType = ThemePrefs.getSelectedTheme(LocalContext.current),
+                darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current),
+                dynamicColors = ThemePrefs.getDynamicColorsBool(LocalContext.current)
+            )
+            {
                 val scrollState = rememberScrollState()
                 Column(
                     Modifier

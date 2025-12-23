@@ -62,7 +62,12 @@ class LoginActivity: ComponentActivity() {
         setContent {
             val context = this.applicationContext
 
-            PasshavenTheme(themeType = ThemePrefs.getSelectedTheme(LocalContext.current), darkTheme = ThemePrefs.getDarkThemeBool(LocalContext.current)) {
+            PasshavenTheme(
+                themeType = ThemePrefs.getSelectedTheme(context),
+                darkTheme = ThemePrefs.getDarkThemeBool(context),
+                dynamicColors = ThemePrefs.getDynamicColorsBool(context)
+            )
+            {
                 if (loginViewModel.loginMethod.value == LoginMethods.ByPIN) {
                     LoginByPIN(loginViewModel)
                 } else if (loginViewModel.loginMethod.value == LoginMethods.ByMP) {

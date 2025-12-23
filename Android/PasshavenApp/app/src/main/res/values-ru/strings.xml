@@ -137,4 +137,5 @@ Passhaven никогда не обращается к серверам и не �
     <string name="edit">Редактировать</string>
     <string name="copied_to_clipboard">Копировано!</string>
     <string name="mfa_code_label">TOTP code\n</string>
+    <string name="dynamic_colors">Использовать динамические цвета? (Android 12+)</string>
 </resources>

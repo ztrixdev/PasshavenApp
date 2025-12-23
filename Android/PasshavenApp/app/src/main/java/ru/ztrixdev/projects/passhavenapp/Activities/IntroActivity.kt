@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.runBlocking
+import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.IntroStages
@@ -66,7 +68,12 @@ class IntroActivity : ComponentActivity() {
         setContent {
             val localctx = LocalContext.current
             var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
-            PasshavenTheme(themeType = selectedTheme, darkTheme = true) {
+            PasshavenTheme(
+                themeType = selectedTheme,
+                darkTheme = isSystemInDarkTheme(),
+                dynamicColors = ThemePrefs.getDynamicColorsBool(localctx)
+            )
+            {
                 when (introViewModel.currentStage.value) {
                     IntroStages.Greeting -> IntroPartGreeting(introViewModel)
                     IntroStages.PINCreation -> IntroPartCreatePIN(introViewModel)

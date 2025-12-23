@@ -80,6 +80,10 @@ class ViewEntryViewModel : ViewModel() {
         return folders
     }
 
+    fun updateMFA() {
+        currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
+    }
+
     suspend fun getCurrentData(context: Context) {
         if (entryUuid == null)
             return
