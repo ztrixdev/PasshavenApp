@@ -16,9 +16,9 @@
 
 <table>
   <tr>
-    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/intro_act.png" alt="Intro" width="250"></td>
+    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/scrshot_intro_act.png" alt="Intro" width="250"></td>
     <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/login_scrshot.png" alt="Login" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/scrshot_view_entry.png" alt="View" width="250"></td>
+    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/scrsht_view_entry.png" alt="View" width="250"></td>
   </tr>
 </table>
 
