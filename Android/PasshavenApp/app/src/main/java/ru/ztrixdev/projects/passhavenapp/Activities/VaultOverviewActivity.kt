@@ -96,7 +96,7 @@ class VaultOverviewActivity: ComponentActivity() {
 
                             println(uuid)
                             ctx .startActivity(
-                                Intent(ctx, EditEntryActivity::class.java)
+                                Intent(ctx, ViewEntryActivity::class.java)
                                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY, uuid)
                             )}
                     }

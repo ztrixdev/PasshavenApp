@@ -81,7 +81,15 @@ class ViewEntryViewModel : ViewModel() {
     }
 
     fun updateMFA() {
-        currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
+
+        if (mfaSecret.text.isEmpty())
+            return;
+        try {
+            currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
+        } catch (_: Exception) {
+            println("weird")
+        }
+
     }
 
     suspend fun getCurrentData(context: Context) {
@@ -119,7 +127,8 @@ class ViewEntryViewModel : ViewModel() {
                 username = TextFieldValue(entry.username)
                 entry.mfaSecret?.let {
                     mfaSecret = TextFieldValue(it)
-                    currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
+                    if (!mfaSecret.text.isEmpty())
+                        currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
                 }
                 password = TextFieldValue(entry.password)
                 entry.recoveryCodes?.let {
@@ -151,14 +160,23 @@ class ViewEntryViewModel : ViewModel() {
         isPasswordVisible = !isPasswordVisible
     }
 
-    fun copyPassword(context: Context) {
-        Utils.copyToClipboard(context, password.text)
+    fun toggleCvcVisibility() {
+        isCvcCvvVisible = !isCvcCvvVisible
     }
 
-    fun copyMFACode(context: Context) {
-        Utils.copyToClipboard(context, currentMFAValue.text)
+    enum class Copyable {
+        Password, CVC, CardNumber, TOTP
     }
 
+    fun copy(copyable: Copyable, context: Context) {
+        when (copyable) {
+            Copyable.Password -> Utils.copyToClipboard(context, password.text)
+            Copyable.CVC -> Utils.copyToClipboard(context, cvcCVV.text)
+            Copyable.CardNumber -> Utils.copyToClipboard(context, cardNumber.text)
+            Copyable.TOTP ->  Utils.copyToClipboard(context, currentMFAValue.text)
+        }
+    }
+    
     fun generatePassword() {
         val passwordGenerator = PasswordGenerator()
         passwordGenerator.setDefaultOptions()
@@ -257,11 +275,14 @@ class ViewEntryViewModel : ViewModel() {
     fun createAccount(): Account? {
         if (entryUuid == null) return null
 
-        val roomEdibleCodes = emptyList<String>().toMutableList()
+        var roomEdibleCodes = emptyList<String>().toMutableList()
         if (recoveryCodes.size > 1) {
             recoveryCodes.forEach {
                 roomEdibleCodes += it.text
             }
+        }
+        if (recoveryCodes.size == 1) {
+            roomEdibleCodes = emptyList<String>().toMutableList()
         }
 
         return Account(
@@ -362,4 +383,8 @@ class ViewEntryViewModel : ViewModel() {
         entryUpdated = true
         return entryUuid
     }
+
+
+   var isCvcCvvVisible by mutableStateOf(false)
+
 }

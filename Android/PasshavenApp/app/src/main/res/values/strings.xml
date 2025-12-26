@@ -138,4 +138,6 @@
     <string name="copied_to_clipboard">Copied!</string>
     <string name="mfa_code_label">TOTP code\n</string>
     <string name="dynamic_colors">Use Dynamic Colors? (Android 12+)</string>
+    <string name="not_set">Not set</string>
+    <string name="in_folder">In folder:</string>
 </resources>

@@ -33,7 +33,7 @@
         </activity>
         <activity
             android:screenOrientation="fullUser"
-            android:name=".Activities.EditEntryActivity"
+            android:name=".Activities.ViewEntryActivity"
             android:exported="true"
             android:theme="@style/Theme.Material3.Dark">
         </activity>

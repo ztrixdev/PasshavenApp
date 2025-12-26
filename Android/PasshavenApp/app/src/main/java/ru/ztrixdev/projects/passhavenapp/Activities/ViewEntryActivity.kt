@@ -75,7 +75,7 @@ import kotlin.uuid.Uuid
 const val EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY = "entry_uuid"
 const val EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY = "previous_activity"
 
-class EditEntryActivity : ComponentActivity() {
+class ViewEntryActivity : ComponentActivity() {
     val viewEntryViewModel: ViewEntryViewModel by viewModels()
 
     val qrScanLauncher = registerForActivityResult(
@@ -200,8 +200,8 @@ class EditEntryActivity : ComponentActivity() {
     @Composable
     private fun MainBody(viewEntryViewModel: ViewEntryViewModel) {
         QuickComposables.Titlebar(stringResource(R.string.editentryactivity_titlebar)) {
-            val intent = Intent(this@EditEntryActivity, VaultOverviewActivity::class.java)
-            this@EditEntryActivity.startActivity(intent)
+            val intent = Intent(this@ViewEntryActivity, VaultOverviewActivity::class.java)
+            this@ViewEntryActivity.startActivity(intent)
         }
         Spacer(
             modifier = Modifier.height(20.dp)
@@ -218,6 +218,7 @@ class EditEntryActivity : ComponentActivity() {
             } else {
                 viewEntryViewModel.editMode = true
                 viewEntryViewModel.isPasswordVisible = true
+                viewEntryViewModel.isCvcCvvVisible = true
             }
         },
             enabled = if (viewEntryViewModel.editMode) viewEntryViewModel.allRequiredFieldsAreFilled else true,
@@ -267,7 +268,11 @@ class EditEntryActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = stringResource(R.string.select_folder),
+                    text =
+                        if (viewEntryViewModel.editMode)
+                            stringResource(R.string.select_folder)
+                        else
+                            stringResource(R.string.in_folder),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -292,8 +297,10 @@ class EditEntryActivity : ComponentActivity() {
                 singleLine = true,
                 isError = nameIsEmptyProblem,
                 supportingText = @Composable {
-                    Text(text =stringResource(R.string.name_cannot_be_empty),
-                        style = MaterialTheme.typography.bodySmall)
+                    if (nameIsEmptyProblem) {
+                        Text(text =stringResource(R.string.name_cannot_be_empty),
+                            style = MaterialTheme.typography.bodySmall)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -359,6 +366,8 @@ class EditEntryActivity : ComponentActivity() {
             editEntryUuid = viewEntryViewModel.updateEntry(account = viewEntryViewModel.createAccount(), context = localctx)
 
         viewEntryViewModel.entryUpdated = editEntryUuid != editEntryUuidClone
+        viewEntryViewModel.isPasswordVisible = false
+        viewEntryViewModel.isCvcCvvVisible = false
         if (editEntryUuid != editEntryUuidClone) {
             viewEntryViewModel.entryUpdated = true
             onSuccess()
@@ -469,7 +478,7 @@ class EditEntryActivity : ComponentActivity() {
                         Spacer(Modifier.width(8.dp))
                         IconButton(
                             onClick = {
-                                viewEntryViewModel.copyPassword(localctx)
+                                viewEntryViewModel.copy(ViewEntryViewModel.Copyable.Password, localctx)
                                 showCopiedToast = true
                             },
                             Modifier.size(20.dp)
@@ -506,86 +515,93 @@ class EditEntryActivity : ComponentActivity() {
             }
 
             val localctx = LocalContext.current
-            // MFA textfield
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+            if (!viewEntryViewModel.currentMFAValue.text.isEmpty() || viewEntryViewModel.editMode) {
+                // MFA textfield
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    OutlinedTextField(
-                        value = when {
-                            !viewEntryViewModel.editMode -> viewEntryViewModel.currentMFAValue
-                            else -> viewEntryViewModel.mfaSecret
-                        },
-                        onValueChange = { it ->
-                            mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
-                            viewEntryViewModel.mfaSecret = it
-                            viewEntryViewModel.allRequiredFieldsAreFilled =
-                                viewEntryViewModel.checkRequiredFields()
-                        },
-                        label = {
-                            Text(
-                                if (!viewEntryViewModel.editMode)
-                                    stringResource(R.string.mfa_code_label)
-                                else
-                                    stringResource(R.string.mfa_secret)
-                            )
-                        },
-                        singleLine = true,
-                        enabled = viewEntryViewModel.editMode,
-                        isError = mfaSecretIsInvalidProblem,
-                        supportingText = {
-                            if (mfaSecretIsInvalidProblem) {
-                                Text(
-                                    text = stringResource(R.string.mfa_secret_invalid),
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f) // 🔹 key part
-                            .padding(top = 8.dp),
-                        colors = QuickComposables.uniformTextFieldColors()
-                    )
-
-                    if (viewEntryViewModel.editMode) {
-                        IconButton(
-                            onClick = {
-                                qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = when {
+                                !viewEntryViewModel.editMode -> viewEntryViewModel.currentMFAValue
+                                else -> viewEntryViewModel.mfaSecret
+                            },
+                            onValueChange = { it ->
+                                mfaSecretIsInvalidProblem = !MFAHandler.verifySecret(it.text)
+                                viewEntryViewModel.mfaSecret = it
                                 viewEntryViewModel.allRequiredFieldsAreFilled =
                                     viewEntryViewModel.checkRequiredFields()
+                            },
+                            label = {
+                                Text(
+                                    if (!viewEntryViewModel.editMode)
+                                        stringResource(R.string.mfa_code_label)
+                                    else
+                                        stringResource(R.string.mfa_secret)
+                                )
+                            },
+                            singleLine = true,
+                            enabled = viewEntryViewModel.editMode,
+                            isError = mfaSecretIsInvalidProblem,
+                            supportingText = {
+                                if (mfaSecretIsInvalidProblem) {
+                                    Text(
+                                        text = stringResource(R.string.mfa_secret_invalid),
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f) // 🔹 key part
+                                .padding(top = 8.dp),
+                            colors = QuickComposables.uniformTextFieldColors()
+                        )
+
+                        if (viewEntryViewModel.editMode) {
+                            IconButton(
+                                onClick = {
+                                    qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                                    viewEntryViewModel.allRequiredFieldsAreFilled =
+                                        viewEntryViewModel.checkRequiredFields()
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.qr_code_scanner_24px),
+                                    contentDescription = "QR button",
+                                    modifier = Modifier.size(36.dp),
+                                    tint = MaterialTheme.colorScheme.inversePrimary
+                                )
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.qr_code_scanner_24px),
-                                contentDescription = "QR button",
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
-                    } else {
-                        IconButton(
-                            onClick = {
-                                viewEntryViewModel.copyMFACode(localctx)
+                        } else {
+                            IconButton(
+                                onClick = {
+                                    viewEntryViewModel.copy(ViewEntryViewModel.Copyable.TOTP,localctx)
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.content_copy_24px),
+                                    tint = MaterialTheme.colorScheme.inversePrimary,
+                                    contentDescription = "Copy password"
+                                )
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.content_copy_24px),
-                                tint = MaterialTheme.colorScheme.inversePrimary,
-                                contentDescription = "Copy password"
-                            )
                         }
                     }
-                }
 
-                if (!viewEntryViewModel.editMode) MFAProgressbar()
+                    if (!viewEntryViewModel.editMode) MFAProgressbar()
+            }
             }
 
 
             // Recovery codes section
             Column {
-                if (!viewEntryViewModel.recoveryCodes.isEmpty()) {
+                if (!viewEntryViewModel.recoveryCodes.isEmpty() || viewEntryViewModel.editMode) {
+                    if (viewEntryViewModel.editMode && viewEntryViewModel.recoveryCodes.isEmpty())
+                        viewEntryViewModel.recoveryCodes.add(TextFieldValue(""))
+                    if (!viewEntryViewModel.editMode && viewEntryViewModel.recoveryCodes.first().text.isEmpty())
+                        return;
                     repeat(viewEntryViewModel.recoveryCodes.size) { index ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -649,7 +665,7 @@ class EditEntryActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MFAProgressbar() {
+    private fun MFAProgressbar() {
         var currentProgress by remember { mutableFloatStateOf(0f) }
 
         LaunchedEffect(Unit) {
@@ -680,8 +696,10 @@ class EditEntryActivity : ComponentActivity() {
         var cardExpirationDateInvalidProblem by remember { mutableStateOf(false) }
         var cardCvcCvvInvalidProblem by remember { mutableStateOf(false) }
 
+        val localctx = LocalContext.current
+
         Column {
-            val brandStringsToBrands= mapOf(
+            val brandStringsToBrands = mapOf(
                 stringResource(R.string.visa) to CardBrands.Visa,
                 stringResource(R.string.mastercard) to CardBrands.Mastercard,
                 stringResource(R.string.unionpay) to CardBrands.UnionPay,
@@ -694,7 +712,7 @@ class EditEntryActivity : ComponentActivity() {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text (
+                    Text(
                         text = stringResource(R.string.cards_brand),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
@@ -712,7 +730,10 @@ class EditEntryActivity : ComponentActivity() {
                 value = viewEntryViewModel.cardNumber,
                 onValueChange = {
                     try {
-                        cardNumberTooLongProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.Number, it.text)
+                        cardNumberTooLongProblem = !viewEntryViewModel.validateCardCredentials(
+                            CardCredentials.Number,
+                            it.text
+                        )
                         cardNumberInvalidProblem = false
                         cardNumberTooShortProblem = false
                     } catch (e: IllegalArgumentException) {
@@ -720,7 +741,8 @@ class EditEntryActivity : ComponentActivity() {
                             cardNumberTooShortProblem = true
                     } finally {
                         viewEntryViewModel.cardNumber = it
-                        viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+                        viewEntryViewModel.allRequiredFieldsAreFilled =
+                            viewEntryViewModel.checkRequiredFields()
                     }
                 },
                 label = {
@@ -735,20 +757,31 @@ class EditEntryActivity : ComponentActivity() {
                 isError = cardNumberInvalidProblem || cardNumberTooShortProblem || cardNumberTooLongProblem,
                 supportingText = @Composable {
                     if (cardNumberInvalidProblem) {
-                        Text(text = stringResource(R.string.error_card_number_invalid),
-                            style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = stringResource(R.string.error_card_number_invalid),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     } else if (cardNumberTooShortProblem) {
-                        Text(text = stringResource(R.string.error_card_number_too_short),
-                            style = MaterialTheme.typography.bodySmall)
-                    }
-                    else if (cardNumberTooLongProblem) {
-                        Text(text = stringResource(R.string.error_card_number_too_long),
-                            style = MaterialTheme.typography.bodySmall)
+                        Text(
+                            text = stringResource(R.string.error_card_number_too_short),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    } else if (cardNumberTooLongProblem) {
+                        Text(
+                            text = stringResource(R.string.error_card_number_too_long),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
+                    .padding(top = 16.dp)
+                    .clickable(
+                        enabled = !viewEntryViewModel.editMode,
+                        onClick = {
+                            viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CardNumber, localctx)
+                        }
+                    ),
                 colors = QuickComposables.uniformTextFieldColors()
             )
             Row(
@@ -762,13 +795,18 @@ class EditEntryActivity : ComponentActivity() {
                     value = viewEntryViewModel.expirationMMYY,
                     onValueChange = {
                         try {
-                            cardExpirationDateInvalidProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.ExpirationDate, it.text)
+                            cardExpirationDateInvalidProblem =
+                                !viewEntryViewModel.validateCardCredentials(
+                                    CardCredentials.ExpirationDate,
+                                    it.text
+                                )
                         } catch (e: IllegalArgumentException) {
                             // have no idea how would this happen, considering that exceptions are only meant to happen with card numbers inside of that function, xd :^
                             println(e)
                         } finally {
                             viewEntryViewModel.expirationMMYY = it
-                        } },
+                        }
+                    },
                     label = {
                         Text(text = stringResource(R.string.card_expdate))
                     },
@@ -781,8 +819,10 @@ class EditEntryActivity : ComponentActivity() {
                     enabled = viewEntryViewModel.editMode,
                     supportingText = @Composable {
                         if (cardExpirationDateInvalidProblem) {
-                            Text(text = stringResource(R.string.error_card_expdate_invalid),
-                                style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                text = stringResource(R.string.error_card_expdate_invalid),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     },
                     colors = QuickComposables.uniformTextFieldColors()
@@ -793,32 +833,53 @@ class EditEntryActivity : ComponentActivity() {
                     value = viewEntryViewModel.cvcCVV,
                     onValueChange = {
                         try {
-                            cardCvcCvvInvalidProblem = !viewEntryViewModel.validateCardCredentials(CardCredentials.CVC_CVV, it.text)
+                            cardCvcCvvInvalidProblem =
+                                !viewEntryViewModel.validateCardCredentials(
+                                    CardCredentials.CVC_CVV,
+                                    it.text
+                                )
                         } catch (e: IllegalArgumentException) {
                             // Justin Case: Prepared for anything.
                             // https://youtube.com/shorts/h7EZR6ppVR8?si=EqTZ2WWq2sQnUJSN
                             println(e)
                         } finally {
                             viewEntryViewModel.cvcCVV = it
-                            viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
+                            viewEntryViewModel.allRequiredFieldsAreFilled =
+                                viewEntryViewModel.checkRequiredFields()
                         }
                     },
                     label = {
                         Text(text = stringResource(R.string.card_cvc_cvv_placeholder))
                     },
                     singleLine = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(
+                            enabled = !viewEntryViewModel.editMode,
+                            onClick = {
+                                viewEntryViewModel.toggleCvcVisibility()
+                                viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CVC, localctx)
+                            }
+                        ),
                     enabled = viewEntryViewModel.editMode,
-                    modifier = Modifier.weight(1f),
                     isError = cardCvcCvvInvalidProblem,
                     supportingText = @Composable {
                         if (cardCvcCvvInvalidProblem)
-                            Text(text = stringResource(R.string.error_card_cvccvv_invalid),
-                                style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                text = stringResource(R.string.error_card_cvccvv_invalid),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                     },
+                    visualTransformation =
+                        if (viewEntryViewModel.isCvcCvvVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = QuickComposables.uniformTextFieldColors()
                 )
             }
+
             // Cardholder Name Field
             OutlinedTextField(
                 value = viewEntryViewModel.cardholderName,
