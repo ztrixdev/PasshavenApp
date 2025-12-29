@@ -73,7 +73,7 @@ class NewFolderViewModel: ViewModel() {
 
         FolderManager.createFolder(db, newFolder)
     }
-
+    /*
     fun toggleEntryInclusion(entryUuid: Uuid) {
         val currentSet = _includedEntryUuids.value
         if (currentSet.contains(entryUuid)) {
@@ -82,4 +82,6 @@ class NewFolderViewModel: ViewModel() {
             includeEntry(entryUuid)
         }
     }
+    */
+    // no idea what is the code above doing but i'll save it bcs you never know
 }

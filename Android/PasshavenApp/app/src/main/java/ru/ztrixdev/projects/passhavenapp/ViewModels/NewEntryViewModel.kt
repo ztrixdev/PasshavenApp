@@ -45,10 +45,6 @@ class NewEntryViewModel: ViewModel() {
         return folders
     }
 
-    suspend fun getSelectedFolder(context: Context): Folder? {
-        return FolderManager.getFolderByUuid(context, selectedFolderUuid as Uuid)
-    }
-
     var newEntryName by mutableStateOf(TextFieldValue(""))
     var additionalNote by mutableStateOf(TextFieldValue(""))
 

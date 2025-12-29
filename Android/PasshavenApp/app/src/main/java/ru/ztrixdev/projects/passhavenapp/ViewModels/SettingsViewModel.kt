@@ -91,7 +91,7 @@ class SettingsViewModel: ViewModel() {
     }
 
 
-    suspend fun _setSelectedFlabs(flabs: Int, context: Context) {
+    fun _setSelectedFlabs(flabs: Int, context: Context) {
         VaultHandler.updateFlabs(flabs, context)
     }
 
@@ -99,7 +99,7 @@ class SettingsViewModel: ViewModel() {
 
     val _backupFolder = mutableStateOf("".toUri())
 
-    suspend fun _setSelectedTV(timeVariant: Long, context: Context) {
+    fun _setSelectedTV(timeVariant: Long, context: Context) {
         VaultHandler.updateTV(timeVariant, context)
         _selectedTimeVariant.longValue = timeVariant
     }

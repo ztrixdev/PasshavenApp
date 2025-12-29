@@ -48,10 +48,6 @@ class ViewEntryViewModel : ViewModel() {
         selectedFolderUuid = folder.uuid
     }
 
-    suspend fun getSelectedFolder(context: Context): Folder? {
-        return FolderManager.getFolderByUuid(context, selectedFolderUuid as Uuid)
-    }
-
     var dataFetchDone by mutableStateOf(false)
 
     var newEntryName by mutableStateOf(TextFieldValue(""))
@@ -81,15 +77,13 @@ class ViewEntryViewModel : ViewModel() {
     }
 
     fun updateMFA() {
-
         if (mfaSecret.text.isEmpty())
-            return;
+            return
         try {
             currentMFAValue = TextFieldValue(MFAHandler.getTotpCode(mfaSecret.text).toString())
         } catch (_: Exception) {
             println("weird")
         }
-
     }
 
     suspend fun getCurrentData(context: Context) {

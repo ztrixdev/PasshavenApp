@@ -27,7 +27,7 @@ public class VaultPrefs {
     }
 
     public static int getFlabs(Context context) {
-        return PreferencesMaster.get(PREFS_NAME, PREFS_FLABS_KEY, 0, context);
+        return PreferencesMaster.get(PREFS_NAME, PREFS_FLABS_KEY, DEFAULT_FLABS, context);
     }
 
     public static void saveFlabsr(Context context, int value) {
@@ -35,7 +35,7 @@ public class VaultPrefs {
     }
 
     public static int getFlabsr(Context context) {
-        return PreferencesMaster.get(PREFS_NAME, PREFS_FLABSR_KEY, 0, context);
+        return PreferencesMaster.get(PREFS_NAME, PREFS_FLABSR_KEY, DEFAULT_FLABSR, context);
     }
 
     public static void saveBackupFolder(Context context, Uri uri) {
