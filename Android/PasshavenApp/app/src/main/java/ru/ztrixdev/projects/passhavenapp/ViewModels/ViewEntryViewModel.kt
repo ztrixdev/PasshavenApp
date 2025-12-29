@@ -105,7 +105,7 @@ class ViewEntryViewModel : ViewModel() {
             else -> return
         }
 
-        val key = VaultHandler().getEncryptionKey(context)
+        val key = VaultHandler.getEncryptionKey(context)
         when (entry) {
             is Card -> entry.decrypt(key)
             is Account -> entry.decrypt(key)
@@ -325,7 +325,7 @@ class ViewEntryViewModel : ViewModel() {
         CardManager.editCard(
             database = database,
             editedCard = card,
-            encryptionKey = VaultHandler().getEncryptionKey(context)
+            encryptionKey = VaultHandler.getEncryptionKey(context)
         )
 
         if (inFolder != null) {
@@ -359,7 +359,7 @@ class ViewEntryViewModel : ViewModel() {
         AccountManager.editAccount(
             database = database,
             editedAccount = account,
-            encryptionKey = VaultHandler().getEncryptionKey(context)
+            encryptionKey = VaultHandler.getEncryptionKey(context)
         )
 
         if (inFolder != null) {

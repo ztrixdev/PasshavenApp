@@ -7,9 +7,9 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.goterl.lazysodium.exceptions.SodiumException
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
+import ru.ztrixdev.projects.passhavenapp.Preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.Room.Account
 import ru.ztrixdev.projects.passhavenapp.Room.Card
-import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.EntryTypes
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Crypto.CryptoNames
@@ -39,12 +39,9 @@ object ExportsHandler {
 
     private const val _export_filename_part_1 = "export_"
     private const val _export_filename_part_2 = "_full.phbckp"
-    suspend fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
 
-        val vault = vaultDao.getVault()[0]
-
-        val path = vault.backupFolder
+    fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
+        val path = VaultPrefs.getBackupFolder(context)
         if (path == "".toUri())
             return false
         // The filename looks like this
@@ -82,16 +79,12 @@ object ExportsHandler {
             return false
         }
 
-        vault.lastBackup = System.currentTimeMillis()
-        vaultDao.update(vault)
+        VaultPrefs.saveLastBackupTimestamp(context, System.currentTimeMillis())
         return true
     }
 
-    suspend fun checkIfABackupIsDue(context: Context): Boolean {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()[0]
-        
-        return ((System.currentTimeMillis() - vault.lastBackup) > vault.backupEvery)
+    fun checkIfABackupIsDue(context: Context): Boolean {
+        return ((System.currentTimeMillis() - VaultPrefs.getLastBackupTimestamp(context)) > VaultPrefs.getBackupEvery(context))
     }
 
     private fun _exportPH(entries: List<Any>, folders: List<Folder>): String {

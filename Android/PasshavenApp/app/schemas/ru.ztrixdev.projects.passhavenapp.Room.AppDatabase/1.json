@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fb293149097d50b0f1b7cc4c7cd997df",
+    "identityHash": "a6d07cf2cb75dcbd673e99716e8c180a",
     "entities": [
       {
         "tableName": "Account",
@@ -176,7 +176,7 @@
       },
       {
         "tableName": "Vault",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `mp_key` BLOB NOT NULL, `mp_salt` BLOB NOT NULL, `mp_iv` BLOB NOT NULL, `mp_hash` BLOB NOT NULL, `mp_hash_iv` BLOB NOT NULL, `pin_hash` BLOB NOT NULL, `pin_hash_iv` BLOB NOT NULL, `failed_login_attempts_before_suicide` INTEGER NOT NULL, `failed_login_attempts_before_suicide_remaining` INTEGER NOT NULL, `backup_folder` TEXT NOT NULL, `last_backup` INTEGER NOT NULL, `backup_every` INTEGER NOT NULL, PRIMARY KEY(`uuid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` TEXT NOT NULL, `mp_key` BLOB NOT NULL, `mp_salt` BLOB NOT NULL, `mp_iv` BLOB NOT NULL, `mp_hash` BLOB NOT NULL, `mp_hash_iv` BLOB NOT NULL, `pin_hash` BLOB NOT NULL, `pin_hash_iv` BLOB NOT NULL, PRIMARY KEY(`uuid`))",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -225,36 +225,6 @@
             "columnName": "pin_hash_iv",
             "affinity": "BLOB",
             "notNull": true
-          },
-          {
-            "fieldPath": "flabs",
-            "columnName": "failed_login_attempts_before_suicide",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "flabsr",
-            "columnName": "failed_login_attempts_before_suicide_remaining",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "backupFolder",
-            "columnName": "backup_folder",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "lastBackup",
-            "columnName": "last_backup",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "backupEvery",
-            "columnName": "backup_every",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -267,7 +237,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fb293149097d50b0f1b7cc4c7cd997df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a6d07cf2cb75dcbd673e99716e8c180a')"
     ]
   }
 }

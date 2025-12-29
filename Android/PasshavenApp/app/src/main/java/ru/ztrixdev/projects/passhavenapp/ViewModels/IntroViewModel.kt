@@ -110,7 +110,7 @@ class IntroViewModel() : ViewModel() {
     suspend fun tryCreateVault(ctx: Context) {
         ThemePrefs.saveSelectedTheme(ctx, AppThemeType.W10)
         ThemePrefs.saveDarkThemeBool(ctx, true)
-        val vh = VaultHandler()
+        val vh = VaultHandler
         if (masterPassword.verify(currentMP.value) && masterPassword.verifyPIN(secondPromptPin.value)) {
             vh.createVault(currentMP.value, secondPromptPin.value,ctx)
         }

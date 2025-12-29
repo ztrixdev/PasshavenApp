@@ -114,7 +114,7 @@ class NewEntryViewModel: ViewModel() {
         val newAccUuid = AccountManager.createAccount(
             database = database,
             account = account,
-            encryptionKey = VaultHandler().getEncryptionKey(context)
+            encryptionKey = VaultHandler.getEncryptionKey(context)
         )
 
         if (selectedFolderUuid != null) {
@@ -212,7 +212,7 @@ class NewEntryViewModel: ViewModel() {
         val newCardUuid = CardManager.createCard(
             database = database,
             card = card,
-            encryptionKey = VaultHandler().getEncryptionKey(context)
+            encryptionKey = VaultHandler.getEncryptionKey(context)
         )
 
         if (selectedFolderUuid != null) {

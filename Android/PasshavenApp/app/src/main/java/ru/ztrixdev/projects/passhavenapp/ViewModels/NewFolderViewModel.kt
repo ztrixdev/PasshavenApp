@@ -33,7 +33,7 @@ class NewFolderViewModel: ViewModel() {
 
     suspend fun loadEntries(context: Context) {
         val db = DatabaseProvider.getDatabase(context)
-        val key = VaultHandler().getEncryptionKey(context)
+        val key = VaultHandler.getEncryptionKey(context)
 
         entries.clear()
         entries.addAll(EntryManager.getAllEntriesForUI(db, key))

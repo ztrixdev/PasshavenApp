@@ -3,6 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.Activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -58,6 +59,13 @@ class LoginActivity: ComponentActivity() {
         val loginViewModel: LoginViewModel by viewModels()
 
         super.onCreate(savedInstanceState)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                return
+            }
+        })
+
         // enableEdgeToEdge()
         setContent {
             val context = this.applicationContext

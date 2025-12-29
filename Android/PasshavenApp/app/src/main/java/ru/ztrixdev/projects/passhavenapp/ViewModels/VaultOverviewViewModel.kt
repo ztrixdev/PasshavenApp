@@ -6,7 +6,7 @@ import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Folder
 
-class VaultOverviewViewModel (context: Context, private val vaultHandler: VaultHandler = VaultHandler()) : ViewModel() {
+class VaultOverviewViewModel (context: Context, private val vaultHandler: VaultHandler = VaultHandler) : ViewModel() {
     private val database = DatabaseProvider.getDatabase(context = context)
 
     suspend fun getFolders(): List<Folder> {

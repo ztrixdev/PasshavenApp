@@ -8,17 +8,18 @@
     <application
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:windowOptOutEdgeToEdgeEnforcement="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Material3.Dark">
+        android:theme="@style/Theme.PasshavenApp">
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,44 +30,44 @@
             android:name=".Activities.IntroActivity"
             android:exported="true"
             android:label="@string/intro_label"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.ViewEntryActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.LoginActivity"
             android:exported="true"
             android:label="@string/login_label"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.VaultOverviewActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.NewEntryActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.NewFolderActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
         <activity
             android:screenOrientation="fullUser"
             android:name=".Activities.SettingsActivity"
             android:exported="true"
-            android:theme="@style/Theme.Material3.Dark">
+            android:theme="@style/Theme.PasshavenApp">
         </activity>
     </application>
 </manifest>

@@ -52,6 +52,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.SortingKeys
+import ru.ztrixdev.projects.passhavenapp.Handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
@@ -61,8 +62,20 @@ import ru.ztrixdev.projects.passhavenapp.ViewModels.NewFolderViewModel
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 
 class NewFolderActivity: ComponentActivity() {
+
+    override fun onResume() {
+        val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
+        if (isSessionExpd) {
+            this.applicationContext.startActivity(
+                Intent(this.applicationContext, LoginActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val newFolderViewModel: NewFolderViewModel by viewModels()
+
+
 
         super.onCreate(savedInstanceState)
         // enableEdgeToEdge()

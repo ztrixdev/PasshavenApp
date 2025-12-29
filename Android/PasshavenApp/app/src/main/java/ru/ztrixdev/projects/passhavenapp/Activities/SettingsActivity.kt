@@ -72,9 +72,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
+import ru.ztrixdev.projects.passhavenapp.Handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.Preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.QuickComposables.FolderNameFromUri
 import ru.ztrixdev.projects.passhavenapp.R
@@ -102,6 +104,15 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
 
 
 class SettingsActivity : ComponentActivity() {
+    override fun onResume() {
+        val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
+        if (isSessionExpd) {
+            this.applicationContext.startActivity(
+                Intent(this.applicationContext, LoginActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        }
+    }
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -610,8 +621,8 @@ class SettingsActivity : ComponentActivity() {
 
         val localctx = LocalContext.current
         LaunchedEffect(Unit) {
-            val result = VaultHandler().getFlabsAndFlabsr(localctx)
-            selectedFlabsIndex = flabsVariants.indexOf(result.first)
+            val result = VaultPrefs.getFlabs(localctx)
+            selectedFlabsIndex = flabsVariants.indexOf(result)
         }
 
         Row(
@@ -793,7 +804,7 @@ class SettingsActivity : ComponentActivity() {
         val localctx = LocalContext.current
         var backupData by remember { mutableStateOf<Triple<Uri, Long, Long>?>(null) }
         LaunchedEffect(Unit) {
-            backupData = VaultHandler().getBackupInfo(localctx)
+            backupData = VaultHandler.getBackupInfo(localctx)
         }
         Column(
             Modifier.padding(all = 16.dp)
@@ -823,7 +834,7 @@ class SettingsActivity : ComponentActivity() {
         LaunchedEffect(exportDone) {
             if (exportDone) {
                 val newTimestamp = withContext(Dispatchers.IO) {
-                    VaultHandler().getBackupInfo(localctx).third
+                    VaultHandler.getBackupInfo(localctx).third
                 }
                 lastBackupForUI = newTimestamp
             }
@@ -901,7 +912,7 @@ class SettingsActivity : ComponentActivity() {
             contentResolver.takePersistableUriPermission(directoryUri, flags)
 
             GlobalScope.launch(Dispatchers.IO) {
-                VaultHandler().setBackupFolder(directoryUri, localctx)
+                VaultHandler.setBackupFolder(directoryUri, localctx)
             }
             settingsViewModel._backupFolder.value = directoryUri
             bfolderChanged = true

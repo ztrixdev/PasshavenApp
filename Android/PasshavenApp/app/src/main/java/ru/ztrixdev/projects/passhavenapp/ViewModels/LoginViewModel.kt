@@ -6,12 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.Handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.Preferences.SessionPrefs
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.ViewModels.Enums.LoginMethods
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
-class LoginViewModel(private val vaultHandler: VaultHandler = VaultHandler()) : ViewModel() {
+class LoginViewModel(private val vaultHandler: VaultHandler = VaultHandler) : ViewModel() {
     val loginMethod = mutableStateOf(LoginMethods.ByPIN)
     val loginSuccessful = mutableStateOf(false)
     private val pin = mutableStateOf("")
@@ -37,12 +38,16 @@ class LoginViewModel(private val vaultHandler: VaultHandler = VaultHandler()) : 
             else loginSuccessful.value = true
             pinLoginAttempts.intValue++
         }
+        if (loginSuccessful.value)
+            SessionPrefs.saveLastLoginTimestamp(ctx, System.currentTimeMillis())
     }
 
     suspend fun tryLoginWithMP(mp: String, ctx: Context): Boolean {
         val loginResult = vaultHandler.loginByPassword(mp, ctx)
         loginSuccessful.value = loginResult
         mpLoginAttempts.intValue++
+        if (loginSuccessful.value)
+            SessionPrefs.saveLastLoginTimestamp(ctx, System.currentTimeMillis())
         return loginResult
     }
 

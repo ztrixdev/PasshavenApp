@@ -1,16 +1,11 @@
 package ru.ztrixdev.projects.passhavenapp.Handlers
 
 import android.content.Context
-import android.icu.text.CaseMap
 import android.net.Uri
-import androidx.compose.foundation.AndroidEmbeddedExternalSurface
-import androidx.compose.runtime.key
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.core.net.toUri
-import androidx.savedstate.serialization.encodeToSavedState
-import org.apache.commons.codec.digest.Crypt
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.FolderManager
+import ru.ztrixdev.projects.passhavenapp.Preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.Room.Dao.VaultDao
 import ru.ztrixdev.projects.passhavenapp.Room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.Room.Vault
@@ -27,10 +22,9 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
-import kotlin.math.exp
 import kotlin.uuid.Uuid
 
-class VaultHandler {
+object VaultHandler {
     suspend fun createVault(password: String, PIN: String, context: Context): List<Vault> {
         if (!MasterPassword.verify(passwd = password))
             throw IllegalArgumentException("The provided password doesn't meet the requirements. Check the requirements and try again.")
@@ -70,13 +64,8 @@ class VaultHandler {
             mpHash = encryptedMPHashCipherAndIV[CryptoNames.cipher]!!,
             mpHashIv = encryptedMPHashCipherAndIV[CryptoNames.iv]!!,
             pinHash = encryptedPINHashCipherAndIV[CryptoNames.cipher]!!,
-            pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!,
-            flabs = 20,
-            flabsr = 20,
-            // By default every 3 days
-            backupEvery = TimeInMillis.ThreeDays.toLong(),
-            lastBackup = 0,
-            backupFolder = "".toUri())
+            pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!
+        )
 
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         // Deletes all the previous vaults to avoid having more than one vault, which will result in errors.
@@ -90,9 +79,10 @@ class VaultHandler {
     suspend fun loginByPassword(passwd: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
-        if (vault == emptyList<Vault>())
+        if (vault.isEmpty())
             return false
-        if (vault[0].flabsr <= 0)
+
+        if (VaultPrefs.getFlabsr(context) <= 0)
             if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
@@ -102,20 +92,26 @@ class VaultHandler {
         val decryptedMPHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpHash, CryptoNames.iv to vault[0].mpHashIv), mpHashProtectingKey as SecretKey)
 
         val loginResult = Checksum.keccak512(passwd).contentEquals(decryptedMPHash)
-        if (!loginResult)
-            vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
-        vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
+        if (!loginResult) {
+            val remainingAttempts = VaultPrefs.getFlabsr(context) - 1
+            VaultPrefs.saveFlabsr(context, remainingAttempts)
+        } else {
+            VaultPrefs.saveFlabsr(context, VaultPrefs.getFlabs(context))
+        }
 
         return loginResult
     }
+
 
     suspend fun loginByPIN(PIN: String, context: Context): Boolean {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
 
-        if (vault == emptyList<Vault>())
+        if (vault.isEmpty())
             return false
-        if (vault[0].flabsr <= 0)
+
+        val remainingAttempts = VaultPrefs.getFlabsr(context)
+        if (remainingAttempts <= 0)
             if (selfDestroy(vaultDao)) return false
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }
@@ -124,10 +120,10 @@ class VaultHandler {
 
         val decryptedPINHash = AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].pinHash, CryptoNames.iv to vault[0].pinHashIv), pinHashProtectingKey as SecretKey)
         val loginResult = Checksum.keccak512(PIN).contentEquals(decryptedPINHash)
-        if (!loginResult)
-            vaultDao.update(flabsr = vault[0].flabsr - 1, uuid = vault[0].uuid)
-        else {
-            vaultDao.update(flabsr = vault[0].flabs, uuid = vault[0].uuid)
+        if (!loginResult) {
+            VaultPrefs.saveFlabsr(context, remainingAttempts - 1)
+        } else {
+            VaultPrefs.saveFlabsr(context, VaultPrefs.getFlabs(context))
         }
         return loginResult
     }
@@ -181,9 +177,9 @@ class VaultHandler {
 
         // Step 0: exit immediately if a backup wasn't done recently
         val NO_BACKUP_EXCEPTION = Exception("A backup hasn't been done in the last 8 hours, cannot continue.")
-        if (db.vaultDao().getVault()[0].backupFolder == "".toUri())
+        if (VaultPrefs.getBackupFolder(context) == "".toUri())
             throw NO_BACKUP_EXCEPTION
-        if ((System.currentTimeMillis() - db.vaultDao().getVault()[0].lastBackup) > TimeInMillis.EightHours)
+        if ((System.currentTimeMillis() - VaultPrefs.getLastBackupTimestamp(context)) > TimeInMillis.EightHours)
             throw NO_BACKUP_EXCEPTION
 
         // Step 1: get a full vault export
@@ -238,11 +234,6 @@ class VaultHandler {
             mpHashIv = encryptedMPHashCipherAndIV[CryptoNames.iv]!!,
             pinHash = encryptedPINHashCipherAndIV[CryptoNames.cipher]!!,
             pinHashIv = encryptedPINHashCipherAndIV[CryptoNames.iv]!!,
-            flabs = vault.flabs,
-            flabsr = vault.flabsr,
-            backupFolder = vault.backupFolder,
-            lastBackup = vault.lastBackup,
-            backupEvery = vault.backupEvery
         )
 
         db.vaultDao().insert(newVault)
@@ -267,13 +258,8 @@ class VaultHandler {
         return true
     }
 
-    suspend fun setBackupFolder(uri: Uri, context: Context) {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()
-
-        val vaultClone = vault[0]
-        vaultClone.backupFolder = uri
-        vaultDao.update(vaultClone)
+    fun setBackupFolder(uri: Uri, context: Context) {
+        VaultPrefs.saveBackupFolder(context, uri)
     }
 
     suspend fun getEncryptionKey(context: Context): ByteArray {
@@ -289,38 +275,22 @@ class VaultHandler {
         return AndroidCrypto.decrypt(mapOf(CryptoNames.cipher to vault[0].mpKey, CryptoNames.iv to vault[0].mpIv), mpProtectingKey as SecretKey)
     }
 
-    suspend fun getFlabsAndFlabsr(context: Context): Pair<Int, Int> {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()
-        println(Pair(vault[0].flabs, vault[0].flabsr))
-        return Pair(vault[0].flabs, vault[0].flabsr)
-    }
-
-    suspend fun updateFlabs(flabs: Int, context: Context) {
+    fun updateFlabs(flabs: Int, context: Context) {
         if (flabs !in 10..30) return
 
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()[0]
-
-        vault.flabs = flabs
-        vault.flabsr = flabs
-
-        vaultDao.update(vault)
+        VaultPrefs.saveFlabs(context, flabs)
+        VaultPrefs.saveFlabsr(context, flabs)
     }
 
-    suspend fun getBackupInfo(context: Context): Triple<Uri, Long, Long> {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()[0]
+    fun getBackupInfo(context: Context): Triple<Uri, Long, Long> {
+        val backupFolder = VaultPrefs.getBackupFolder(context)
+        val backupEvery = VaultPrefs.getBackupEvery(context)
+        val lastBackup = VaultPrefs.getLastBackupTimestamp(context)
 
-        return Triple(vault.backupFolder, vault.backupEvery, vault.lastBackup)
+        return Triple(backupFolder, backupEvery, lastBackup)
     }
 
-    suspend fun updateTV(timeVariant: Long, context: Context) {
-        val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
-        val vault = vaultDao.getVault()[0]
-
-        vault.backupEvery = timeVariant
-        vaultDao.update(vault)
+    fun updateTV(timeVariant: Long, context: Context) {
+        VaultPrefs.saveBackupEvery(context, timeVariant)
     }
-
 }

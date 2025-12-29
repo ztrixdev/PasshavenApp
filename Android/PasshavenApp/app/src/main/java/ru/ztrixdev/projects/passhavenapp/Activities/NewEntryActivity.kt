@@ -59,6 +59,7 @@ import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
+import ru.ztrixdev.projects.passhavenapp.Handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
@@ -80,6 +81,15 @@ class NewEntryActivity: ComponentActivity()  {
         if (result.contents != null) {
             val qr = MFAHandler.processQR(result.contents)
             newEntryViewModel.mfaSecret = TextFieldValue(qr.secret)
+        }
+    }
+
+    override fun onResume() {
+        val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
+        if (isSessionExpd) {
+            this.applicationContext.startActivity(
+                Intent(this.applicationContext, LoginActivity::class.java)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
     }
 

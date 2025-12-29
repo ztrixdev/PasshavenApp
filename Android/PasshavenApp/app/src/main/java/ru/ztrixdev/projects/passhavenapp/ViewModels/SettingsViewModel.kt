@@ -65,7 +65,7 @@ class SettingsViewModel: ViewModel() {
         } else if (btnClicked.toString() == specialCharacters[SpecialCharNames.Tick].toString()) {
             when {
                 !currentPINConfirmed.value -> {
-                    val pinMatches = VaultHandler().loginByPIN(currentPIN.value, ctx)
+                    val pinMatches = VaultHandler.loginByPIN(currentPIN.value, ctx)
                     if (pinMatches)
                         currentPINConfirmed.value = true
                     else
@@ -92,7 +92,7 @@ class SettingsViewModel: ViewModel() {
 
 
     suspend fun _setSelectedFlabs(flabs: Int, context: Context) {
-        VaultHandler().updateFlabs(flabs, context)
+        VaultHandler.updateFlabs(flabs, context)
     }
 
     val _selectedTimeVariant = mutableLongStateOf(0L)
@@ -100,7 +100,7 @@ class SettingsViewModel: ViewModel() {
     val _backupFolder = mutableStateOf("".toUri())
 
     suspend fun _setSelectedTV(timeVariant: Long, context: Context) {
-        VaultHandler().updateTV(timeVariant, context)
+        VaultHandler.updateTV(timeVariant, context)
         _selectedTimeVariant.longValue = timeVariant
     }
 
@@ -115,17 +115,17 @@ class SettingsViewModel: ViewModel() {
     }
 
     suspend fun changePIN(ctx: Context) {
-        VaultHandler().changePIN(secondPromptPin.value, ctx)
+        VaultHandler.changePIN(secondPromptPin.value, ctx)
         SecurityPrefs.saveLastPINChange(System.currentTimeMillis(), ctx)
     }
 
     suspend fun setBackupPassword(password: String, context: Context) {
-        val encryptedPassword = SodiumCrypto.encrypt(password, VaultHandler().getEncryptionKey(context))
+        val encryptedPassword = SodiumCrypto.encrypt(password, VaultHandler.getEncryptionKey(context))
         SecurityPrefs.saveBackupPassword(encryptedPassword, context)
     }
 
     suspend fun export(context: Context): Boolean {
-        val key = VaultHandler().getEncryptionKey(context)
+        val key = VaultHandler.getEncryptionKey(context)
 
         var password = SecurityPrefs.getBackupPassword(context)
         val noPasswordSet = password.contentEquals("")

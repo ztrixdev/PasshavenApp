@@ -8,4 +8,6 @@ object TimeInMillis {
     const val Month = 30 * Day
     const val TwelveHours = Hour * 12
     const val EightHours = Hour * 8
+    const val FifteenMinutes = Hour / 4
+    const val FortyFiveMinutes = Hour - FifteenMinutes
 }
