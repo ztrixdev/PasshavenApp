@@ -85,6 +85,7 @@ class NewEntryActivity: ComponentActivity()  {
     }
 
     override fun onResume() {
+        super.onResume()
         val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
         if (isSessionExpd) {
             this.applicationContext.startActivity(

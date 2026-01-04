@@ -105,6 +105,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
 
 class SettingsActivity : ComponentActivity() {
     override fun onResume() {
+        super.onResume()
         val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
         if (isSessionExpd) {
             this.applicationContext.startActivity(

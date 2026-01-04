@@ -64,6 +64,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 class NewFolderActivity: ComponentActivity() {
 
     override fun onResume() {
+        super.onResume()
         val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
         if (isSessionExpd) {
             this.applicationContext.startActivity(

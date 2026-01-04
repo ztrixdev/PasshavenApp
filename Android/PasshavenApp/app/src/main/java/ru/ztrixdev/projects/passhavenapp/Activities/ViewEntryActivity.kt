@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -28,7 +27,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,7 +34,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +54,6 @@ import androidx.lifecycle.lifecycleScope
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.Preferences.ThemePrefs
@@ -112,14 +108,14 @@ class ViewEntryActivity : ComponentActivity() {
                         .background(MaterialTheme.colorScheme.background)
                         .verticalScroll(scrollState)
                 ) {
-                    MainBody(viewEntryViewModel)
+                    MainBody()
                 }
             }
         }
     }
 
     @Composable
-    private fun FolderSelectionDropdown(viewEntryViewModel: ViewEntryViewModel) {
+    private fun FolderSelectionDropdown() {
         val localctx = LocalContext.current
 
         val isDropDownExpanded = remember {
@@ -198,7 +194,7 @@ class ViewEntryActivity : ComponentActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     @Composable
-    private fun MainBody(viewEntryViewModel: ViewEntryViewModel) {
+    private fun MainBody() {
         QuickComposables.Titlebar(stringResource(R.string.editentryactivity_titlebar)) {
             val intent = Intent(this@ViewEntryActivity, VaultOverviewActivity::class.java)
             this@ViewEntryActivity.startActivity(intent)
@@ -211,7 +207,7 @@ class ViewEntryActivity : ComponentActivity() {
             viewEntryViewModel.allRequiredFieldsAreFilled = viewEntryViewModel.checkRequiredFields()
             if (viewEntryViewModel.editMode) {
                 lifecycleScope.launch {
-                    finish(localctx, viewEntryViewModel) {
+                    finish(localctx) {
                         viewEntryViewModel.editMode = false
                     }
                 }
@@ -277,7 +273,7 @@ class ViewEntryActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 6.dp))
-                FolderSelectionDropdown(viewEntryViewModel = viewEntryViewModel)
+                FolderSelectionDropdown()
             }
 
             var nameIsEmptyProblem by remember { mutableStateOf(false) }
@@ -319,8 +315,8 @@ class ViewEntryActivity : ComponentActivity() {
             }
 
             when (viewEntryViewModel.type) {
-                EntryTypes.Account -> AccountSpecificFields(viewEntryViewModel)
-                EntryTypes.Card -> CardSpecificFields(viewEntryViewModel)
+                EntryTypes.Account -> AccountSpecificFields()
+                EntryTypes.Card -> CardSpecificFields()
                 EntryTypes.Folder -> {}
             }
 
@@ -356,7 +352,7 @@ class ViewEntryActivity : ComponentActivity() {
         }
     }
 
-    private suspend fun finish(localctx: Context, viewEntryViewModel: ViewEntryViewModel, onSuccess: () -> Unit) {
+    private suspend fun finish(localctx: Context, onSuccess: () -> Unit) {
         var editEntryUuid = Uuid.random()
         val editEntryUuidClone = editEntryUuid
 
@@ -375,7 +371,7 @@ class ViewEntryActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun AccountSpecificFields(viewEntryViewModel: ViewEntryViewModel) {
+    private fun AccountSpecificFields() {
         var usernameIsEmptyProblem by remember { mutableStateOf(false) }
         var passwordIsEmptyProblem by remember { mutableStateOf(false) }
         var mfaSecretIsInvalidProblem by remember { mutableStateOf(false) }
@@ -590,7 +586,7 @@ class ViewEntryActivity : ComponentActivity() {
                         }
                     }
 
-                    if (!viewEntryViewModel.editMode) MFAProgressbar()
+                    if (!viewEntryViewModel.editMode) QuickComposables.ThirtySecondsProgressbar(fillMaxWidth = false) { viewEntryViewModel.updateMFA() }
             }
             }
 
@@ -664,32 +660,9 @@ class ViewEntryActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    private fun MFAProgressbar() {
-        var currentProgress by remember { mutableFloatStateOf(0f) }
-
-        LaunchedEffect(Unit) {
-            while (true) {
-                for (i in 1..300) {
-                    currentProgress = i / 300f
-                    delay(100)
-                }
-                currentProgress = 0f
-                viewEntryViewModel.updateMFA()
-            }
-        }
-        LinearProgressIndicator(
-            progress = { currentProgress },
-            modifier = Modifier
-                .widthIn(100.dp, 400.dp)
-                .padding(bottom = 12.dp),
-            color = MaterialTheme.colorScheme.inversePrimary
-        )
-    }
-
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    private fun CardSpecificFields(viewEntryViewModel: ViewEntryViewModel) {
+    private fun CardSpecificFields() {
         var cardNumberInvalidProblem by remember { mutableStateOf(false) }
         var cardNumberTooShortProblem by remember { mutableStateOf(false) }
         var cardNumberTooLongProblem by remember { mutableStateOf(false) }
