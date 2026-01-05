@@ -1,6 +1,9 @@
 package ru.ztrixdev.projects.passhavenapp.ViewModels
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.EntryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.Handlers.MFAHandler
@@ -13,10 +16,15 @@ class VaultOverviewViewModel() : ViewModel() {
      fun getTOTP(secret: String): Long {
         return MFAHandler.getTotpCode(secret)
     }
-
     fun copy(text: String, context: Context) {
         Utils.copyToClipboard(context, text)
     }
+
+    enum class Views {
+        Overview, MFA, Generator
+    }
+
+    var currentView by mutableStateOf<Views>(Views.Overview)
 
     suspend fun getUsernameByUuid(uuid: Uuid, context: Context): String {
         val entry = EntryManager.getEntryByUuid(

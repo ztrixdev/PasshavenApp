@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -66,7 +64,7 @@ class LoginActivity: ComponentActivity() {
             }
         })
 
-        // enableEdgeToEdge()
+
         setContent {
             val context = this.applicationContext
 
@@ -106,7 +104,7 @@ class LoginActivity: ComponentActivity() {
             Text(
                 text = stringResource(R.string.login_to_passhaven),
                 style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.size(64.dp))
@@ -211,7 +209,7 @@ class LoginActivity: ComponentActivity() {
             Text(
                 text = stringResource(R.string.login_to_passhaven),
                 style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.size(64.dp))
@@ -226,8 +224,7 @@ class LoginActivity: ComponentActivity() {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = Color.White)
+                    .padding(top = 16.dp)
             )
             if (!loginViewModel.loginSuccessful.value && loginViewModel.mpLoginAttempts.intValue > 0) {
                 Text(

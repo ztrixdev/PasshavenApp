@@ -16,7 +16,7 @@ import kotlin.uuid.Uuid
 class NewFolderViewModel: ViewModel() {
     val folderCreated = mutableStateOf(false)
 
-    private val _selectedSortingKey = mutableStateOf(SortingKeys.ByAlphabet)
+    val _selectedSortingKey = mutableStateOf(SortingKeys.ByAlphabet)
 
     // Public, for the UI
     var entries = mutableStateListOf<Any>()
@@ -72,6 +72,7 @@ class NewFolderViewModel: ViewModel() {
         )
 
         FolderManager.createFolder(db, newFolder)
+        folderCreated.value = true
     }
     /*
     fun toggleEntryInclusion(entryUuid: Uuid) {

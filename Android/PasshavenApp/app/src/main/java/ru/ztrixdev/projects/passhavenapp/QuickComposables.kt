@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,13 +52,16 @@ import kotlinx.coroutines.withContext
 
 
 object QuickComposables {
+
     @Composable
-    fun Titlebar(text: String, onBackButtonClickAction: () -> Unit) {
+    fun BackButtonTitlebar(text: String, onBackButtonClickAction: () -> Unit) {
         Row(
+            verticalAlignment = Alignment.CenterVertically, // Center items vertically
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .padding(bottom = 10.dp, top= 10.dp)
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .statusBarsPadding()
+                .padding(vertical = 8.dp)
         ) {
             IconButton(
                 onClick = onBackButtonClickAction,
@@ -68,12 +72,12 @@ object QuickComposables {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "An arrow facing backwards, damnit",
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
             Text(
                 text = text,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
                     .padding(start = 40.dp)

@@ -65,7 +65,6 @@
 
     <string name="username_placeholder">ПоклейщикЦыпочек2010</string>
     <string name="fill_this_field_up_pls">Пожалуйста, заполните это поле.</string>
-    <string name="mfa_secret_supporting_text">Ключ 2FA обычно выглядит так: HB3DEITWNDAFTDJTBRQNPONCXGTPK3N</string>
     <string name="mfa_secret_invalid">Секрет 2FA не прошёл проверку подлинности. Проверьте его.</string>
     <string name="generate_password_for_me">Сгенерировать пароль для меня</string>
     <string name="recovery_code_label">Код восстановления №</string>
@@ -140,4 +139,8 @@ Passhaven никогда не обращается к серверам и не �
     <string name="dynamic_colors">Использовать динамические цвета? (Android 12+)</string>
     <string name="not_set">Не задан</string>
     <string name="in_folder">В папке:</string>
+    <string name="generator">Генератор</string>
+    <string name="overview">Обзор</string>
+    <string name="sort_and_select">Сортировка и выбор</string>
+    <string name="create_folder">Создать папку</string>
 </resources>

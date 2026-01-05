@@ -65,7 +65,7 @@
     <string name="username_placeholder">TheGoochCollector</string>
     <string name="password_placeholder" translatable="false">WoAiBeijingTiananmen0110</string>
     <string name="fill_this_field_up_pls">Please fill in this field.</string>
-    <string name="mfa_secret_supporting_text">An MFA secret typically looks like this: LDWZKBKNEYG55F2IWQKGP3W7YPHK6LSW</string>
+    <string name="mfa_secret_supporting_text"></string>
     <string name="mfa_secret_invalid">This doesn\'t appear to be a valid MFA secret</string>
     <string name="generate_password_for_me">Generate the password for me, please</string>
     <string name="recovery_code_label">Recovery code #</string>
@@ -140,4 +140,10 @@
     <string name="dynamic_colors">Use Dynamic Colors? (Android 12+)</string>
     <string name="not_set">Not set</string>
     <string name="in_folder">In folder:</string>
+    <string name="generator">Generator</string>
+    <string name="overview">Overview</string>
+    <string name="mfa">2FA</string>
+    <string name="passhaven" translatable="false">Passhaven</string>
+    <string name="sort_and_select">Sort and select</string>
+    <string name="create_folder">Create folder</string>
 </resources>

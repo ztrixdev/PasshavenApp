@@ -35,9 +35,12 @@ class NewEntryViewModel: ViewModel() {
     val entryCreated = mutableStateOf(false)
 
     var selectedFolderUuid by mutableStateOf<Uuid?>(null)
+    var selectedFolder by mutableStateOf<Folder?>(null)
 
-    fun setSelectedFolder(folder: Folder) {
+
+    fun _setSelectedFolder(folder: Folder) {
         selectedFolderUuid = folder.uuid
+        selectedFolder = folder
     }
 
     suspend fun getFolders(context: Context): List<Folder> {

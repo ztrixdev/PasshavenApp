@@ -32,10 +32,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -117,7 +115,7 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge()
+
         setContent {
             val settingsViewModel: SettingsViewModel by viewModels()
             val localctx = LocalContext.current
@@ -170,7 +168,7 @@ class SettingsActivity : ComponentActivity() {
                         }
 
                         else -> {
-                            QuickComposables.Titlebar(stringResource(R.string.settings_titlebar)) {
+                            QuickComposables.BackButtonTitlebar(stringResource(R.string.settings_titlebar)) {
                                 val intent = Intent(this@SettingsActivity, VaultOverviewActivity::class.java)
                                 this@SettingsActivity.startActivity(intent)
                             }
@@ -209,14 +207,14 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.palette_24px),
                         contentDescription = "A palette.",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(32.dp)
                     )
                     Text(
                         text = stringResource(R.string.appearance_setting),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 20.dp)
                     )
@@ -241,14 +239,14 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.security_24px),
                         contentDescription = "A shield.",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(32.dp)
                     )
                     Text(
                         text = stringResource(R.string.security_setting),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 20.dp)
                     )
@@ -273,14 +271,14 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.upload_24px),
                         contentDescription = "An arrow coming from a box.",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(32.dp)
                     )
                     Text(
                         text = stringResource(R.string.export_backup_setting),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 20.dp)
                     )
@@ -305,14 +303,14 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.download_24px),
                         contentDescription = "An arrow smashin into a box lol.",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(32.dp)
                     )
                     Text(
                         text = stringResource(R.string.import_setting),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 20.dp)
                     )
@@ -337,14 +335,14 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.info_24px),
                         contentDescription = "An information symbol",
-                        tint = MaterialTheme.colorScheme.onBackground,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .size(32.dp)
                     )
                     Text(
                         text = stringResource(R.string.info_setting),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(start = 20.dp)
                     )
@@ -359,7 +357,7 @@ class SettingsActivity : ComponentActivity() {
                                    darkBoolChanged: (Boolean) -> Unit,
                                    dynamicColorsChanged: (Boolean) -> Unit
     ) {
-        QuickComposables.Titlebar(stringResource(R.string.appearance_setting)) {
+        QuickComposables.BackButtonTitlebar(stringResource(R.string.appearance_setting)) {
             settingsViewModel.openAppearance.value = false
         }
 
@@ -373,10 +371,10 @@ class SettingsActivity : ComponentActivity() {
             Text(
                 text = stringResource(R.string.theme),
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            var AreWeDarkThemedRn by remember { mutableStateOf(
+            var areWeDarkThemedRn by remember { mutableStateOf(
                 ThemePrefs.getDarkThemeBool(localctx)
             ) }
             Row (
@@ -388,22 +386,22 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = stringResource(R.string.dark_theme),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Switch(
-                    checked = AreWeDarkThemedRn,
-                    onCheckedChange = { AreWeDarkThemedRn = it },
+                    checked = areWeDarkThemedRn,
+                    onCheckedChange = { areWeDarkThemedRn = it },
                 )
             }
 
-            LaunchedEffect(AreWeDarkThemedRn) {
-                ThemePrefs.saveDarkThemeBool(localctx, AreWeDarkThemedRn)
-                darkBoolChanged(AreWeDarkThemedRn)
+            LaunchedEffect(areWeDarkThemedRn) {
+                ThemePrefs.saveDarkThemeBool(localctx, areWeDarkThemedRn)
+                darkBoolChanged(areWeDarkThemedRn)
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                var UsingDymanicColorsRn by remember { mutableStateOf(
+                var usingDymanicColorsRn by remember { mutableStateOf(
                     ThemePrefs.getDynamicColorsBool(localctx)
                 ) }
                 Row (
@@ -415,18 +413,18 @@ class SettingsActivity : ComponentActivity() {
                     Text(
                         text = stringResource(R.string.dynamic_colors),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
-                        checked = UsingDymanicColorsRn,
-                        onCheckedChange = { UsingDymanicColorsRn = it },
+                        checked = usingDymanicColorsRn,
+                        onCheckedChange = { usingDymanicColorsRn = it },
                     )
                 }
 
-                LaunchedEffect(UsingDymanicColorsRn) {
-                    ThemePrefs.saveDynamicColorsBool(localctx, AreWeDarkThemedRn)
-                    dynamicColorsChanged(UsingDymanicColorsRn)
+                LaunchedEffect(usingDymanicColorsRn) {
+                    ThemePrefs.saveDynamicColorsBool(localctx, areWeDarkThemedRn)
+                    dynamicColorsChanged(usingDymanicColorsRn)
                 }
             }
 
@@ -467,7 +465,7 @@ class SettingsActivity : ComponentActivity() {
                             Text(
                                 text = stringResource(nameRes),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
                             RadioButton(
@@ -480,7 +478,7 @@ class SettingsActivity : ComponentActivity() {
                                 Icon(
                                     painter = painterResource(R.drawable.dark_mode_24px),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primaryContainer,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
                                 ThemeColorsShowcase(darkScheme)
@@ -489,7 +487,7 @@ class SettingsActivity : ComponentActivity() {
                                 Icon(
                                     painter = painterResource(R.drawable.light_mode_24px),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primaryContainer,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(end = 8.dp)
                                 )
                                 ThemeColorsShowcase(lightScheme)
@@ -547,7 +545,7 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun SecuritySettings(settingsViewModel: SettingsViewModel) {
-        QuickComposables.Titlebar(stringResource(R.string.security_setting)) {
+        QuickComposables.BackButtonTitlebar(stringResource(R.string.security_setting)) {
             settingsViewModel.openSecurity.value = false
         }
 
@@ -562,7 +560,7 @@ class SettingsActivity : ComponentActivity() {
                         stringResource(R.string.pin_never_changed)
                     },
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .widthIn(100.dp, 160.dp)
                 )
@@ -571,10 +569,8 @@ class SettingsActivity : ComponentActivity() {
                     onClick = {
                         settingsViewModel.openPINChange.value = true
                     },
-                    colors = ButtonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
                     modifier = Modifier
@@ -582,8 +578,7 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     Text(
                         text = stringResource(R.string.change_pin_btn),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
@@ -595,7 +590,7 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = stringResource(R.string.flabs_explanation_part_1),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .widthIn(60.dp, 140.dp)
                 )
@@ -605,7 +600,7 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = stringResource(R.string.flabs_explanation_part_2),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .widthIn(60.dp, 140.dp)
                 )
@@ -634,13 +629,13 @@ class SettingsActivity : ComponentActivity() {
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_drop_down_24px),
-                tint = MaterialTheme.colorScheme.primaryContainer,
+                tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Dropdown arrow lol :3"
             )
             Text(
                 text = flabsVariants[selectedFlabsIndex].toString(),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.primaryContainer
+                color = MaterialTheme.colorScheme.primary
             )
             DropdownMenu(
                 expanded = isDropDownExpanded,
@@ -685,7 +680,7 @@ class SettingsActivity : ComponentActivity() {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "An arrow facing backwards, damnit",
-                tint = MaterialTheme.colorScheme.primaryContainer
+                tint = MaterialTheme.colorScheme.primary
             )
         }
         Column(
@@ -697,7 +692,7 @@ class SettingsActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Icon(
                 painter = painterResource(R.drawable.pin_48px),
@@ -705,14 +700,14 @@ class SettingsActivity : ComponentActivity() {
                 modifier = Modifier
                     .size(128.dp)
                     .padding(bottom = 24.dp),
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(R.string.change_pin_desc),
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text =
@@ -725,7 +720,7 @@ class SettingsActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -798,7 +793,7 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun ExportsSettings(settingsViewModel: SettingsViewModel) {
-        QuickComposables.Titlebar(
+        QuickComposables.BackButtonTitlebar(
             text = stringResource(R.string.export_backup_setting),
             onBackButtonClickAction = {settingsViewModel.openExports.value = false}
         )
@@ -849,13 +844,13 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = "${stringResource(R.string.last_backup_date)}:",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = DateTimeProcessor.convertToHumanReadable(lastBackupForUI),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.End,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             var showWaitDialog by remember { mutableStateOf(false) }
@@ -879,17 +874,14 @@ class SettingsActivity : ComponentActivity() {
                             }
                         }
                     },
-                    colors = ButtonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 ) {
                     Text(
                         text = stringResource(R.string.make_backup_now),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
@@ -930,7 +922,7 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = stringResource(R.string.backup_folder),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 val folderUri = settingsViewModel._backupFolder.value
                 if (folderUri == "".toUri()) {
@@ -953,10 +945,8 @@ class SettingsActivity : ComponentActivity() {
                     onClick = {
                         launcher.launch(null)
                     },
-                    colors = ButtonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                        disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                     ),
                 ) {
@@ -965,8 +955,7 @@ class SettingsActivity : ComponentActivity() {
                             stringResource(R.string.set) } else {
                             stringResource(R.string.change)
                         },
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
                 /*
@@ -985,17 +974,14 @@ class SettingsActivity : ComponentActivity() {
                                 localctx.startActivity(intent)
                             }
                         },
-                        colors = ButtonColors(
+                        colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            disabledContainerColor = MaterialTheme.colorScheme.inverseSurface,
-                            disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
                     ) {
                         Text(
                             text = stringResource(R.string.open_in_finder),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
 }
@@ -1014,7 +1000,7 @@ class SettingsActivity : ComponentActivity() {
             Text(
                 text = stringResource(R.string.backup_every),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onSurface
             )
             BackupEveryDropdown(settingsViewModel = settingsViewModel, backupEveryValue = backupEveryValue)
         }
@@ -1049,7 +1035,7 @@ class SettingsActivity : ComponentActivity() {
         ) {
             Icon(
                 painter = painterResource(R.drawable.arrow_drop_down_24px),
-                tint = MaterialTheme.colorScheme.primaryContainer,
+                tint = MaterialTheme.colorScheme.primary,
                 contentDescription = "Dropdown arrow lol :3"
             )
             if (selectedTVIndex == -1) {
@@ -1060,7 +1046,7 @@ class SettingsActivity : ComponentActivity() {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primaryContainer
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             DropdownMenu(
@@ -1143,65 +1129,37 @@ class SettingsActivity : ComponentActivity() {
                                     checked = specialCharNumber >= MP_SPECCHARS_MINIMUM,
                                     onCheckedChange = null,
                                     enabled = false,
-                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary,
-                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
-                                    )
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp)
                                 )
-                                Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
+                                Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.onSurface, fontSize =12.sp)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = digitNumber >= MP_DIGITS_MINIMUM,
                                     onCheckedChange = null,
                                     enabled = false,
-                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary,
-                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
-                                    )
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp)
                                 )
-                                Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
+                                Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.onSurface, fontSize =12.sp)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = uppercaseNumber >= MP_UPPERCASE_MINIMUM,
                                     onCheckedChange = null,
                                     enabled = false,
-                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary,
-                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
-                                    )
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp)
                                 )
-                                Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.onBackground,  fontSize =12.sp)
+                                Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.onSurface,  fontSize =12.sp)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = textState.text.length >= MP_LENGTH_MINIMUM,
                                     onCheckedChange = null,
                                     enabled = false,
-                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp),
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary,
-                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                                        disabledCheckedColor = MaterialTheme.colorScheme.primary,
-                                        disabledUncheckedColor = MaterialTheme.colorScheme.secondary
-                                    )
+                                    modifier = Modifier.padding(vertical = 8.dp, horizontal = 5.dp)
                                 )
                                 Text(stringResource(R.string.mp_creation_checkbox_length),
-                                    color = MaterialTheme.colorScheme.onBackground,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontSize =12.sp)
                             }
                         }
@@ -1243,7 +1201,7 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun Info(settingsViewModel: SettingsViewModel) {
-        QuickComposables.Titlebar(stringResource(R.string.info_setting)) {
+        QuickComposables.BackButtonTitlebar(stringResource(R.string.info_setting)) {
             settingsViewModel.openInfo.value = false
         }
 
@@ -1254,12 +1212,12 @@ class SettingsActivity : ComponentActivity() {
             Column {
                 Text(
                     text = "Passhaven",
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.displayLarge
                 )
                 Text(
                     text = stringResource(R.string.developed_by),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -1267,7 +1225,7 @@ class SettingsActivity : ComponentActivity() {
             Column {
                 Text(
                     text = stringResource(R.string.ph_desc),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -1275,33 +1233,33 @@ class SettingsActivity : ComponentActivity() {
             Column {
                 Text(
                     text = stringResource(R.string.ph_credits),
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Column(Modifier.padding(start = 8.dp)) {
                     Text(
                         text = stringResource(R.string.aegis_respect),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = stringResource(R.string.rossman_respect),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = stringResource(R.string.andy_respect),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = stringResource(R.string.fam_respect),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
                         text = stringResource(R.string.me_respect),
-                        color = MaterialTheme.colorScheme.onBackground,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -1315,7 +1273,7 @@ class SettingsActivity : ComponentActivity() {
         ) {
             Text(
                 text = stringResource(R.string.source_code),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyMedium
             )
             Row(
@@ -1328,7 +1286,7 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.codeberg), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
@@ -1339,7 +1297,7 @@ class SettingsActivity : ComponentActivity() {
                     Icon(
                         painter = painterResource(R.drawable.github_light),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
@@ -1349,13 +1307,13 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.gitlab), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             Text(
                 text = stringResource(R.string.ztrix_socials),
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyMedium
             )
             Row(
@@ -1368,17 +1326,16 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.bluesky), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
                     onClick = {
-                        uriHandler.openUri("https://t.me/ztrixdev")
                     }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.telegram), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 IconButton(
@@ -1388,7 +1345,7 @@ class SettingsActivity : ComponentActivity() {
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.youtube), contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -1396,4 +1353,3 @@ class SettingsActivity : ComponentActivity() {
     }
 
 }
-

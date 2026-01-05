@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge()
+
         setContent {
             val context = LocalContext.current
             var destination by remember { mutableStateOf<Destination>(Destination.Loading)}

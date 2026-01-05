@@ -32,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,7 +62,7 @@ class IntroActivity : ComponentActivity() {
         val introViewModel: IntroViewModel by viewModels()
 
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge()
+
         setContent {
             val localctx = LocalContext.current
             var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
@@ -113,7 +111,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Icon(
                 painter = painterResource(R.drawable.lock_person_40px),
@@ -121,7 +119,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier
                     .size(200.dp)
                     .padding(bottom = 24.dp),
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.size(32.dp))
             Text(
@@ -130,7 +128,7 @@ class IntroActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = stringResource(R.string.intro_part_greeting_text_description_p2),
@@ -138,7 +136,7 @@ class IntroActivity : ComponentActivity() {
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.size(32.dp))
             Button(
@@ -150,7 +148,7 @@ class IntroActivity : ComponentActivity() {
             ) {
                 Text(
                     text = stringResource(R.string.intro_part_greeting_button_get_started),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
                     fontSize = 18.sp
                 )
             }
@@ -179,7 +177,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Icon(
@@ -188,20 +186,20 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier
                     .size(128.dp)
                     .padding(bottom = 16.dp),
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = stringResource(R.string.mp_creation_text_description_p1),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 4.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = stringResource(R.string.mp_creation_text_description_p2),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 24.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Box(
@@ -215,14 +213,14 @@ class IntroActivity : ComponentActivity() {
                         text = stringResource(R.string.click_regenerate_once),
                         modifier = Modifier.padding(10.dp),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 } else {
                     Text(
                         text = introViewModel.currentMP.value,
                         modifier = Modifier.padding(10.dp),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -258,7 +256,7 @@ class IntroActivity : ComponentActivity() {
                 Text(
                     text = stringResource(R.string.continue_button),
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
@@ -279,7 +277,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 fontSize = 28.sp,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Icon(
@@ -288,14 +286,14 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier
                     .size(128.dp)
                     .padding(bottom = 16.dp),
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.primary
             )
 
             Text(
                 text = stringResource(R.string.mp_creation_text_description_p1),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 8.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             var text by remember { mutableStateOf(TextFieldValue("")) }
@@ -312,8 +310,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent, errorContainerColor = Color.Transparent, focusedTextColor = MaterialTheme.colorScheme.primary)
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -329,7 +326,7 @@ class IntroActivity : ComponentActivity() {
                         enabled = false,
                         modifier = Modifier.padding(end = 5.dp),
                     )
-                    Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.primary, fontSize =12.sp)
+                    Text(stringResource(R.string.mp_creation_checkbox_special_chars),  color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -338,7 +335,7 @@ class IntroActivity : ComponentActivity() {
                         enabled = false,
                         modifier = Modifier.padding(end = 5.dp)
                     )
-                    Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.primary, fontSize =12.sp)
+                    Text(stringResource(R.string.mp_creation_checkbox_digits), color = MaterialTheme.colorScheme.onBackground, fontSize =12.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -347,7 +344,7 @@ class IntroActivity : ComponentActivity() {
                         enabled = false,
                         modifier = Modifier.padding(end = 5.dp)
                     )
-                    Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.primary,  fontSize =12.sp)
+                    Text(stringResource(R.string.mp_creation_checkbox_uppercase),  color = MaterialTheme.colorScheme.onBackground,  fontSize =12.sp)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
@@ -357,7 +354,7 @@ class IntroActivity : ComponentActivity() {
                         modifier = Modifier.padding(end = 5.dp),
                     )
                     Text(stringResource(R.string.mp_creation_checkbox_length),
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize =12.sp)
                 }
             }
@@ -413,7 +410,7 @@ class IntroActivity : ComponentActivity() {
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
         Icon(
             painter = painterResource(R.drawable.pin_48px),
@@ -421,14 +418,14 @@ class IntroActivity : ComponentActivity() {
             modifier = Modifier
                 .size(128.dp)
                 .padding(bottom = 24.dp),
-            tint = MaterialTheme.colorScheme.secondary
+            tint = MaterialTheme.colorScheme.primary
         )
         Text(
             text = stringResource(R.string.pin_creation_description),
             modifier = Modifier.padding(bottom = 24.dp),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
         if (introViewModel.firstPromptDone.intValue == 1) {
             Text(
@@ -436,7 +433,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
         else {
@@ -445,7 +442,7 @@ class IntroActivity : ComponentActivity() {
                 modifier = Modifier.padding(bottom = 24.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
