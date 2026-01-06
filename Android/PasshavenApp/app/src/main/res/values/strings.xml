@@ -146,4 +146,5 @@
     <string name="passhaven" translatable="false">Passhaven</string>
     <string name="sort_and_select">Sort and select</string>
     <string name="create_folder">Create folder</string>
+    <string name="login_with_pin_instead">I\'ll login using my PIN</string>
 </resources>

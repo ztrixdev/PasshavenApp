@@ -85,6 +85,8 @@ dependencies {
     val jnaVersion = "5.17.0"
     val roomVersion = "2.8.3"
 
+    implementation(libs.java.otp)
+    implementation("commons-codec:commons-codec:1.16.0")
     implementation(libs.androidx.documentfile)
     implementation("com.goterl:lazysodium-android:$lazyVersion@aar")
     implementation("net.java.dev.jna:jna:$jnaVersion@aar")
@@ -98,7 +100,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.symbol.processing.api)
     implementation(libs.filekit.dialogs.compose)
-    implementation(libs.googleauth)
     implementation(libs.gson)
     implementation(kotlincrypto.hash.sha3)
     implementation(libs.material.icons.core)

@@ -5,6 +5,7 @@ documentfile = "1.1.0"
 filekitDialogsCompose = "0.12.0"
 googleauth = "1.5.0"
 gson = "2.13.2"
+javaOtp = "0.4.0"
 kotlin = "2.2.20"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -34,6 +35,7 @@ core = { module = "com.google.zxing:core", version.ref = "core" }
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekitDialogsCompose" }
 googleauth = { module = "com.warrenstrange:googleauth", version.ref = "googleauth" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+java-otp = { module = "com.eatthepath:java-otp", version.ref = "javaOtp" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
