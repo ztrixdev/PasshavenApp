@@ -17,26 +17,14 @@
 <table>
   <tr>
     <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/scrshot_intro_act.png" alt="Intro" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/login_scrshot.png" alt="Login" width="250"></td>
-    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/scrsht_view_entry.png" alt="View" width="250"></td>
+    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/vault_overview_early_dev_scrshot.jpg" alt="Overview" width="250"></td>
+    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/new_entry_early_dev_scrshot.jpg" alt="New entry" width="250"></td>
+    <td><img src="https://raw.githubusercontent.com/ztrixdev/PasshavenApp/refs/heads/main/readme/new_folder_scrshot.jpg" alt="New folder" width="250"></td>
+    
   </tr>
 </table>
 
-## Current status: Infdev
-The project is in it's soopa (as in [soopa high level tactics, remember that yeah?](https://www.youtube.com/watch?v=Wop7Ld0eX1g)) early stage of development.   
-Here's a quick list of what's done and what's TODO:
+## Current status: Alpha
+The project is facing a major UI/UX overhaul, as well as a full 2FA rework (moving from an obsolete Google Auth library that is neither customizable nor stable to a <a href="https://codeberg.org/ztrixdev/j2fa" target="_blank">self-written one</a>)  
+Most of the app's backend functionality is done and just needs a UI wrapper to serve a purpose.
 
-- Done:  
-    1. The encryption mechanism
-    2. The database is fully set up, ready to serve
-    3. The export system (though so far it's only exporting in sort of a proprietary format)
-    4. Folder and entry creation
-    5. Theming (incl. Dynamic Colors)
-    6. Entry management
-    7. Settings menu
-- TODO:
-  1. Vault overview page
-  2. 2FA overview page
-  3. Importing (to recover a Ph vault or to migrate from BW/VW)
-
-There's still a lot to be done, but I expect the project to be available for beta testing by Jan/Feb 2026.
