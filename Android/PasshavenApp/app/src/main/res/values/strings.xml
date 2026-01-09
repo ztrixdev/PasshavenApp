@@ -149,4 +149,5 @@
     <string name="login_with_pin_instead">I\'ll login using my PIN</string>
     <string name="view_mode_cards">Cards</string>
     <string name="view_mode_rows">Rows</string>
+    <string name="version_number">App version: beta 1.0</string>
 </resources>

@@ -146,4 +146,5 @@ Passhaven никогда не обращается к серверам и не �
     <string name="login_with_pin_instead">Я войду с помощью PIN</string>
     <string name="view_mode_cards">Карточки</string>
     <string name="view_mode_rows">Ряды</string>
+    <string name="version_number">Версия: бета 1.0</string>
 </resources>

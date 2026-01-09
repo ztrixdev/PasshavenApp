@@ -93,22 +93,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
-import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
-import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
-import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
-import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
-import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.QuickComposables.FolderNameFromUri
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.TimeInMillis
-import ru.ztrixdev.projects.passhavenapp.viewModels.SettingsViewModel
+import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
+import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_DIGITS_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_LENGTH_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_SPECCHARS_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_UPPERCASE_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
+import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
+import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
@@ -122,6 +121,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
+import ru.ztrixdev.projects.passhavenapp.viewModels.SettingsViewModel
 
 
 class SettingsActivity : ComponentActivity() {
@@ -181,11 +181,11 @@ class SettingsActivity : ComponentActivity() {
                         settingsViewModel.openExports.value -> {
                             ExportsSettings()
                         }
-
+                    /*
                         settingsViewModel.openImports.value -> {
                             ImportsSettings()
                         }
-
+                    */
                         settingsViewModel.openInfo.value -> {
                             Info(settingsViewModel = settingsViewModel)
                         }
@@ -1201,6 +1201,11 @@ class SettingsActivity : ComponentActivity() {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                Text(
+                    text = stringResource(R.string.version_number),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
@@ -1222,7 +1227,6 @@ class SettingsActivity : ComponentActivity() {
             val creditResourceIds = listOf(
                 R.string.aegis_respect,
                 R.string.rossman_respect,
-                R.string.andy_respect,
             )
 
             items(creditResourceIds) { resId ->
@@ -1242,7 +1246,7 @@ class SettingsActivity : ComponentActivity() {
                 SocialIconRow(links = sourceLinks)
                 Spacer(modifier = Modifier.height(32.dp))
             }
-
+            /*
             item {
                 SectionTitle(stringResource(R.string.ztrix_socials))
                 val socialLinks = listOf(
@@ -1252,6 +1256,8 @@ class SettingsActivity : ComponentActivity() {
                 )
                 SocialIconRow(links = socialLinks)
             }
+
+             */
         }
     }
 
