@@ -24,7 +24,7 @@
   </tr>
 </table>
 
-## Current status: Alpha
-The project is facing a major UI/UX overhaul, as well as a full 2FA rework (moving from an obsolete Google Auth library that is neither customizable nor stable to a <a href="https://codeberg.org/ztrixdev/j2fa" target="_blank">self-written one</a>)  
-Most of the app's backend functionality is done and just needs a UI wrapper to serve a purpose.
+## Current status: BETA
+We are in Beta!
+Latest release: <a href="https://github.com/ztrixdev/PasshavenApp/releases/tag/BETA">here!</a>
 
