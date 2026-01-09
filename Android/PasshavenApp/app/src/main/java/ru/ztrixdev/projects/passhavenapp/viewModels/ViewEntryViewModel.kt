@@ -11,22 +11,22 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import com.journeyapps.barcodescanner.ScanOptions
+import ru.ztrixdev.projects.passhavenapp.Utils
 import ru.ztrixdev.projects.passhavenapp.entryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
 import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.room.Folder
 import ru.ztrixdev.projects.passhavenapp.room.decrypt
-import ru.ztrixdev.projects.passhavenapp.Utils
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
 class ViewEntryViewModel : ViewModel() {
@@ -84,6 +84,10 @@ class ViewEntryViewModel : ViewModel() {
         } catch (_: Exception) {
             println("weird")
         }
+    }
+
+    suspend fun deleteEntry(context: Context) {
+        EntryManager.deleteEntryByUuid(database = DatabaseProvider.getDatabase(context = context), Uuid.parse(entryUuid as String))
     }
 
     suspend fun getCurrentData(context: Context) {

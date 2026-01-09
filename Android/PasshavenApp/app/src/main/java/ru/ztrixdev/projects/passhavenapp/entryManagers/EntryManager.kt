@@ -37,6 +37,15 @@ object EntryManager {
         }
     }
 
+    suspend fun deleteEntryByUuid(database: AppDatabase, entryUuid: Uuid) {
+        when (val entry = getEntryByUuid(database, entryUuid)) {
+            is Card -> database.cardDao().delete(entry)
+            is Account -> database.accountDao().delete(entry)
+            is Folder -> database.folderDao().delete(entry)
+        }
+    }
+
+
     suspend fun getAllEntriesForUI(database: AppDatabase, encryptionKey: ByteArray): List<Any> {
         val allEntries = emptyList<Any>().toMutableList()
         allEntries.addAll(AccountManager.getAllAccounts(database, encryptionKey))

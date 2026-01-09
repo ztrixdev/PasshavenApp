@@ -8,10 +8,10 @@ object MFATripleManager {
         val mfaTriples = mutableListOf<MFATriple>()
 
         for (account in accounts) {
-            if (account.mfaSecret == null)
-                continue
-            else
+            if (account.mfaSecret!!.isNotBlank())
                 mfaTriples.add(MFATriple(account.uuid,account.name, account.mfaSecret!!))
+            else
+                continue
         }
 
         return mfaTriples

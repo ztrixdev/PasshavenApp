@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -36,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -107,11 +111,7 @@ class ViewEntryActivity : ComponentActivity() {
                         QuickComposables.BackButtonTitlebar(
                             stringResource(R.string.editentryactivity_titlebar)
                         ) {
-                            val prev_activity = intent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY)
-                            if (prev_activity.equals(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_VAULT_OVERVIEW_VALUE))
-                                startActivity(Intent(localctx, VaultOverviewActivity::class.java))
-                            if (prev_activity == null)
-                                startActivity(Intent(localctx, VaultOverviewActivity::class.java))
+                            goToPrevActivity()
                         }
                     },
                     floatingActionButton = {
@@ -136,12 +136,79 @@ class ViewEntryActivity : ComponentActivity() {
                         }
 
                         item { AdditionalNoteField() }
+                        item {
+                            DeleteButton()
+                        }
                         item { Spacer(Modifier.height(80.dp)) }
                     }
                 }
             }
         }
     }
+
+    @Composable
+    private fun DeleteButton() {
+        var showDeleteDialog by remember { mutableStateOf(false) }
+        val localctx = LocalContext.current
+
+        TextButton (
+            onClick = {
+                showDeleteDialog = true
+            }
+        ) {
+            Text(
+                text = stringResource(R.string.delete),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text(stringResource(R.string.delete)) },
+                text = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.delete_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        enabled = true,
+                        onClick = {
+                            lifecycleScope.launch {
+                                viewEntryViewModel.deleteEntry(context = localctx)
+                                goToPrevActivity()
+                            }
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+    }
+
+
+    private fun goToPrevActivity() {
+        val prev_activity = intent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY)
+        if (prev_activity.equals(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_VAULT_OVERVIEW_VALUE))
+            startActivity(Intent(this@ViewEntryActivity, VaultOverviewActivity::class.java))
+        if (prev_activity == null)
+            startActivity(Intent(this@ViewEntryActivity, VaultOverviewActivity::class.java))
+    }
+
 
     /* -------------------------------------------------- FAB */
 
@@ -275,7 +342,7 @@ class ViewEntryActivity : ComponentActivity() {
                 label = { Text(stringResource(R.string.username)) },
                 leadingIcon = { Icon(Icons.Default.Email, null) }
             )
-
+            val localctx = LocalContext.current
             OutlinedTextField(
                 value = viewEntryViewModel.password,
                 onValueChange = {
@@ -293,7 +360,9 @@ class ViewEntryActivity : ComponentActivity() {
                     if (passwordVisible) VisualTransformation.None
                     else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(onClick = { passwordVisible = !passwordVisible
+                            viewEntryViewModel.copy(ViewEntryViewModel.Copyable.Password, localctx)
+                        }) {
                         Icon(
                             painter =
                                 if (passwordVisible)
@@ -338,7 +407,7 @@ class ViewEntryActivity : ComponentActivity() {
     @Composable
     private fun CardSpecificFields() {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-
+            val localctx = LocalContext.current
             OutlinedTextField(
                 value = viewEntryViewModel.cardholderName,
                 onValueChange = {
@@ -360,7 +429,10 @@ class ViewEntryActivity : ComponentActivity() {
                         viewEntryViewModel.checkRequiredFields()
                 },
                 readOnly = !viewEntryViewModel.editMode,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .clickable(onClick = {
+                        viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CardNumber, localctx)
+                    }),
                 label = { Text(stringResource(R.string.card_number)) },
                 leadingIcon = {
                     Icon(painterResource(R.drawable.credit_card_24px), null)
@@ -390,7 +462,10 @@ class ViewEntryActivity : ComponentActivity() {
                             viewEntryViewModel.checkRequiredFields()
                     },
                     readOnly = !viewEntryViewModel.editMode,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).clickable(onClick = {
+                        viewEntryViewModel.isCvcCvvVisible = !viewEntryViewModel.isCvcCvvVisible
+                        viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CVC, localctx)
+                    }),
                     label = { Text(stringResource(R.string.card_cvc_cvv_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     visualTransformation =

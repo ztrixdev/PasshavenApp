@@ -30,6 +30,8 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,15 +44,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,14 +66,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.entryManagers.MFATriple
 import ru.ztrixdev.projects.passhavenapp.entryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.Card
@@ -105,6 +115,8 @@ class VaultOverviewActivity: ComponentActivity() {
                 LaunchedEffect(Unit) {
                     vaultOverviewViewModel.fetchEntries(localctx)
                     vaultOverviewViewModel.showAll()
+                    vaultOverviewViewModel.autoBackup(localctx)
+                    vaultOverviewViewModel.checkBackupPassword(localctx)
                 }
 
                 var isNewFabExpanded by remember { mutableStateOf(false) }
@@ -122,6 +134,12 @@ class VaultOverviewActivity: ComponentActivity() {
                             .padding(innerPadding)
                     ) {
                         MainBody()
+                        if (vaultOverviewViewModel.showBackupPopup) {
+                            QuickComposables.WaitingDialog(stringResource(R.string.backing_up_wait))
+                        }
+                        if (vaultOverviewViewModel.showBackupPasswordPopup) {
+                            PasswordDialog()
+                        }
                     }
 
                 }
@@ -184,6 +202,7 @@ class VaultOverviewActivity: ComponentActivity() {
                 }
             }
             if (vaultOverviewViewModel.currentView == VaultOverviewViewModel.Views.MFA) {
+                println(vaultOverviewViewModel.visibleMFA.forEach { println(it) })
                 items(
                     items = vaultOverviewViewModel.visibleMFA
                 ) { mfa ->
@@ -200,7 +219,75 @@ class VaultOverviewActivity: ComponentActivity() {
         }
     }
 
+    @Composable
+    private fun PasswordDialog() {
+        var textState by remember { mutableStateOf(TextFieldValue()) }
+        var attemptsLeft by remember { mutableIntStateOf(4) }
 
+        val localctx = LocalContext.current
+
+        if (vaultOverviewViewModel.showBackupPasswordPopup) {
+            AlertDialog(
+                onDismissRequest = { vaultOverviewViewModel.showBackupPasswordPopup = false },
+                title = { Text(stringResource(R.string.verify_backup_password)) },
+                text = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.verify_backup_password_description),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = textState,
+                            onValueChange = {
+                                textState = it
+                            },
+                            isError = attemptsLeft < 4,
+                            supportingText = {
+                                if (attemptsLeft < 4) {
+                                    Text(stringResource(R.string.incorrect_password_attempts_left) + " " + attemptsLeft.toString())
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        enabled = MasterPassword.verify(textState.text),
+                        onClick = {
+                            lifecycleScope.launch {
+                                val success = vaultOverviewViewModel.verifyBackupPassword(password = textState.text, context = localctx)
+                                if (!success) {
+                                    textState = TextFieldValue()
+                                    attemptsLeft--
+                                }
+                                if (success) {
+                                    SecurityPrefs.setLastBPChange(localctx, System.currentTimeMillis())
+                                    vaultOverviewViewModel.showBackupPasswordPopup = false
+                                }
+                                if (attemptsLeft==0) {
+                                    goChangeBackupPassword()
+                                }
+                            }
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { vaultOverviewViewModel.showBackupPasswordPopup = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
+    }
 
 
     @Composable
@@ -749,6 +836,16 @@ class VaultOverviewActivity: ComponentActivity() {
             Intent(this@VaultOverviewActivity, NewEntryActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
+
+    private fun goChangeBackupPassword() {
+        startActivity(
+            Intent(this@VaultOverviewActivity,
+            SettingsActivity::class.java)
+                .putExtra(SETTINGS_ACTIVITY_EXTRA_CHANGE_BACKUP_PASSWORD_KEY, true)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+    }
+
 
     private fun goToNewFolder() {
         startActivity(

@@ -7,17 +7,17 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
+import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.entryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.ExportTemplates
 import ru.ztrixdev.projects.passhavenapp.handlers.ExportsHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
-import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
-import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
+import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
+import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class SettingsViewModel: ViewModel() {

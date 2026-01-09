@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -124,6 +125,8 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
 import ru.ztrixdev.projects.passhavenapp.viewModels.SettingsViewModel
 
 
+val SETTINGS_ACTIVITY_EXTRA_CHANGE_BACKUP_PASSWORD_KEY = "change_backup_password"
+
 class SettingsActivity : ComponentActivity() {
     val settingsViewModel: SettingsViewModel by viewModels()
     override fun onResume() {
@@ -135,6 +138,7 @@ class SettingsActivity : ComponentActivity() {
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
     }
+    var isPasswordDialogOpen by mutableStateOf(false)
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,6 +181,12 @@ class SettingsActivity : ComponentActivity() {
                                 SecuritySettings()
                             }
                         }
+
+                        intent.getBooleanExtra(SETTINGS_ACTIVITY_EXTRA_CHANGE_BACKUP_PASSWORD_KEY, false) -> {
+                            ExportsSettings()
+                            isPasswordDialogOpen = true
+                        }
+
 
                         settingsViewModel.openExports.value -> {
                             ExportsSettings()
@@ -983,15 +993,16 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun BackupEverySetting(backupEveryValue: Long, onBackupEveryChanged: (Long) -> Unit) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Row (
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = stringResource(R.string.backup_every),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.widthIn(100.dp, 240.dp)
             )
             BackupEveryDropdown(
                 backupEveryValue = backupEveryValue,
@@ -1055,7 +1066,6 @@ class SettingsActivity : ComponentActivity() {
 
     @Composable
     private fun PasswordDialog(settingsViewModel: SettingsViewModel) {
-        var isDialogOpen by remember { mutableStateOf(false) }
         var textState by remember { mutableStateOf(TextFieldValue()) }
 
         val localctx = LocalContext.current
@@ -1063,7 +1073,7 @@ class SettingsActivity : ComponentActivity() {
         Column {
             TextButton (
                 onClick = {
-                    isDialogOpen = true
+                    isPasswordDialogOpen = true
                 }
             )  {
                 Text(
@@ -1077,13 +1087,13 @@ class SettingsActivity : ComponentActivity() {
                 )
             }
         }
-        if (isDialogOpen) {
+        if (isPasswordDialogOpen) {
             var digitNumber by remember(textState) { mutableIntStateOf(0) }
             var specialCharNumber by remember(textState) { mutableIntStateOf(0) }
             var uppercaseNumber by remember(textState) { mutableIntStateOf(0) }
 
             AlertDialog(
-                onDismissRequest = { isDialogOpen = false },
+                onDismissRequest = { isPasswordDialogOpen = false },
                 title = { Text(stringResource(R.string.backup_password)) },
                 text = {
                     Column {
@@ -1128,15 +1138,16 @@ class SettingsActivity : ComponentActivity() {
                         onClick = {
                             lifecycleScope.launch {
                                 settingsViewModel.setBackupPassword(textState.text, localctx)
+                                SecurityPrefs.setLastBPChange(localctx, System.currentTimeMillis())
                             }
-                            isDialogOpen = false
+                            isPasswordDialogOpen = false
                         }
                     ) {
                         Text("OK")
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { isDialogOpen = false }) {
+                    TextButton(onClick = { isPasswordDialogOpen = false }) {
                         Text(stringResource(R.string.cancel))
                     }
                 }
