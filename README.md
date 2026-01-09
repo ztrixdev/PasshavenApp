@@ -1,6 +1,8 @@
 # Passhaven
 ## The ultimate local-only secrets manager
 
+[:ru: Русский](https://github.com/ztrixdev/PasshavenApp/blob/main/README_ru.md)
+
 > _<it>Passwords are too sensitive to store on a remote cloud.
 >  Data leaks happen, politics change and you never know which other service will be unavailable in your region tomorrow... 
 >  Sure, you can self-host a password manager like Vaultwarden, but that requires either a rented VPS or a 24/7 running home server. 
