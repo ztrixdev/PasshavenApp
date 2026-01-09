@@ -130,7 +130,7 @@ class SettingsActivity : ComponentActivity() {
         super.onResume()
         val isSessionExpd = SessionHandler.isSessionExpired(this.applicationContext)
         if (isSessionExpd) {
-            this.applicationContext.startActivity(
+            startActivity(
                 Intent(this.applicationContext, LoginActivity::class.java)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }

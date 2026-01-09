@@ -144,4 +144,6 @@ Passhaven никогда не обращается к серверам и не �
     <string name="sort_and_select">Сортировка и выбор</string>
     <string name="create_folder">Создать папку</string>
     <string name="login_with_pin_instead">Я войду с помощью PIN</string>
+    <string name="view_mode_cards">Карточки</string>
+    <string name="view_mode_rows">Ряды</string>
 </resources>

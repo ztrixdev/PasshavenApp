@@ -44,29 +44,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import ru.ztrixdev.projects.passhavenapp.QuickComposables
+import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.entryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
-import ru.ztrixdev.projects.passhavenapp.QuickComposables
-import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.Card
-import ru.ztrixdev.projects.passhavenapp.viewModels.NewFolderViewModel
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
+import ru.ztrixdev.projects.passhavenapp.viewModels.NewFolderViewModel
 
 class NewFolderActivity : ComponentActivity() {
+    val newFolderViewModel: NewFolderViewModel by viewModels()
 
     override fun onResume() {
         super.onResume()
         if (SessionHandler.isSessionExpired(this.applicationContext)) {
             val intent = Intent(this.applicationContext, LoginActivity::class.java)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            this.applicationContext.startActivity(intent)
+            startActivity(intent)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val newFolderViewModel: NewFolderViewModel by viewModels()
+
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -109,7 +110,7 @@ class NewFolderActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     Column(modifier = Modifier.padding(innerPadding)) {
-                        MainBody(newFolderViewModel)
+                        MainBody()
                     }
                 }
             }
@@ -117,14 +118,14 @@ class NewFolderActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun MainBody(newFolderViewModel: NewFolderViewModel) {
+    private fun MainBody() {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                NameTextField(newFolderViewModel = newFolderViewModel)
+                NameTextField()
             }
 
             item {
@@ -139,8 +140,8 @@ class NewFolderActivity : ComponentActivity() {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SortingKeySelectionDropdown(newFolderViewModel = newFolderViewModel)
-                        ReverseSortingCheckbox(newFolderViewModel = newFolderViewModel)
+                        SortingKeySelectionDropdown()
+                        ReverseSortingCheckbox()
                     }
                 }
             }
@@ -155,7 +156,7 @@ class NewFolderActivity : ComponentActivity() {
                     }
                 }
             ) { entry ->
-                EntryRow(entry = entry, newFolderViewModel = newFolderViewModel)
+                EntryRow(entry = entry)
             }
 
             item {
@@ -165,7 +166,7 @@ class NewFolderActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun EntryRow(entry: Any, newFolderViewModel: NewFolderViewModel) {
+    private fun EntryRow(entry: Any) {
         val entryId = when (entry) {
             is Card -> entry.uuid
             is Account -> entry.uuid
@@ -232,7 +233,7 @@ class NewFolderActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun NameTextField(newFolderViewModel: NewFolderViewModel) {
+    private fun NameTextField() {
         OutlinedTextField(
             value = newFolderViewModel.newFolderName.value,
             onValueChange = { newFolderViewModel.newFolderName.value = it },
@@ -245,7 +246,7 @@ class NewFolderActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun SortingKeySelectionDropdown(newFolderViewModel: NewFolderViewModel) {
+    private fun SortingKeySelectionDropdown() {
         var isExpanded by remember { mutableStateOf(false) }
         val sortingKeyStringsToEntryTypes = mapOf(
             stringResource(R.string.sort_by_alphabet) to SortingKeys.ByAlphabet,
@@ -282,7 +283,7 @@ class NewFolderActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun ReverseSortingCheckbox(newFolderViewModel: NewFolderViewModel) {
+    private fun ReverseSortingCheckbox() {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.clickable {

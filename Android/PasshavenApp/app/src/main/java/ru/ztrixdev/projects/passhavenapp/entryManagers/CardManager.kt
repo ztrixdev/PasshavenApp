@@ -1,10 +1,10 @@
 package ru.ztrixdev.projects.passhavenapp.entryManagers
 
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.decrypt
 import ru.ztrixdev.projects.passhavenapp.room.encrypt
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import kotlin.uuid.Uuid
 
 object CardManager {
@@ -28,6 +28,7 @@ object CardManager {
 
         return cards
     }
+
     
     suspend fun editCard(database: AppDatabase, editedCard: Card, encryptionKey: ByteArray) {
         val cardDao = database.cardDao()

@@ -16,4 +16,11 @@ object MFATripleManager {
 
         return mfaTriples
     }
+
+    fun sortMFATriples(triples: List<MFATriple>, reverse: Boolean = false): List<MFATriple> {
+        val sortedList = triples.sortedBy { it.name.lowercase() }
+        return if (reverse) sortedList.reversed() else sortedList
+    }
+
+
 }

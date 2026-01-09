@@ -57,19 +57,20 @@ import androidx.lifecycle.lifecycleScope
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.launch
-import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
-import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
+import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.room.Folder
-import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.viewModels.ViewEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
+import ru.ztrixdev.projects.passhavenapp.viewModels.ViewEntryViewModel
+import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
 import kotlin.uuid.Uuid
 
 
 const val EDIT_ENTRY_ACTIVITY_EXTRA_ENTRY_UUID_KEY = "entry_uuid"
 const val EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY = "previous_activity"
+const val EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_VAULT_OVERVIEW_VALUE = "vault_overview"
 
 class ViewEntryActivity : ComponentActivity() {
 
@@ -106,9 +107,11 @@ class ViewEntryActivity : ComponentActivity() {
                         QuickComposables.BackButtonTitlebar(
                             stringResource(R.string.editentryactivity_titlebar)
                         ) {
-                            startActivity(
-                                Intent(this@ViewEntryActivity, VaultOverviewActivity::class.java)
-                            )
+                            val prev_activity = intent.getStringExtra(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_KEY)
+                            if (prev_activity.equals(EDIT_ENTRY_ACTIVITY_EXTRA_PREV_ACTIVITY_VAULT_OVERVIEW_VALUE))
+                                startActivity(Intent(localctx, VaultOverviewActivity::class.java))
+                            if (prev_activity == null)
+                                startActivity(Intent(localctx, VaultOverviewActivity::class.java))
                         }
                     },
                     floatingActionButton = {
