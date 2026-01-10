@@ -219,11 +219,9 @@ object QuickComposables {
             modifier =  if (fillMaxWidth) {
                 Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp)
             } else {
                 Modifier
                     .widthIn(100.dp, 400.dp)
-                    .padding(bottom = 12.dp)
             },
             color = if (currentProgress > 0.2f)
                 MaterialTheme.colorScheme.inversePrimary

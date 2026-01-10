@@ -112,6 +112,8 @@ import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledLightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionDarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionLightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintDarkScheme
@@ -360,6 +362,7 @@ class SettingsActivity : ComponentActivity() {
             }
 
             val themes = listOf(
+                (AppThemeType.AMOLED to R.string.theme_name_amoled) to (amoledDarkScheme to amoledLightScheme),
                 (AppThemeType.MINT to R.string.theme_name_mint) to (mintDarkScheme to mintLightScheme),
                 (AppThemeType.W10 to R.string.theme_name_w10) to (w10DarkScheme to w10LightScheme),
                 (AppThemeType.W81 to R.string.theme_name_w81) to (w81DarkScheme to w81LightScheme),

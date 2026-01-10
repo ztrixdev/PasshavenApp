@@ -19,12 +19,12 @@ public class MFAHandler {
         }
     }
 
-    public static long getTotpCode(@NonNull String secret) {
+    public static String getTotpCode(@NonNull String secret) {
         TOTP totp = new TOTP();
         try {
             return totp.compute(secret);
         } catch (InvalidKeyException exception) {
-            return -1;
+            return "";
         }
     }
 

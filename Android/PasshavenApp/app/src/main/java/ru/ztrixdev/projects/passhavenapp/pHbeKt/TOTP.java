@@ -98,21 +98,25 @@ public class TOTP {
 
     private static final IllegalArgumentException NullKeyException = new IllegalArgumentException("Cannot compute a TOTP for a null key");
 
-    public long compute(String key) throws InvalidKeyException {
+    public String compute(String key) throws InvalidKeyException {
         if (key == null) throw NullKeyException;
 
         final Key jKey = getJavaKey(key);
         final TimeBasedOneTimePasswordGenerator generator = getGenerator();
 
-        return generator.generateOneTimePassword(jKey, Instant.now());
+        long otp = generator.generateOneTimePassword(jKey, Instant.now());
+
+        return String.format("%0" + passwordLength + "d", otp);
     }
 
-    public long computeAt(String key, Instant instant) throws InvalidKeyException {
+    public String computeAt(String key, Instant instant) throws InvalidKeyException {
         if (key == null) throw NullKeyException;
 
         final Key jKey = getJavaKey(key);
         final TimeBasedOneTimePasswordGenerator generator = getGenerator();
 
-        return generator.generateOneTimePassword(jKey, instant);
+        long otp = generator.generateOneTimePassword(jKey, instant);
+
+        return String.format("%0" + passwordLength + "d", otp);
     }
 }

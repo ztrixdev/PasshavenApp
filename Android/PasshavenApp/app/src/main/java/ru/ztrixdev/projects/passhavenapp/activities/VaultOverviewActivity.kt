@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,13 +44,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -173,7 +174,11 @@ class VaultOverviewActivity: ComponentActivity() {
                     }
                 }
             }
-
+            if (vaultOverviewViewModel.currentView == VaultOverviewViewModel.Views.MFA) {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    MFAProgressBar()
+                }
+            }
             val folders = vaultOverviewViewModel.getFolders()
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LazyRow(
@@ -202,7 +207,6 @@ class VaultOverviewActivity: ComponentActivity() {
                 }
             }
             if (vaultOverviewViewModel.currentView == VaultOverviewViewModel.Views.MFA) {
-                println(vaultOverviewViewModel.visibleMFA.forEach { println(it) })
                 items(
                     items = vaultOverviewViewModel.visibleMFA
                 ) { mfa ->
@@ -364,7 +368,9 @@ class VaultOverviewActivity: ComponentActivity() {
             modes.forEachIndexed { index, (mode, label, iconRes) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = modes.size),
-                    onClick = { vaultOverviewViewModel.viewMode = mode },
+                    onClick = {
+                        vaultOverviewViewModel.viewMode = mode
+                              },
                     selected = vaultOverviewViewModel.viewMode == mode,
                     icon = {
                         SegmentedButtonDefaults.Icon(active = vaultOverviewViewModel.viewMode == mode) {
@@ -434,9 +440,25 @@ class VaultOverviewActivity: ComponentActivity() {
         }
     }
 
+    var refreshMFA by mutableStateOf(false)
+
+    @Composable
+    private fun MFAProgressBar() {
+        QuickComposables.ThirtySecondsProgressbar(fillMaxWidth = true) {
+            refreshMFA = true
+        }
+    }
+
     @Composable
     private fun MFACard(triple: MFATriple) {
-        var code by remember { mutableStateOf(vaultOverviewViewModel.getTOTP(triple.secret).toString()) }
+        var code by remember(triple.secret)
+        { mutableStateOf(vaultOverviewViewModel.getTOTP(triple.secret)) }
+
+        LaunchedEffect(refreshMFA) {
+            code = vaultOverviewViewModel.getTOTP(triple.secret)
+            refreshMFA = false
+        }
+
         val localctx = LocalContext.current
         Card(
             modifier = Modifier
@@ -474,19 +496,24 @@ class VaultOverviewActivity: ComponentActivity() {
                         fontFamily = FontFamily.Monospace
                     )
                 }
-
-                QuickComposables.ThirtySecondsProgressbar(fillMaxWidth = true) {
-                    code = vaultOverviewViewModel.getTOTP(triple.secret).toString()
-                }
             }
         }
     }
 
     @Composable
     private fun MFARow(triple: MFATriple) {
-        var code by remember { mutableStateOf(vaultOverviewViewModel.getTOTP(triple.secret).toString()) }
+        var code by remember(triple.secret)
+        {
+            mutableStateOf(vaultOverviewViewModel.getTOTP(triple.secret))
+        }
         var username by remember { mutableStateOf("") }
         val localctx = LocalContext.current
+
+        LaunchedEffect(refreshMFA) {
+            code = vaultOverviewViewModel.getTOTP(triple.secret)
+            refreshMFA = false
+        }
+
 
         LaunchedEffect(triple.originalUuid) {
             username = vaultOverviewViewModel.getUsernameByUuid(triple.originalUuid, localctx)
@@ -535,11 +562,6 @@ class VaultOverviewActivity: ComponentActivity() {
                         fontFamily = FontFamily.Monospace,
                         modifier = Modifier.padding(bottom = 2.dp)
                     )
-                    Box(modifier = Modifier.width(60.dp)) {
-                        QuickComposables.ThirtySecondsProgressbar(fillMaxWidth = true) {
-                            code = vaultOverviewViewModel.getTOTP(triple.secret).toString()
-                        }
-                    }
                 }
             }
         }
@@ -550,37 +572,106 @@ class VaultOverviewActivity: ComponentActivity() {
     private fun FolderButton(folder: Folder) {
         val isSelected = vaultOverviewViewModel.selectedFolderUuid == folder.uuid
 
-        val colors = if (isSelected) {
-            ButtonDefaults.filledTonalButtonColors(
+        var isDeletable by remember { mutableStateOf(false) }
+
+
+        if (showFolderDeletionDialog) {
+            FolderDeletionDialog(folder = folder)
+        }
+
+        val colors = when {
+            isSelected -> ButtonDefaults.filledTonalButtonColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
-        } else {
-            ButtonDefaults.outlinedButtonColors(
+            isDeletable -> ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer
+            )
+            else -> ButtonDefaults.outlinedButtonColors(
                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
-        OutlinedButton(
-            onClick = {
-                if (isSelected) {
-                    // Deselect if clicking the same one
-                    vaultOverviewViewModel.selectedFolderUuid = null
-                    vaultOverviewViewModel.showAll()
-                } else {
-                    vaultOverviewViewModel.selectedFolderUuid = folder.uuid
-                    vaultOverviewViewModel.showFolderContents(folder)
+        Box(
+            modifier = Modifier.combinedClickable(
+                onClick = {
+                    isDeletable = false
+                    if (isSelected) {
+                        vaultOverviewViewModel.selectedFolderUuid = null
+                        vaultOverviewViewModel.showAll()
+                    } else {
+                        vaultOverviewViewModel.selectedFolderUuid = folder.uuid
+                        vaultOverviewViewModel.showFolderContents(folder)
+                    }
+                },
+                onLongClick = {
+                    isDeletable = true
+                    showFolderDeletionDialog = true
                 }
-            },
-            shape = RoundedCornerShape(16.dp),
-            colors = colors,
-            border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-            modifier = Modifier.height(40.dp)
+            )
         ) {
-            Text(
-                text = folder.name,
-                style = MaterialTheme.typography.labelLarge,
-                maxLines = 1
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = colors.containerColor,
+                contentColor = colors.contentColor,
+                border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant) else null,
+                modifier = Modifier.height(40.dp)
+            ) {
+                Box(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = folder.name,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+
+
+    var showFolderDeletionDialog by mutableStateOf(false)
+
+    @Composable
+    private fun FolderDeletionDialog(folder: Folder) {
+        val localctx = LocalContext.current
+        if (showFolderDeletionDialog) {
+            AlertDialog(
+                onDismissRequest = { showFolderDeletionDialog = false},
+                title = { Text(stringResource(R.string.delete_folder)) },
+                text = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.delete_folder_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        enabled = true,
+                        onClick = {
+                            lifecycleScope.launch {
+                                vaultOverviewViewModel.deleteFolder(folder, localctx)
+                                vaultOverviewViewModel.fetchEntries(localctx)
+                                vaultOverviewViewModel.showAll()
+                                showFolderDeletionDialog = false
+                            }
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showFolderDeletionDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
             )
         }
     }
@@ -738,10 +829,12 @@ class VaultOverviewActivity: ComponentActivity() {
         val currentView = vaultOverviewViewModel.currentView
 
         Row(
-            Modifier.background(
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
-            ).fillMaxWidth()
+            Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceContainer,
+                    shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
+                )
+                .fillMaxWidth()
         ) {
             Row(
                 Modifier.padding(bottom = 12.dp)

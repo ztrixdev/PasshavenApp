@@ -7,6 +7,8 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledLightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionDarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionLightScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintDarkScheme
@@ -20,7 +22,7 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
 
 enum class AppThemeType {
-    LION, W10, UBUNTU, MINT, W81
+    AMOLED, LION, W10, UBUNTU, MINT, W81
 }
 
 @Composable
@@ -42,6 +44,8 @@ fun PasshavenTheme(
         }
 
         else -> when (themeType) {
+            AppThemeType.AMOLED ->
+                if (darkTheme) amoledDarkScheme else amoledLightScheme
             AppThemeType.LION ->
                 if (darkTheme) lionDarkScheme else lionLightScheme
             AppThemeType.W10 ->

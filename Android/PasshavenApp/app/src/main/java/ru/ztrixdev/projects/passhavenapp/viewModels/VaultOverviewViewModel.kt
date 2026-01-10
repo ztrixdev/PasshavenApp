@@ -27,7 +27,7 @@ import ru.ztrixdev.projects.passhavenapp.room.decrypt
 import kotlin.uuid.Uuid
 
 class VaultOverviewViewModel() : ViewModel() {
-     fun getTOTP(secret: String): Long {
+     fun getTOTP(secret: String): String {
         return MFAHandler.getTotpCode(secret)
     }
     fun copy(text: String, context: Context) {
@@ -146,7 +146,7 @@ class VaultOverviewViewModel() : ViewModel() {
         showBackupPopup = false
     }
 
-    suspend fun checkBackupPassword(context: Context) {
+    fun checkBackupPassword(context: Context) {
         val lastVerification = SecurityPrefs.getLastBPChange(context)
         if (!(System.currentTimeMillis() - lastVerification > TimeInMillis.ThreeDays && lastVerification != 0L))
             return
@@ -208,6 +208,10 @@ class VaultOverviewViewModel() : ViewModel() {
         visibleMFA.clear()
         visibleMFA.addAll(_mfaList)
         sortVisibles()
+    }
+
+    suspend fun deleteFolder(folder: Folder, context: Context) {
+        FolderManager.deleteFolderByUuid(context, folder.uuid)
     }
 }
 

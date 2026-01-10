@@ -155,4 +155,7 @@
     <string name="incorrect_password_attempts_left">Incorrect password! Attempts left:</string>
     <string name="delete">Delete</string>
     <string name="delete_desc">This entry will be deleted and you won\'t be able to restore it later. Are you sure?</string>
+    <string name="theme_name_amoled">AMOLED</string>
+    <string name="delete_folder">Delete this folder?</string>
+    <string name="delete_folder_desc">This folder will be deleted and you won\'t be able to recover it. Proceed?</string>
 </resources>

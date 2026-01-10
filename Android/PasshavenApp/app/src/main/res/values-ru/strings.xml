@@ -152,4 +152,7 @@ Passhaven никогда не обращается к серверам и не �
     <string name="incorrect_password_attempts_left">Неверный пароль! Осталось попыток:</string>
     <string name="delete">Удалить</string>
     <string name="delete_desc">Эта запись будет удалена и вы не сможете ее восстановить. Вы уверены?</string>
+    <string name="theme_name_amoled">AMOLED</string>
+    <string name="delete_folder">Удалить эту папку?</string>
+    <string name="delete_folder_desc">Эта папка будет удалена и вы не сможете ее восстановить. Продоожить?</string>
 </resources>
