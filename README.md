@@ -1,7 +1,7 @@
 # Passhaven
 ## The ultimate local-only secrets manager
 
-[:ru: Русский](https://github.com/ztrixdev/PasshavenApp/blob/main/README_ru.md)
+[:ru: Русский](readme/README_ru.md) [:🇧🇾: Беларуская](readme/README_be.md)
 
 > _<it>Passwords are too sensitive to store on a remote cloud.
 >  Data leaks happen, politics change and you never know which other service will be unavailable in your region tomorrow... 
@@ -27,5 +27,5 @@
 
 ## Current status: BETA
 We are in Beta!
-Latest release: <a href="https://github.com/ztrixdev/PasshavenApp/releases/tag/BETA">here!</a>
+Latest release: <a href="https://github.com/ztrixdev/PasshavenApp/releases/">here!</a>
 
