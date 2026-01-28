@@ -2,10 +2,24 @@ package ru.ztrixdev.projects.passhavenapp;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
+
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.DocumentsContract;
 
+import androidx.activity.result.ActivityResultLauncher;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -52,6 +66,30 @@ public class Utils {
             throw new AssertionError(ex);
         }
     }
+
+
+    public static final String FILE_NOT_FOUND_SIGNAL = "file_not_found";
+    public static final String IO_EXCEPTION_SIGNAL = "io_exception";
+
+    public static String readFile(Uri uri, ContentResolver resolver) {
+        try {
+            InputStream stream = resolver.openInputStream(uri);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder total = new StringBuilder();
+
+            for (String line; (line = reader.readLine()) != null; ) {
+                total.append(line).append('\n');
+            }
+
+            String content = total.toString().trim();
+            return content;
+        } catch (FileNotFoundException e) {
+            return FILE_NOT_FOUND_SIGNAL;
+        } catch (IOException e) {
+            return IO_EXCEPTION_SIGNAL;
+        }
+    }
+
 
     public static void copyToClipboard(Context context, String text) {
         ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(CLIPBOARD_SERVICE);

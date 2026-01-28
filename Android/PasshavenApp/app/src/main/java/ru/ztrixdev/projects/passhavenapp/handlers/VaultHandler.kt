@@ -3,14 +3,11 @@ package ru.ztrixdev.projects.passhavenapp.handlers
 import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
+import ru.ztrixdev.projects.passhavenapp.TimeInMillis
 import ru.ztrixdev.projects.passhavenapp.entryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
-import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
-import ru.ztrixdev.projects.passhavenapp.room.dao.VaultDao
-import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Vault
-import ru.ztrixdev.projects.passhavenapp.TimeInMillis
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.Checksum
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.AndroidCrypto
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.CryptoNames
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.Keygen
@@ -18,7 +15,10 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.keystoreInstanceName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.mpHashProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.mpProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.pinHashProtectingKeyName
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
+import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
+import ru.ztrixdev.projects.passhavenapp.room.Vault
+import ru.ztrixdev.projects.passhavenapp.room.dao.VaultDao
 import java.security.Key
 import java.security.KeyStore
 import javax.crypto.SecretKey
@@ -238,7 +238,7 @@ object VaultHandler {
 
         db.vaultDao().insert(newVault)
         val import = ImportsHandler.getImport(template = ExportTemplates.Passhaven, import = export)
-        ImportsHandler.apply(
+        ImportsHandler.__apply__(
             entries = import,
             db = db,
             encryptionKey = key!!
@@ -249,7 +249,7 @@ object VaultHandler {
 
     suspend fun selfDestroy(dao: VaultDao): Boolean {
         var vaults = dao.getVault()
-        while (vaults != emptyList<Vault>()) {
+        while (vaults.isNotEmpty()) {
             for (vlt: Vault in vaults) {
                 dao.delete(vlt)
             }
@@ -265,7 +265,7 @@ object VaultHandler {
     suspend fun getEncryptionKey(context: Context): ByteArray {
         val vaultDao = DatabaseProvider.getDatabase(context).vaultDao()
         val vault = vaultDao.getVault()
-        if (vault == emptyList<Vault>())
+        if (vault.isEmpty())
             throw RuntimeException("No vault found!")
 
         val keystore: KeyStore = KeyStore.getInstance(keystoreInstanceName).apply { load(null) }

@@ -21,11 +21,16 @@ object ImportsHandler {
     }
 
     private fun _processPH(import: String): List<ExportsHandler.ExportWrapper> {
-        val type = object : TypeToken<List<ExportsHandler.ExportWrapper>>() {}.type
-        return Gson().fromJson(import, type)
+        try {
+            val type = object : TypeToken<List<ExportsHandler.ExportWrapper>>() {}.type
+            return Gson().fromJson(import, type)
+        } catch (ex: NullPointerException) {
+            return emptyList()
+        }
     }
 
-    suspend fun apply(entries: List<ExportsHandler.ExportWrapper>, db: AppDatabase, encryptionKey: ByteArray) {
+
+    suspend fun __apply__(entries: List<ExportsHandler.ExportWrapper>, db: AppDatabase, encryptionKey: ByteArray) {
         for (category in entries) {
             if (category.Folder != null) {
                 for (folder in category.Folder) {

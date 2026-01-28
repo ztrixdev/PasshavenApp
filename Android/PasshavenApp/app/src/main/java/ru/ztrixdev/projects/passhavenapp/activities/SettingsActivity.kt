@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -43,6 +44,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenuItem
@@ -99,6 +101,9 @@ import ru.ztrixdev.projects.passhavenapp.QuickComposables.FolderNameFromUri
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
 import ru.ztrixdev.projects.passhavenapp.TimeInMillis
+import ru.ztrixdev.projects.passhavenapp.Utils
+import ru.ztrixdev.projects.passhavenapp.handlers.ExportsHandler
+import ru.ztrixdev.projects.passhavenapp.handlers.ExportsHandler.isNotEmpty
 import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_DIGITS_MINIMUM
@@ -109,6 +114,9 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
+import ru.ztrixdev.projects.passhavenapp.room.Account
+import ru.ztrixdev.projects.passhavenapp.room.Card
+import ru.ztrixdev.projects.passhavenapp.room.Folder
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
@@ -147,7 +155,6 @@ class SettingsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val settingsViewModel: SettingsViewModel by viewModels()
             val localctx = LocalContext.current
             var selectedTheme by remember {
                 mutableStateOf(ThemePrefs.getSelectedTheme(localctx))
@@ -193,13 +200,13 @@ class SettingsActivity : ComponentActivity() {
                         settingsViewModel.openExports.value -> {
                             ExportsSettings()
                         }
-                    /*
+
                         settingsViewModel.openImports.value -> {
                             ImportsSettings()
                         }
-                    */
+
                         settingsViewModel.openInfo.value -> {
-                            Info(settingsViewModel = settingsViewModel)
+                            Info()
                         }
 
                         else -> {
@@ -854,7 +861,7 @@ class SettingsActivity : ComponentActivity() {
                         )
                     }
                     item {
-                        PasswordDialog(settingsViewModel = settingsViewModel)
+                        PasswordDialog()
                     }
                     item {
                         BackupFolderSetting(
@@ -1068,7 +1075,7 @@ class SettingsActivity : ComponentActivity() {
 
 
     @Composable
-    private fun PasswordDialog(settingsViewModel: SettingsViewModel) {
+    private fun PasswordDialog() {
         var textState by remember { mutableStateOf(TextFieldValue()) }
 
         val localctx = LocalContext.current
@@ -1182,19 +1189,334 @@ class SettingsActivity : ComponentActivity() {
     }
 
 
+
+
+    private val importPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        uri?.let {
+            val content = Utils.readFile(uri, contentResolver)
+            val canImport = settingsViewModel.checkImportability(content)
+            when (canImport) {
+                settingsViewModel.IMPORTABLE_SIGNAL -> {
+                    settingsViewModel.importFileContents = content
+                }
+                settingsViewModel.CORRUPTED_SIGNAL -> {
+                    settingsViewModel.importBackToMain()
+                    Toast.makeText(
+                        this.applicationContext,
+                        R.string.corrupted_file,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                settingsViewModel.ENCRYPTED_SIGNAL -> {
+                    settingsViewModel.importFileContents = content
+                    settingsViewModel.currentImportStage = SettingsViewModel.ImportStages.CheckPassword
+                }
+                Utils.IO_EXCEPTION_SIGNAL -> {
+                    settingsViewModel.importBackToMain()
+                    Toast.makeText(
+                        this.applicationContext,
+                        R.string.corrupted_file,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                Utils.FILE_NOT_FOUND_SIGNAL -> {
+                    settingsViewModel.importBackToMain()
+                    Toast.makeText(
+                        this.applicationContext,
+                        R.string.file_not_found,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+
+
+
     @Composable
-    private fun BackupPassowrdSetting(settingsViewModel: SettingsViewModel) {
+    private fun MainImport() {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ),
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Column() {
+                            Text(
+                                text = stringResource(R.string.import_file_title),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.import_file_desc),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
 
+                        Spacer(modifier = Modifier.height(16.dp))
 
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Button(
+                                onClick = {
+                                    importPicker.launch(arrayOf("application/octet-stream", "*/*"))
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.download_24px),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(stringResource(R.string.select_file_button))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var checkImportFinishButton by mutableStateOf(false)
+
+    @Composable
+    private fun SelectEntries() {
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item() {
+                val localctx = LocalContext.current
+                var isButtonEnabled by remember { mutableStateOf(settingsViewModel.includedImportEntries.isNotEmpty()) }
+                LaunchedEffect(checkImportFinishButton) {
+                    isButtonEnabled = settingsViewModel.includedImportEntries.isNotEmpty()
+                    checkImportFinishButton = false
+                }
+                Button(
+                    onClick = {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            settingsViewModel.finishImport(localctx)
+                            settingsViewModel.clearImport()
+                        }
+                        Toast.makeText(
+                            this@SettingsActivity,
+                            R.string.successful_import,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    },
+                    enabled = isButtonEnabled
+                ) {
+                    if (isButtonEnabled) {
+                        Text(stringResource(R.string.import_selected))
+                        Icon(
+                            painter = painterResource(id = R.drawable.download_24px),
+                            contentDescription = null
+                        )
+                    } else {
+                        Text(stringResource(R.string.no_entries_selected))
+                    }
+                }
+            }
+            items(
+                items = settingsViewModel.getEntryFlattenedList(),
+                key = { entry ->
+                    when (entry) {
+                        is Card -> entry.uuid
+                        is Account -> entry.uuid
+                        is Folder -> entry.uuid
+                        else -> entry.hashCode()
+                    }
+                }
+            ) { entry ->
+                EntryRow(entry = entry)
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(80.dp))
+            }
+        }
+    }
+
+    @Composable
+    private fun EntryRow(entry: Any) {
+        val entryId = when (entry) {
+            is Card -> entry.uuid
+            is Account -> entry.uuid
+            is Folder -> entry.uuid
+            else -> return
+        }
+
+        var isChecked by remember(settingsViewModel.includedImportEntries) {
+            mutableStateOf(
+                settingsViewModel.includedImportEntries.Card?.any { it.uuid == entryId } == true ||
+                        settingsViewModel.includedImportEntries.Account?.any { it.uuid == entryId } == true ||
+                        settingsViewModel.includedImportEntries.Folder?.any { it.uuid == entryId } == true
+            )
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                isChecked = !isChecked
+                checkImportFinishButton = true
+                if (isChecked) {
+                    settingsViewModel.includeImportEntry(entry)
+                } else {
+                    settingsViewModel.excludeImportEntry(entry)
+                }
+            },
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val iconRes = when (entry) {
+                    is Card -> R.drawable.credit_card_24px
+                    is Account -> R.drawable.person_24px
+                    is Folder -> R.drawable.folder_open_24px
+                    else -> R.drawable.browse_24px
+                }
+                Icon(painter = painterResource(id = iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+
+                Spacer(Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    val name = when (entry) {
+                        is Card -> entry.name
+                        is Account -> entry.name
+                        is Folder -> entry.name
+                        else -> "N/A"
+                    }
+                    val type = when (entry) {
+                        is Card -> stringResource(R.string.card)
+                        is Account -> stringResource(R.string.account)
+                        is Folder -> stringResource(R.string.folder)
+                        else -> "N/A"
+                    }
+                    Text(text = name, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = type, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+
+                Checkbox(
+                    checked = isChecked,
+                    onCheckedChange = null
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun BackupPasswordImportDialog(export: String) {
+        var textState by remember { mutableStateOf(TextFieldValue()) }
+        var attemptsLeft by remember { mutableIntStateOf(4) }
+
+        if (settingsViewModel.currentImportStage == SettingsViewModel.ImportStages.CheckPassword) {
+            AlertDialog(
+                onDismissRequest = { settingsViewModel.importBackToMain() },
+                title = { Text(stringResource(R.string.backup_password_import)) },
+                text = {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.backup_password_import_description),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = textState,
+                            onValueChange = {
+                                textState = it
+                            },
+                            isError = attemptsLeft < 4,
+                            supportingText = {
+                                if (attemptsLeft < 4) {
+                                    Text(stringResource(R.string.incorrect_password_attempts_left) + " " + attemptsLeft.toString())
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        enabled = MasterPassword.verify(textState.text),
+                        onClick = {
+                            lifecycleScope.launch {
+                                var export: String = ""
+                                try {
+                                    export = ExportsHandler.getProtectedExport(settingsViewModel.importFileContents, textState.text)
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                    textState = TextFieldValue()
+                                    attemptsLeft--
+                                }
+
+                                if (export.isNotBlank()) {
+                                    settingsViewModel.importFileContents = export
+                                    settingsViewModel.fetchImportFileEntries()
+                                    settingsViewModel.currentImportStage = SettingsViewModel.ImportStages.EntrySelect
+                                }
+                                if (attemptsLeft==0) {
+                                    settingsViewModel.importBackToMain()
+                                }
+                            }
+                        }
+                    ) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { settingsViewModel.importBackToMain() }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
+        }
     }
 
     @Composable
     private fun ImportsSettings() {
+        QuickComposables.BackButtonTitlebar(stringResource(R.string.import_setting)) {
+            settingsViewModel.importBackToMain()
+            settingsViewModel.openImports.value = false
+        }
 
+        when (settingsViewModel.currentImportStage) {
+            SettingsViewModel.ImportStages.Main -> MainImport()
+            SettingsViewModel.ImportStages.CheckPassword -> BackupPasswordImportDialog(export = settingsViewModel.importFileContents)
+            SettingsViewModel.ImportStages.EntrySelect -> SelectEntries()
+            else -> {}
+        }
     }
 
     @Composable
-    private fun Info(settingsViewModel: SettingsViewModel) {
+    private fun Info() {
         QuickComposables.BackButtonTitlebar(stringResource(R.string.info_setting)) {
             settingsViewModel.openInfo.value = false
         }

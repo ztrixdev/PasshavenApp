@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,18 +47,22 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.runBlocking
-import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
-import ru.ztrixdev.projects.passhavenapp.viewModels.enums.IntroStages
-import ru.ztrixdev.projects.passhavenapp.viewModels.IntroViewModel
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
+import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
+import ru.ztrixdev.projects.passhavenapp.viewModels.IntroViewModel
+import ru.ztrixdev.projects.passhavenapp.viewModels.enums.IntroStages
 
 class IntroActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val introViewModel: IntroViewModel by viewModels()
 
@@ -72,13 +77,11 @@ class IntroActivity : ComponentActivity() {
                 dynamicColors = ThemePrefs.getDynamicColorsBool(localctx)
             )
             {
-                when (introViewModel.currentStage.value) {
-                    IntroStages.Greeting -> IntroPartGreeting(introViewModel)
-                    IntroStages.PINCreation -> IntroPartCreatePIN(introViewModel)
-                    IntroStages.MasterPasswordGenerator -> IntroPartCreateMPG(introViewModel)
-                    IntroStages.ManualMPSet -> IntroPartCreateMPM(introViewModel)
-                    IntroStages.CreateVault -> {
-                        runBlocking {
+                var createVault by remember { mutableStateOf(false) }
+
+                LaunchedEffect(createVault) {
+                    if (createVault) {
+                        withContext(Dispatchers.IO) {
                             introViewModel.tryCreateVault(localctx)
                             localctx.startActivity(
                                 Intent(
@@ -87,6 +90,20 @@ class IntroActivity : ComponentActivity() {
                                 ).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             )
                         }
+                    }
+                }
+
+                when (introViewModel.currentStage.value) {
+                    IntroStages.Greeting -> IntroPartGreeting(introViewModel)
+                    IntroStages.PINCreation -> IntroPartCreatePIN(introViewModel)
+                    IntroStages.MasterPasswordGenerator -> IntroPartCreateMPG(introViewModel)
+                    IntroStages.ManualMPSet -> IntroPartCreateMPM(introViewModel)
+                    IntroStages.CreateVault -> {
+                        Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            QuickComposables.WaitingDialog(stringResource(R.string.creating_vault_pls_wait))
+                        }
+
+                        createVault = true
                     }
                 }
             }

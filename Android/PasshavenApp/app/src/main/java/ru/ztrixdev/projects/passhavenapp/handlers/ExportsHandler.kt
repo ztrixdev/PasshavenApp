@@ -7,22 +7,54 @@ import androidx.documentfile.provider.DocumentFile
 import com.google.gson.Gson
 import com.goterl.lazysodium.exceptions.SodiumException
 import ru.ztrixdev.projects.passhavenapp.DateTimeProcessor
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.CryptoNames
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.Keygen
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.Folder
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.CryptoNames
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.Keygen
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 
 
 object ExportsHandler {
     data class ExportWrapper(
-        val Folder: List<Folder>?,
-        val Card: List<Card>?,
-        val Account: List<Account>?
+        val Folder: MutableList<Folder>?,
+        val Card: MutableList<Card>?,
+        val Account: MutableList<Account>?
     )
+
+    fun ExportWrapper.getAccounts(): List<Account> {
+        val result = mutableListOf<Account>()
+        Account?.let { result.addAll(it) }
+        return result.toList()
+    }
+
+    fun ExportWrapper.getCards(): List<Card> {
+        val result = mutableListOf<Card>()
+        Card?.let { result.addAll(it) }
+        return result.toList()
+    }
+
+    fun ExportWrapper.getFolders(): List<Folder> {
+        val result = mutableListOf<Folder>()
+        Folder?.let { result.addAll(it) }
+        return result
+    }
+
+    fun ExportWrapper.isNotEmpty(): Boolean  {
+        if (Folder?.isEmpty() == false) {
+            return true
+        }
+        if (Card?.isEmpty() == false) {
+            return true
+        }
+        if (Account?.isEmpty() == false) {
+            return true
+        }
+        return false
+    }
+
 
     fun getExport(template: ExportTemplates, entries: List<Any>, folders: List<Folder>): String {
         when (template) {
@@ -84,6 +116,8 @@ object ExportsHandler {
     }
 
     fun checkIfABackupIsDue(context: Context): Boolean {
+        if (VaultPrefs.getBackupEvery(context) == 0L)
+            return false
         return ((System.currentTimeMillis() - VaultPrefs.getLastBackupTimestamp(context)) > VaultPrefs.getBackupEvery(context))
     }
 
@@ -103,17 +137,19 @@ object ExportsHandler {
     // The final blob looks like this:
     // {beginsalt}HEX_SALT_STRING{endsalt}
     // ENCRYPTED_EXPORT_HEX_STRING
-    private const val _beginSaltStr = "{beginsalt}"
-    private const val _endSaltStr = "{endsalt}"
+    const val _beginSaltStr = "{beginsalt}"
+    const val _endSaltStr = "{endsalt}"
     fun protectExport(export: String, password: String): String {
-        var blob = _beginSaltStr
-        val keyFromPWD = Keygen.deriveKeySaltPairFromMP(password)
+
+        val blob: StringBuilder = StringBuilder()
+        blob.append(_beginSaltStr)
+        val keyFromPWD = Keygen.deriveKeySaltPairFromMP(password, Keygen.KeyStrength.Moderate)
         if (keyFromPWD[CryptoNames.key] != null) {
             val encryptedExport = SodiumCrypto.encrypt(export, keyFromPWD[CryptoNames.key] as ByteArray)
-            blob += SodiumCrypto.sodium.toHexStr(keyFromPWD[CryptoNames.salt])
-            blob += _endSaltStr
-            blob += encryptedExport
-            return blob
+            blob.append(SodiumCrypto.sodium.toHexStr(keyFromPWD[CryptoNames.salt]))
+            blob.append(_endSaltStr)
+            blob.append(encryptedExport)
+            return blob.toString().trim()
         }
         return "Failed to password-protect the export!"
     }
@@ -122,7 +158,7 @@ object ExportsHandler {
         val INCORRECT_PASSWORD_EXCEPTION = Exception("Incorrect password!")
 
         val salt = export.substring(export.indexOf(_beginSaltStr) + _beginSaltStr.length, export.indexOf(_endSaltStr))
-        val key = Keygen.getKeyWithMPnSalt(password, SodiumCrypto.sodium.toBinary(salt))
+        val key = Keygen.getKeyWithMPnSalt(password, SodiumCrypto.sodium.toBinary(salt), strength = Keygen.KeyStrength.Moderate)
 
         val exportBlob = export.substring(export.indexOf(_endSaltStr) + _endSaltStr.length)
         try {

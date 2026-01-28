@@ -1,23 +1,30 @@
 package ru.ztrixdev.projects.passhavenapp.viewModels
 
 import android.content.Context
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.net.toUri
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
+import ru.ztrixdev.projects.passhavenapp.Utils
 import ru.ztrixdev.projects.passhavenapp.entryManagers.EntryManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.ExportTemplates
 import ru.ztrixdev.projects.passhavenapp.handlers.ExportsHandler
+import ru.ztrixdev.projects.passhavenapp.handlers.ImportsHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
+import ru.ztrixdev.projects.passhavenapp.room.Account
+import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
+import ru.ztrixdev.projects.passhavenapp.room.Folder
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class SettingsViewModel: ViewModel() {
@@ -28,13 +35,20 @@ class SettingsViewModel: ViewModel() {
     val openInfo = mutableStateOf(false)
     val openPINChange = mutableStateOf(false)
 
+    var currentImportStage by mutableStateOf(ImportStages.Main)
+    var importFileContents by mutableStateOf("")
+
+    enum class ImportStages {
+        Main, FileSelect, EntrySelect, Done, CheckPassword
+    }
+
+
     val currentPINConfirmed = mutableStateOf(false)
     val currentPIN = mutableStateOf("")
     val firstPromptDone = mutableStateOf(false)
     val firstPromptPin = mutableStateOf("")
     val secondPromptDone = mutableStateOf(false)
     val secondPromptPin = mutableStateOf("")
-
     var pinLastChanged = mutableLongStateOf(0L)
     var mpLastChanged = mutableLongStateOf(0L)
 
@@ -114,6 +128,8 @@ class SettingsViewModel: ViewModel() {
         }
     }
 
+
+
     suspend fun changePIN(ctx: Context) {
         VaultHandler.changePIN(secondPromptPin.value, ctx)
         SecurityPrefs.saveLastPINChange(System.currentTimeMillis(), ctx)
@@ -150,6 +166,111 @@ class SettingsViewModel: ViewModel() {
         firstPromptPin.value = ""
         secondPromptDone.value = false
         secondPromptPin.value = ""
+    }
+
+
+    var importEntries by mutableStateOf<ExportsHandler.ExportWrapper>( ExportsHandler.ExportWrapper(
+        mutableListOf(), mutableListOf(), mutableListOf()
+    ))
+    var includedImportEntries by mutableStateOf<ExportsHandler.ExportWrapper>( ExportsHandler.ExportWrapper(
+    mutableListOf(), mutableListOf(), mutableListOf()
+    ))
+
+    fun fetchImportFileEntries() {
+        val results = ImportsHandler.getImport(ExportTemplates.Passhaven, importFileContents)
+
+        if (results.isNotEmpty()) {
+            importEntries.Folder?.clear()
+            importEntries.Card?.clear()
+            importEntries.Account?.clear()
+
+            for (category in results) {
+                category.Folder?.let { importEntries.Folder?.addAll(it) }
+                category.Card?.let { importEntries.Card?.addAll(it) }
+                category.Account?.let { importEntries.Account?.addAll(it) }
+            }
+        }
+    }
+
+    fun getEntryFlattenedList(): List<Any> {
+        val flattened = mutableListOf<Any>()
+
+        importEntries.Folder?.let { flattened.addAll(it) }
+        importEntries.Card?.let { flattened.addAll(it) }
+        importEntries.Account?.let { flattened.addAll(it) }
+
+        return flattened
+    }
+
+
+    private fun refreshIncludedEntries() {
+        val current = includedImportEntries
+        includedImportEntries = ExportsHandler.ExportWrapper(
+            Card = current.Card?.toMutableList(),
+            Account = current.Account?.toMutableList(),
+            Folder = current.Folder?.toMutableList()
+        )
+    }
+
+    fun includeImportEntry(entry: Any) {
+        when (entry) {
+            is Card -> importEntries.Card?.find { it.uuid == entry.uuid }?.let {
+                includedImportEntries.Card?.add(it)
+            }
+            is Account -> importEntries.Account?.find { it.uuid == entry.uuid }?.let {
+                includedImportEntries.Account?.add(it)
+            }
+            is Folder -> importEntries.Folder?.find { it.uuid == entry.uuid }?.let {
+                includedImportEntries.Folder?.add(it)
+            }
+        }
+        refreshIncludedEntries() // Trigger UI update
+    }
+
+    fun excludeImportEntry(entry: Any) {
+        when (entry) {
+            is Card -> includedImportEntries.Card?.removeAll { it.uuid == entry.uuid }
+            is Account -> includedImportEntries.Account?.removeAll { it.uuid == entry.uuid }
+            is Folder -> includedImportEntries.Folder?.removeAll { it.uuid == entry.uuid }
+        }
+        refreshIncludedEntries() // Trigger UI update
+    }
+
+
+    val IMPORTABLE_SIGNAL: String = "importable"
+    val ENCRYPTED_SIGNAL: String = "encrypted"
+    val CORRUPTED_SIGNAL: String = "corrupted"
+    fun checkImportability(fileContents: String): String {
+        return if (fileContents == Utils.FILE_NOT_FOUND_SIGNAL || fileContents == Utils.IO_EXCEPTION_SIGNAL)
+            fileContents
+        else if (fileContents.startsWith(ExportsHandler._beginSaltStr) && fileContents.contains(ExportsHandler._endSaltStr))
+            ENCRYPTED_SIGNAL
+        else if (ImportsHandler.getImport(ExportTemplates.Passhaven, fileContents).isNotEmpty())
+            IMPORTABLE_SIGNAL
+        else
+           CORRUPTED_SIGNAL
+    }
+
+    fun importBackToMain() {
+        currentImportStage = ImportStages.Main
+    }
+
+    fun clearImport() {
+        importEntries = ExportsHandler.ExportWrapper(mutableListOf(), mutableListOf(), mutableListOf())
+        importFileContents = ""
+        includedImportEntries = ExportsHandler.ExportWrapper(mutableListOf(), mutableListOf(), mutableListOf())
+        importBackToMain()
+    }
+
+    suspend fun finishImport(context: Context) {
+        if (includedImportEntries.Card?.isNotEmpty() == true ||
+            includedImportEntries.Account?.isNotEmpty() == true ||
+            includedImportEntries.Folder?.isNotEmpty() == true) {
+
+            val db = DatabaseProvider.getDatabase(context = context)
+            val key = VaultHandler.getEncryptionKey(context = context)
+            ImportsHandler.__apply__(listOf(includedImportEntries), db, key)
+        }
     }
 
 }

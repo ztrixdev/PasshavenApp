@@ -35,9 +35,9 @@
     <string name="select_folder">Выберите папку:</string>
     <string name="unfoldered">Без папки</string>
     <string name="select_type">Выберите тип:</string>
-    <string name="account">👥 Аккаунт</string>
-    <string name="card">💳 Банковская карта</string>
+    <string name="account">" Аккаунт"</string>
 
+    <string name="card">Банковская карта</string>
     <string name="newentryactivity_titlebar">Новая запись</string>
     <string name="card_number_placeholder">4242 4242 4242 4242</string>
     <string name="card_mm_yy_placeholder">ММ/ГГ</string>
@@ -155,4 +155,16 @@ Passhaven никогда не обращается к серверам и не �
     <string name="theme_name_amoled">AMOLED</string>
     <string name="delete_folder">Удалить эту папку?</string>
     <string name="delete_folder_desc">Эта папка будет удалена и вы не сможете ее восстановить. Продоожить?</string>
+    <string name="select_file_button">Выбрать файл</string>
+    <string name="import_file_desc">Если вы ранее создали резервную копию, вы сможете восстановить записи из нее используя кнопку ниже</string>
+    <string name="import_file_title">Восстановить записи из файла</string>
+    <string name="corrupted_file">Выбранный файл поврежден. Попробуйте другой.</string>
+    <string name="file_not_found">Файл не найден. Попробуйте другой.</string>
+    <string name="backup_password_import">Введите пароль которым зашифрована данная резервная копия</string>
+    <string name="backup_password_import_description">Данная резервная копия зашифрована. Для расшифровки потребуется пароль. Если вы его не помните - вы не сможете восстановить записи из этой резервной копии.</string>
+    <string name="folder">Папка</string>
+    <string name="import_selected">Импортировать выбранное</string>
+    <string name="no_entries_selected">Ни одной записи не выбрано</string>
+    <string name="successful_import">Импортировано успешно!</string>
+    <string name="creating_vault_pls_wait">Идет создание хранилища, подождите...</string>
 </resources>

@@ -31,8 +31,8 @@
     <string name="select_folder">Select a folder:</string>
     <string name="unfoldered">No folder</string>
     <string name="select_type">Select type:</string>
-    <string name="account">👥 Account</string>
-    <string name="card">💳 Bank Card</string>
+    <string name="account">Account</string>
+    <string name="card">Bank Card</string>
     <string name="newentryactivity_titlebar">New Entry</string>
     <string name="card_number_placeholder">4242 4242 4242 4242</string>
     <string name="card_mm_yy_placeholder">MM/YY</string>
@@ -158,4 +158,16 @@
     <string name="theme_name_amoled">AMOLED</string>
     <string name="delete_folder">Delete this folder?</string>
     <string name="delete_folder_desc">This folder will be deleted and you won\'t be able to recover it. Proceed?</string>
+    <string name="select_file_button">Select file</string>
+    <string name="import_file_desc">If you have previously created a backup, you will be able to recover entries from the backup using the button below.</string>
+    <string name="import_file_title">Import entries from a file</string>
+    <string name="corrupted_file">The selected file is corrupted. Try another one.</string>
+    <string name="file_not_found">File not found. Try another one.</string>
+    <string name="backup_password_import">Enter the password used to encrypt this backup</string>
+    <string name="backup_password_import_description">This backup is encrypted and needs a password to be read. If you do not remember it, you will not be able to recover entries from this backup.</string>
+    <string name="folder">Folder</string>
+    <string name="import_selected">Import selected</string>
+    <string name="no_entries_selected">No entries selected</string>
+    <string name="successful_import">Successfully imported!</string>
+    <string name="creating_vault_pls_wait">Creating vault, please wait...</string>
 </resources>

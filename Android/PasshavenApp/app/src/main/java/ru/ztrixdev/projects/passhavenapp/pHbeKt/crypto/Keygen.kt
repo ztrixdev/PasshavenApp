@@ -6,8 +6,14 @@ import com.goterl.lazysodium.interfaces.PwHash
 import javax.crypto.KeyGenerator
 
 object Keygen {
+    enum class KeyStrength {
+        Sensitive,
+        Moderate,
+        Interactive
+    }
+
     @OptIn(ExperimentalStdlibApi::class)
-    fun deriveKeySaltPairFromMP(password: String): Map<CryptoNames, ByteArray> {
+    fun deriveKeySaltPairFromMP(password: String, strength: KeyStrength = KeyStrength.Sensitive): Map<CryptoNames, ByteArray> {
         val lazySodium = SodiumHelper.getSodium()
 
         val key = ByteArray(32)
@@ -19,8 +25,16 @@ object Keygen {
             password.toByteArray(),
             password.length,
             salt,
-            PwHash.OPSLIMIT_SENSITIVE,
-            PwHash.MEMLIMIT_SENSITIVE,
+            when (strength) {
+                KeyStrength.Interactive -> PwHash.OPSLIMIT_INTERACTIVE
+                KeyStrength.Moderate -> PwHash.OPSLIMIT_MODERATE
+                KeyStrength.Sensitive -> PwHash.OPSLIMIT_SENSITIVE
+                            },
+            when (strength) {
+                KeyStrength.Interactive -> PwHash.MEMLIMIT_INTERACTIVE
+                KeyStrength.Moderate -> PwHash.MEMLIMIT_MODERATE
+                KeyStrength.Sensitive -> PwHash.MEMLIMIT_SENSITIVE
+            },
             PwHash.Alg.PWHASH_ALG_ARGON2I13
         )
         if (!computingSuccess)
@@ -30,7 +44,7 @@ object Keygen {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun getKeyWithMPnSalt(password: String, salt: ByteArray): ByteArray {
+    fun getKeyWithMPnSalt(password: String, salt: ByteArray, strength: KeyStrength = KeyStrength.Sensitive): ByteArray {
         val lazySodium = SodiumHelper.getSodium()
 
         if (salt.size != PwHash.SALTBYTES) {
@@ -44,9 +58,17 @@ object Keygen {
             password.toByteArray(),
             password.length,
             salt,
-            PwHash.OPSLIMIT_SENSITIVE,
-            PwHash.MEMLIMIT_SENSITIVE,
-            PwHash.Alg.PWHASH_ALG_ARGON2I13
+    when (strength) {
+                KeyStrength.Interactive -> PwHash.OPSLIMIT_INTERACTIVE
+                KeyStrength.Moderate -> PwHash.OPSLIMIT_MODERATE
+                KeyStrength.Sensitive -> PwHash.OPSLIMIT_SENSITIVE
+            },
+    when (strength) {
+                KeyStrength.Interactive -> PwHash.MEMLIMIT_INTERACTIVE
+                KeyStrength.Moderate -> PwHash.MEMLIMIT_MODERATE
+                KeyStrength.Sensitive -> PwHash.MEMLIMIT_SENSITIVE
+            },
+        PwHash.Alg.PWHASH_ALG_ARGON2I13
         )
         if (!computingSuccess)
             throw RuntimeException("Couldn't compute a key!")
