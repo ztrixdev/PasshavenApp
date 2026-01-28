@@ -1,8 +1,10 @@
-package ru.ztrixdev.projects.passhavenapp.ui.theme.w81
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+package ru.ztrixdev.projects.passhavenapp.ui.theme.aqua
 
-val w81LightScheme = lightColorScheme(
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+
+
+val aquaLightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -40,7 +42,7 @@ val w81LightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-val w81DarkScheme = darkColorScheme(
+val aquaDarkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,

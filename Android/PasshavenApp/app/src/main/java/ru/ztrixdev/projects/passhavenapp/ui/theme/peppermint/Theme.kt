@@ -1,8 +1,10 @@
-package ru.ztrixdev.projects.passhavenapp.ui.theme.ubuntu
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+package ru.ztrixdev.projects.passhavenapp.ui.theme.peppermint
 
-val ubuntuLightScheme = lightColorScheme(
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+
+
+val peppermintLightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -40,7 +42,7 @@ val ubuntuLightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
- val ubuntuDarkScheme = darkColorScheme(
+val peppermintDarkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -77,3 +79,4 @@ val ubuntuLightScheme = lightColorScheme(
     surfaceContainerHigh = surfaceContainerHighDark,
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
+

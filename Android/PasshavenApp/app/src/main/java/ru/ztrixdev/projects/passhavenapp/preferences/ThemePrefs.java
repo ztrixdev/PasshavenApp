@@ -15,7 +15,7 @@ public class ThemePrefs {
     }
 
     public static AppThemeType getSelectedTheme(Context context) {
-        String themeName = PreferencesMaster.get(PREFS_NAME, PREF_THEME_KEY, AppThemeType.W10.name(), context);
+        String themeName = PreferencesMaster.get(PREFS_NAME, PREF_THEME_KEY, AppThemeType.Monochroma.name(), context);
         return AppThemeType.valueOf(themeName);
     }
 

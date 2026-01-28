@@ -149,7 +149,7 @@
     <string name="login_with_pin_instead">I\'ll login using my PIN</string>
     <string name="view_mode_cards">Cards</string>
     <string name="view_mode_rows">Rows</string>
-    <string name="version_number">App version: beta 1.0</string>
+    <string name="version_number">App version: release 2.0</string>
     <string name="verify_backup_password">Verify your backup password</string>
     <string name="verify_backup_password_description">It has been three days since you\'ve last entered your backup password. Memorizing it is crucial for the safety of your sensitive info. Please enter it once again to check, whether or not you remember it.</string>
     <string name="incorrect_password_attempts_left">Incorrect password! Attempts left:</string>
@@ -170,4 +170,8 @@
     <string name="no_entries_selected">No entries selected</string>
     <string name="successful_import">Successfully imported!</string>
     <string name="creating_vault_pls_wait">Creating vault, please wait...</string>
+    <string name="theme_name_aqua">Aqua</string>
+    <string name="theme_name_hotpink">Hot pink</string>
+    <string name="theme_name_codered">Code RED</string>
+    <string name="theme_name_monochroma">Monochroma</string>
 </resources>

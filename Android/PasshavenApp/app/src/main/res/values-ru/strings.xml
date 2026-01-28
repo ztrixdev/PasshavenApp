@@ -146,7 +146,7 @@ Passhaven никогда не обращается к серверам и не �
     <string name="login_with_pin_instead">Я войду с помощью PIN</string>
     <string name="view_mode_cards">Карточки</string>
     <string name="view_mode_rows">Ряды</string>
-    <string name="version_number">Версия: бета 1.0</string>
+    <string name="version_number">Версия: релиз 2.0</string>
     <string name="verify_backup_password">Проверьте ваш пароль для резервных копий</string>
     <string name="verify_backup_password_description">Прошло три дня с момента, как вы в последний раз вводили свой пароль для резервных копий. Держать его в памяти критически важно для сохранности ваших персональных данных. Пожалуйста, введите его еще раз чтобы проверить, помните ли вы его или нет.</string>
     <string name="incorrect_password_attempts_left">Неверный пароль! Осталось попыток:</string>
@@ -167,4 +167,8 @@ Passhaven никогда не обращается к серверам и не �
     <string name="no_entries_selected">Ни одной записи не выбрано</string>
     <string name="successful_import">Импортировано успешно!</string>
     <string name="creating_vault_pls_wait">Идет создание хранилища, подождите...</string>
+    <string name="theme_name_aqua">Аква</string>
+    <string name="theme_name_hotpink">Горячий розовый</string>
+    <string name="theme_name_codered">Код \"Красный\"</string>
+    <string name="theme_name_monochroma">Монохрома</string>
 </resources>

@@ -70,7 +70,7 @@ class IntroActivity : ComponentActivity() {
 
         setContent {
             val localctx = LocalContext.current
-            var selectedTheme by remember { mutableStateOf(AppThemeType.W10) }
+            var selectedTheme by remember { mutableStateOf(AppThemeType.Monochroma) }
             PasshavenTheme(
                 themeType = selectedTheme,
                 darkTheme = isSystemInDarkTheme(),

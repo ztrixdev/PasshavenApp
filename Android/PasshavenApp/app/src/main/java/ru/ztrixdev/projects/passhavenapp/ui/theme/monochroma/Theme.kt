@@ -1,8 +1,10 @@
-package ru.ztrixdev.projects.passhavenapp.ui.theme.mint
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+package ru.ztrixdev.projects.passhavenapp.ui.theme.monochroma
 
-val mintLightScheme = lightColorScheme(
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+
+
+val monochromaLightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -40,7 +42,7 @@ val mintLightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-val mintDarkScheme = darkColorScheme(
+val monochromaDarkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -77,5 +79,4 @@ val mintDarkScheme = darkColorScheme(
     surfaceContainerHigh = surfaceContainerHighDark,
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
-
 

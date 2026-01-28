@@ -9,20 +9,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledDarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.ubuntu.ubuntuDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.ubuntu.ubuntuLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.AppTypography
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.aqua.aquaDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.aqua.aquaLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.codered.codeRedDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.codered.codeRedLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.hotpink.hotpinkDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.hotpink.hotpinkLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.monochroma.monochromaDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.monochroma.monochromaLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.peppermint.peppermintDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.peppermint.peppermintLightScheme
 
 enum class AppThemeType {
-    AMOLED, LION, W10, UBUNTU, MINT, W81
+    Amoled, Aqua, CodeRED, HotPink, Monochroma, Peppermint
 }
 
 @Composable
@@ -44,18 +43,18 @@ fun PasshavenTheme(
         }
 
         else -> when (themeType) {
-            AppThemeType.AMOLED ->
+            AppThemeType.Amoled ->
                 if (darkTheme) amoledDarkScheme else amoledLightScheme
-            AppThemeType.LION ->
-                if (darkTheme) lionDarkScheme else lionLightScheme
-            AppThemeType.W10 ->
-                if (darkTheme) w10DarkScheme else w10LightScheme
-            AppThemeType.W81 ->
-                if (darkTheme) w81DarkScheme else w81LightScheme
-            AppThemeType.UBUNTU ->
-                if (darkTheme) ubuntuDarkScheme else ubuntuLightScheme
-            AppThemeType.MINT ->
-                if (darkTheme) mintDarkScheme else mintLightScheme
+            AppThemeType.CodeRED ->
+                if (darkTheme) codeRedDarkScheme else codeRedLightScheme
+            AppThemeType.Peppermint ->
+                if (darkTheme) peppermintDarkScheme else peppermintLightScheme
+            AppThemeType.Monochroma ->
+                if (darkTheme) monochromaDarkScheme else monochromaLightScheme
+            AppThemeType.Aqua  ->
+                if (darkTheme) aquaDarkScheme else aquaLightScheme
+            AppThemeType.HotPink ->
+                if (darkTheme) hotpinkDarkScheme else hotpinkLightScheme
         }
     }
 

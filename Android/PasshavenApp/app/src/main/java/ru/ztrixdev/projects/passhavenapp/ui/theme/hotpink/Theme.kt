@@ -1,8 +1,10 @@
-package ru.ztrixdev.projects.passhavenapp.ui.theme.lion
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+package ru.ztrixdev.projects.passhavenapp.ui.theme.hotpink
 
-val lionLightScheme = lightColorScheme(
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+
+
+val hotpinkLightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -40,7 +42,7 @@ val lionLightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-val lionDarkScheme = darkColorScheme(
+val hotpinkDarkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,

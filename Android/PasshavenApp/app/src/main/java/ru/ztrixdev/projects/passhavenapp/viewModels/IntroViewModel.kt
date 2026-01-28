@@ -6,10 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.ViewModel
-import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
-import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.SpecialCharNames
-import ru.ztrixdev.projects.passhavenapp.viewModels.enums.IntroStages
+import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_ABSOLUTE_LENGTH
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_DIGITS_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_LENGTH_MINIMUM
@@ -17,8 +15,10 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_SPECCHARS_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MP_UPPERCASE_MINIMUM
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
+import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
+import ru.ztrixdev.projects.passhavenapp.viewModels.enums.IntroStages
 
 class IntroViewModel() : ViewModel() {
     private val masterPassword = MasterPassword
@@ -108,7 +108,7 @@ class IntroViewModel() : ViewModel() {
     }
 
     suspend fun tryCreateVault(ctx: Context) {
-        ThemePrefs.saveSelectedTheme(ctx, AppThemeType.W10)
+        ThemePrefs.saveSelectedTheme(ctx, AppThemeType.Monochroma)
         ThemePrefs.saveDarkThemeBool(ctx, true)
         val vh = VaultHandler
         if (masterPassword.verify(currentMP.value) && masterPassword.verifyPIN(secondPromptPin.value)) {

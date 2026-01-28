@@ -153,6 +153,10 @@ class VaultOverviewActivity: ComponentActivity() {
         val viewMode = vaultOverviewViewModel.viewMode
         val columns = if (viewMode == VaultOverviewViewModel.ViewMode.Card) 2 else 1
 
+        folderPendingDeletion?.let { folder ->
+            FolderDeletionDialog(folder = folder)
+        }
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             modifier = Modifier.fillMaxSize(),
@@ -572,12 +576,7 @@ class VaultOverviewActivity: ComponentActivity() {
     private fun FolderButton(folder: Folder) {
         val isSelected = vaultOverviewViewModel.selectedFolderUuid == folder.uuid
 
-        var isDeletable by remember { mutableStateOf(false) }
-
-
-        if (showFolderDeletionDialog) {
-            FolderDeletionDialog(folder = folder)
-        }
+        var isDeletable = folderPendingDeletion?.uuid == folder.uuid
 
         val colors = when {
             isSelected -> ButtonDefaults.filledTonalButtonColors(
@@ -597,6 +596,7 @@ class VaultOverviewActivity: ComponentActivity() {
             modifier = Modifier.combinedClickable(
                 onClick = {
                     isDeletable = false
+                    println(folder)
                     if (isSelected) {
                         vaultOverviewViewModel.selectedFolderUuid = null
                         vaultOverviewViewModel.showAll()
@@ -607,7 +607,7 @@ class VaultOverviewActivity: ComponentActivity() {
                 },
                 onLongClick = {
                     isDeletable = true
-                    showFolderDeletionDialog = true
+                    folderPendingDeletion = folder
                 }
             )
         ) {
@@ -633,14 +633,14 @@ class VaultOverviewActivity: ComponentActivity() {
     }
 
 
-    var showFolderDeletionDialog by mutableStateOf(false)
+    var folderPendingDeletion by mutableStateOf<Folder?>(null)
 
     @Composable
     private fun FolderDeletionDialog(folder: Folder) {
         val localctx = LocalContext.current
-        if (showFolderDeletionDialog) {
+        folderPendingDeletion?.let {
             AlertDialog(
-                onDismissRequest = { showFolderDeletionDialog = false},
+                onDismissRequest = { folderPendingDeletion = null},
                 title = { Text(stringResource(R.string.delete_folder)) },
                 text = {
                     Column {
@@ -660,7 +660,7 @@ class VaultOverviewActivity: ComponentActivity() {
                                 vaultOverviewViewModel.deleteFolder(folder, localctx)
                                 vaultOverviewViewModel.fetchEntries(localctx)
                                 vaultOverviewViewModel.showAll()
-                                showFolderDeletionDialog = false
+                                folderPendingDeletion = null
                             }
                         }
                     ) {
@@ -668,7 +668,7 @@ class VaultOverviewActivity: ComponentActivity() {
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showFolderDeletionDialog = false }) {
+                    TextButton(onClick = { folderPendingDeletion = null }) {
                         Text(stringResource(R.string.cancel))
                     }
                 }

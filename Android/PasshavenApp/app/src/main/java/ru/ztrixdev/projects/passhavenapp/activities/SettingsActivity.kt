@@ -122,16 +122,16 @@ import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledDarkScheme
 import ru.ztrixdev.projects.passhavenapp.ui.theme.amoled.amoledLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.lion.lionLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.mint.mintLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.ubuntu.ubuntuDarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.ubuntu.ubuntuLightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10DarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w10.w10LightScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81DarkScheme
-import ru.ztrixdev.projects.passhavenapp.ui.theme.w81.w81LightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.aqua.aquaDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.aqua.aquaLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.codered.codeRedDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.codered.codeRedLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.hotpink.hotpinkDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.hotpink.hotpinkLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.monochroma.monochromaDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.monochroma.monochromaLightScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.peppermint.peppermintDarkScheme
+import ru.ztrixdev.projects.passhavenapp.ui.theme.peppermint.peppermintLightScheme
 import ru.ztrixdev.projects.passhavenapp.viewModels.SettingsViewModel
 
 
@@ -369,12 +369,12 @@ class SettingsActivity : ComponentActivity() {
             }
 
             val themes = listOf(
-                (AppThemeType.AMOLED to R.string.theme_name_amoled) to (amoledDarkScheme to amoledLightScheme),
-                (AppThemeType.MINT to R.string.theme_name_mint) to (mintDarkScheme to mintLightScheme),
-                (AppThemeType.W10 to R.string.theme_name_w10) to (w10DarkScheme to w10LightScheme),
-                (AppThemeType.W81 to R.string.theme_name_w81) to (w81DarkScheme to w81LightScheme),
-                (AppThemeType.LION to R.string.theme_name_osxlion) to (lionDarkScheme to lionLightScheme),
-                (AppThemeType.UBUNTU to R.string.theme_name_ubuntu) to (ubuntuDarkScheme to ubuntuLightScheme)
+                (AppThemeType.Amoled to R.string.theme_name_amoled) to (amoledDarkScheme to amoledLightScheme),
+                (AppThemeType.Peppermint to R.string.theme_name_mint) to (peppermintDarkScheme to peppermintLightScheme),
+                (AppThemeType.Aqua to R.string.theme_name_aqua) to (aquaDarkScheme to aquaLightScheme),
+                (AppThemeType.HotPink to R.string.theme_name_hotpink) to (hotpinkDarkScheme to hotpinkLightScheme),
+                (AppThemeType.Monochroma to R.string.theme_name_monochroma) to (monochromaDarkScheme to monochromaLightScheme),
+                (AppThemeType.CodeRED to R.string.theme_name_codered) to (codeRedDarkScheme to codeRedLightScheme)
             )
 
             items(themes) { themeInfo ->
