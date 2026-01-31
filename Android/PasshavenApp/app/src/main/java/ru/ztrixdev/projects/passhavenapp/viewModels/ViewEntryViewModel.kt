@@ -113,7 +113,7 @@ class ViewEntryViewModel : ViewModel() {
         when (entry) {
             is Card -> {
                 newEntryName = TextFieldValue(entry.name)
-                cardNumber = TextFieldValue(entry.number)
+                cardNumber = TextFieldValue(entry.number.chunked(4).joinToString(" "))
                 cardholderName = TextFieldValue(entry.cardholder)
                 expirationMMYY = TextFieldValue(entry.expirationDate)
                 cvcCVV = TextFieldValue(entry.cvcCvv)
@@ -152,6 +152,7 @@ class ViewEntryViewModel : ViewModel() {
     }
 
     var isPasswordVisible by mutableStateOf(false)
+    var isMFASecretVisible by mutableStateOf(false)
     var currentMFAValue by mutableStateOf(TextFieldValue(""))
 
     fun togglePasswordVisibility() {
@@ -162,8 +163,12 @@ class ViewEntryViewModel : ViewModel() {
         isCvcCvvVisible = !isCvcCvvVisible
     }
 
+    fun toggleMFAVisibility() {
+        isMFASecretVisible = !isMFASecretVisible
+    }
+
     enum class Copyable {
-        Password, CVC, CardNumber, TOTP
+        Password, CVC, CardNumber, TOTP, MFASecret
     }
 
     fun copy(copyable: Copyable, context: Context) {
@@ -172,6 +177,7 @@ class ViewEntryViewModel : ViewModel() {
             Copyable.CVC -> Utils.copyToClipboard(context, cvcCVV.text)
             Copyable.CardNumber -> Utils.copyToClipboard(context, cardNumber.text)
             Copyable.TOTP ->  Utils.copyToClipboard(context, currentMFAValue.text)
+            Copyable.MFASecret -> Utils.copyToClipboard(context, mfaSecret.text)
         }
     }
     

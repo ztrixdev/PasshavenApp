@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -361,7 +360,10 @@ class ViewEntryActivity : ComponentActivity() {
                     else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible
-                            viewEntryViewModel.copy(ViewEntryViewModel.Copyable.Password, localctx)
+                            if (passwordVisible)
+                            {
+                                viewEntryViewModel.copy(ViewEntryViewModel.Copyable.Password, localctx)
+                            }
                         }) {
                         Icon(
                             painter =
@@ -386,18 +388,43 @@ class ViewEntryActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.mfa_secret)) },
                 trailingIcon = {
-                    IconButton(
-                        enabled = viewEntryViewModel.editMode,
-                        onClick = {
-                            qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                    if (viewEntryViewModel.editMode) {
+                        IconButton(
+                            enabled = viewEntryViewModel.editMode,
+                            onClick = {
+                                qrScanLauncher.launch(viewEntryViewModel.defaultQRScanOpts)
+                            }
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.qr_code_scanner_24px),
+                                null
+                            )
                         }
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.qr_code_scanner_24px),
-                            null
-                        )
+                    } else {
+                        IconButton(
+                            enabled = !viewEntryViewModel.editMode,
+                            onClick = {
+                                viewEntryViewModel.toggleMFAVisibility()
+                                if (viewEntryViewModel.isMFASecretVisible) {
+                                    viewEntryViewModel.copy(ViewEntryViewModel.Copyable.MFASecret, localctx)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter =
+                                    if (passwordVisible)
+                                        painterResource(R.drawable.visibility_off_24px)
+                                    else
+                                        painterResource(R.drawable.visibility_24px),
+                                null
+                            )
+                        }
                     }
-                }
+                },
+                visualTransformation =
+                    if (viewEntryViewModel.isMFASecretVisible)
+                        VisualTransformation.None
+                    else PasswordVisualTransformation()
             )
         }
     }
@@ -429,10 +456,14 @@ class ViewEntryActivity : ComponentActivity() {
                         viewEntryViewModel.checkRequiredFields()
                 },
                 readOnly = !viewEntryViewModel.editMode,
-                modifier = Modifier.fillMaxWidth()
-                    .clickable(onClick = {
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = {
                         viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CardNumber, localctx)
-                    }),
+                    }) {
+                        Icon(painter = painterResource(R.drawable.content_copy_24px), contentDescription =  null)
+                    }
+                },
                 label = { Text(stringResource(R.string.card_number)) },
                 leadingIcon = {
                     Icon(painterResource(R.drawable.credit_card_24px), null)
@@ -453,7 +484,6 @@ class ViewEntryActivity : ComponentActivity() {
                     label = { Text(stringResource(R.string.card_expdate)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
-
                 OutlinedTextField(
                     value = viewEntryViewModel.cvcCVV,
                     onValueChange = {
@@ -462,10 +492,19 @@ class ViewEntryActivity : ComponentActivity() {
                             viewEntryViewModel.checkRequiredFields()
                     },
                     readOnly = !viewEntryViewModel.editMode,
-                    modifier = Modifier.weight(1f).clickable(onClick = {
-                        viewEntryViewModel.isCvcCvvVisible = !viewEntryViewModel.isCvcCvvVisible
-                        viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CVC, localctx)
-                    }),
+                    modifier = Modifier.weight(1f),
+                    trailingIcon = { IconButton(
+                        onClick = {
+                            viewEntryViewModel.toggleCvcVisibility()
+                            if (viewEntryViewModel.isCvcCvvVisible) {
+                                viewEntryViewModel.copy(ViewEntryViewModel.Copyable.CVC, localctx)
+                            }
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.visibility_24px),
+                            null
+                        )
+                    } } ,
                     label = { Text(stringResource(R.string.card_cvc_cvv_placeholder)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     visualTransformation =

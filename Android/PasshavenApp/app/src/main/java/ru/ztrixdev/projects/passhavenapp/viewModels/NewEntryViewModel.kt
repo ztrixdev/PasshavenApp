@@ -15,6 +15,7 @@ import ru.ztrixdev.projects.passhavenapp.entryManagers.AccountManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
+import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
 import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
@@ -22,7 +23,6 @@ import ru.ztrixdev.projects.passhavenapp.room.Folder
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
 import kotlin.uuid.Uuid
 
 class NewEntryViewModel: ViewModel() {
@@ -226,28 +226,35 @@ class NewEntryViewModel: ViewModel() {
         return newCardUuid
     }
 
-    var allRequiredFieldsAreFilled by mutableStateOf(checkRequiredFields())
-    fun checkRequiredFields(): Boolean {
-        if (newEntryName.text.isEmpty())
-            return false
+    var allRequiredFieldsAreFilled by mutableStateOf(false)
+    fun checkRequiredFields() {
+        if (newEntryName.text.isEmpty()) {
+            allRequiredFieldsAreFilled = false; return
+        }
 
-        if (selectedEntryType == EntryTypes.Card)
-            return when {
+
+
+        if (selectedEntryType == EntryTypes.Card) {
+            allRequiredFieldsAreFilled = when {
                 cardNumber.text.isEmpty() -> false
                 expirationMMYY.text.isEmpty() -> false
                 cvcCVV.text.isEmpty() -> false
                 cardholderName.text.isEmpty() -> false
                 else -> true
-            }
+            }; return
+        }
 
-        if (selectedEntryType == EntryTypes.Account)
-            return when {
+
+        if (selectedEntryType == EntryTypes.Account) {
+            allRequiredFieldsAreFilled = when {
                 username.text.isEmpty() -> false
                 password.text.isEmpty() -> false
                 else -> true
-            }
+            }; return
+        }
 
-        return true
+
+        allRequiredFieldsAreFilled = true; return
     }
 }
 

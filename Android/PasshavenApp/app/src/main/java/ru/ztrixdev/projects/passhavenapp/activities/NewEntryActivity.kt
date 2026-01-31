@@ -61,14 +61,14 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanIntentResult
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
-import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
-import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
+import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
+import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.room.Folder
-import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
-import ru.ztrixdev.projects.passhavenapp.viewModels.NewEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
+import ru.ztrixdev.projects.passhavenapp.viewModels.NewEntryViewModel
+import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
 import kotlin.uuid.Uuid
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -142,7 +142,7 @@ class NewEntryActivity : ComponentActivity() {
                                 onValueChange = {
                                     nameIsEmptyProblem = it.text.isEmpty()
                                     newEntryViewModel.newEntryName = it
-                                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                                    newEntryViewModel.checkRequiredFields()
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 label = { Text(stringResource(R.string.new_entry_name)) },
@@ -165,7 +165,10 @@ class NewEntryActivity : ComponentActivity() {
                         item {
                             OutlinedTextField(
                                 value = newEntryViewModel.additionalNote,
-                                onValueChange = { newEntryViewModel.additionalNote = it },
+                                onValueChange = {
+                                    newEntryViewModel.additionalNote = it
+                                    newEntryViewModel.checkRequiredFields()
+                                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 label = { Text(stringResource(R.string.additional_note)) },
                                 leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
@@ -210,7 +213,7 @@ class NewEntryActivity : ComponentActivity() {
                     selected = tabIndex == index,
                     onClick = {
                         viewModel._setSelectedEntryType(type)
-                        viewModel.allRequiredFieldsAreFilled = viewModel.checkRequiredFields()
+                        newEntryViewModel.checkRequiredFields()
                     },
                     text = { Text(text = title) },
                     icon = {
@@ -294,7 +297,7 @@ class NewEntryActivity : ComponentActivity() {
                 onValueChange = {
                     usernameIsEmptyProblem = it.text.isEmpty()
                     newEntryViewModel.username = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                    newEntryViewModel.checkRequiredFields()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.username)) },
@@ -309,7 +312,7 @@ class NewEntryActivity : ComponentActivity() {
                 onValueChange = {
                     passwordIsEmptyProblem = it.text.isEmpty()
                     newEntryViewModel.password = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                    newEntryViewModel.checkRequiredFields()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.password)) },
@@ -338,7 +341,7 @@ class NewEntryActivity : ComponentActivity() {
                 onValueChange = {
                     mfaSecretIsInvalidProblem = it.text.isNotEmpty() && !MFAHandler.verifySecret(it.text)
                     newEntryViewModel.mfaSecret = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                    newEntryViewModel.checkRequiredFields()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.mfa_secret)) },
@@ -363,7 +366,7 @@ class NewEntryActivity : ComponentActivity() {
             OutlinedTextField(
                 value = newEntryViewModel.cardholderName,
                 onValueChange = { newEntryViewModel.cardholderName = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()},
+                    newEntryViewModel.checkRequiredFields() },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.cardholder_name)) },
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
@@ -374,7 +377,7 @@ class NewEntryActivity : ComponentActivity() {
                 value = newEntryViewModel.cardNumber,
                 onValueChange = {
                     newEntryViewModel.cardNumber = it
-                    newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                    newEntryViewModel.checkRequiredFields()
                                 },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text(stringResource(R.string.card_number)) },
@@ -387,7 +390,7 @@ class NewEntryActivity : ComponentActivity() {
                 OutlinedTextField(
                     value = newEntryViewModel.expirationMMYY,
                     onValueChange = { newEntryViewModel.expirationMMYY = it
-                        newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()},
+                        newEntryViewModel.checkRequiredFields() },
                     modifier = Modifier.weight(1f),
                     label = { Text(stringResource(R.string.card_expdate)) },
                     placeholder = { Text("MM/YY") },
@@ -398,7 +401,7 @@ class NewEntryActivity : ComponentActivity() {
                     value = newEntryViewModel.cvcCVV,
                     onValueChange = {
                         newEntryViewModel.cvcCVV = it
-                        newEntryViewModel.allRequiredFieldsAreFilled = newEntryViewModel.checkRequiredFields()
+                        newEntryViewModel.checkRequiredFields()
                                     },
                     modifier = Modifier.weight(1f),
                     label = { Text(stringResource(R.string.card_cvc_cvv_placeholder)) },
