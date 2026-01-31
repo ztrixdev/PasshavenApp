@@ -19,11 +19,11 @@ import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
-import ru.ztrixdev.projects.passhavenapp.room.decrypt
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataServices.AccountService
 import kotlin.uuid.Uuid
 
 class VaultOverviewViewModel() : ViewModel() {
@@ -86,8 +86,7 @@ class VaultOverviewViewModel() : ViewModel() {
             soughtUuid = uuid
         )
         if (entry is Account) {
-            entry.decrypt(key)
-            return entry.username
+            return AccountService.decrypt(entry, key).username
         }
         else return ""
     }

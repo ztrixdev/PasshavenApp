@@ -17,7 +17,7 @@ android {
     }
     defaultConfig {
         applicationId = "ru.ztrixdev.projects.passhavenapp"
-        minSdk = 30
+        minSdk = 33
         targetSdk = 36
         versionCode = 2
         versionName = "release 2.0"
@@ -80,7 +80,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.foundation)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.foundation)
     val lazyVersion = "5.2.0"

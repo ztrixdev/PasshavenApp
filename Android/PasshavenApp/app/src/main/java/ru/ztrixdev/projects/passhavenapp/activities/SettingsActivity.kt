@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -114,9 +115,9 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 import ru.ztrixdev.projects.passhavenapp.ui.theme.AppThemeType
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
@@ -153,6 +154,30 @@ class SettingsActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when {
+                    isPasswordDialogOpen -> isPasswordDialogOpen = false
+                    settingsViewModel.openAppearance.value -> { settingsViewModel.openAppearance.value = false; return }
+                    settingsViewModel.openPINChange.value -> { settingsViewModel.openPINChange.value = false; return }
+                    settingsViewModel.openInfo.value -> { settingsViewModel.openInfo.value = false; return}
+                    settingsViewModel.openSecurity.value -> { settingsViewModel.openSecurity.value = false; return }
+                    settingsViewModel.openExports.value -> { settingsViewModel.openExports.value = false; return  }
+                    settingsViewModel.openImports.value -> { settingsViewModel.openImports.value = false; return }
+                }
+                val nothingIsOpened = (!isPasswordDialogOpen && !settingsViewModel.openAppearance.value &&
+                        !settingsViewModel.openPINChange.value && !settingsViewModel.openInfo.value &&
+                        !settingsViewModel.openSecurity.value && !settingsViewModel.openExports.value &&
+                        !settingsViewModel.openImports.value)
+                if (nothingIsOpened) {
+                    val intent = Intent(this@SettingsActivity, VaultOverviewActivity::class.java)
+                    this@SettingsActivity.startActivity(intent)
+                }
+
+                finish()
+
+            }
+        })
 
         setContent {
             val localctx = LocalContext.current
@@ -1254,7 +1279,7 @@ class SettingsActivity : ComponentActivity() {
                             .padding(16.dp)
                             .fillMaxWidth()
                     ) {
-                        Column() {
+                        Column {
                             Text(
                                 text = stringResource(R.string.import_file_title),
                                 style = MaterialTheme.typography.titleLarge,
@@ -1304,7 +1329,7 @@ class SettingsActivity : ComponentActivity() {
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item() {
+            item {
                 val localctx = LocalContext.current
                 var isButtonEnabled by remember { mutableStateOf(settingsViewModel.includedImportEntries.isNotEmpty()) }
                 LaunchedEffect(checkImportFinishButton) {
@@ -1428,7 +1453,7 @@ class SettingsActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun BackupPasswordImportDialog(export: String) {
+    private fun BackupPasswordImportDialog() {
         var textState by remember { mutableStateOf(TextFieldValue()) }
         var attemptsLeft by remember { mutableIntStateOf(4) }
 

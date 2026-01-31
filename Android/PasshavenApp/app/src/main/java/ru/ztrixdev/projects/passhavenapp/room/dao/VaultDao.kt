@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import ru.ztrixdev.projects.passhavenapp.room.Vault
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Vault
 import kotlin.uuid.ExperimentalUuidApi
 
 @Dao

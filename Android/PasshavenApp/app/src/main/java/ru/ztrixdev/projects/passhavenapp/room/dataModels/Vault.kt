@@ -1,4 +1,4 @@
-package ru.ztrixdev.projects.passhavenapp.room
+package ru.ztrixdev.projects.passhavenapp.room.dataModels
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

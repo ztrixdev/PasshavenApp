@@ -119,4 +119,5 @@ public class TOTP {
 
         return String.format("%0" + passwordLength + "d", otp);
     }
+
 }

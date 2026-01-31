@@ -64,7 +64,7 @@ import ru.ztrixdev.projects.passhavenapp.QuickComposables
 import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import ru.ztrixdev.projects.passhavenapp.viewModels.ViewEntryViewModel
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes

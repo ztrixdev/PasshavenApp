@@ -7,6 +7,10 @@ import ru.ztrixdev.projects.passhavenapp.room.dao.AccountDao
 import ru.ztrixdev.projects.passhavenapp.room.dao.CardDao
 import ru.ztrixdev.projects.passhavenapp.room.dao.FolderDao
 import ru.ztrixdev.projects.passhavenapp.room.dao.VaultDao
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Vault
 import ru.ztrixdev.projects.passhavenapp.room.typeConverters.StringListConverter
 import ru.ztrixdev.projects.passhavenapp.room.typeConverters.UriConverter
 import ru.ztrixdev.projects.passhavenapp.room.typeConverters.UuidConverter

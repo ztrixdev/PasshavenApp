@@ -1,5 +1,7 @@
 package ru.ztrixdev.projects.passhavenapp;
 
+import android.annotation.SuppressLint;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +9,7 @@ import java.util.Locale;
 
 public class DateTimeProcessor {
     // Human readable formatter
+    @SuppressLint("ConstantLocale")
     private static final DateTimeFormatter HRFORMATTER =
             DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm")
                     .withZone(ZoneId.systemDefault())

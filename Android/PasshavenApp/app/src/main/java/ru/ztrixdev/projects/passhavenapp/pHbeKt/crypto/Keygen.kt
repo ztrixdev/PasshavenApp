@@ -35,7 +35,7 @@ object Keygen {
                 KeyStrength.Moderate -> PwHash.MEMLIMIT_MODERATE
                 KeyStrength.Sensitive -> PwHash.MEMLIMIT_SENSITIVE
             },
-            PwHash.Alg.PWHASH_ALG_ARGON2I13
+            PwHash.Alg.PWHASH_ALG_ARGON2ID13
         )
         if (!computingSuccess)
             throw RuntimeException("Couldn't compute a key!")
@@ -68,7 +68,7 @@ object Keygen {
                 KeyStrength.Moderate -> PwHash.MEMLIMIT_MODERATE
                 KeyStrength.Sensitive -> PwHash.MEMLIMIT_SENSITIVE
             },
-        PwHash.Alg.PWHASH_ALG_ARGON2I13
+        PwHash.Alg.PWHASH_ALG_ARGON2ID13
         )
         if (!computingSuccess)
             throw RuntimeException("Couldn't compute a key!")

@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import ru.ztrixdev.projects.passhavenapp.room.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

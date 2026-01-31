@@ -11,9 +11,9 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.CryptoNames
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.Keygen
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
 
 
@@ -69,8 +69,9 @@ object ExportsHandler {
         return ""
     }
 
-    private const val _export_filename_part_1 = "export_"
-    private const val _export_filename_part_2 = "_full.phbckp"
+
+    private const val _EXPORT_FILENAME_PART_1 = "export_"
+    private const val _EXPORT_FILENAME_PART_2 = "_full.phbckp"
 
     fun exportToFolder(resolver: ContentResolver, export: String, context: Context): Boolean {
         val path = VaultPrefs.getBackupFolder(context)
@@ -93,7 +94,7 @@ object ExportsHandler {
         🇺🇸 🦅 💯
          */
         val today = DateTimeProcessor.convertForFIlename(System.currentTimeMillis())
-        val filename = "$_export_filename_part_1${today}$_export_filename_part_2"
+        val filename = "${_EXPORT_FILENAME_PART_1}${today}${_EXPORT_FILENAME_PART_2}"
 
         val directory = DocumentFile.fromTreeUri(context, path)
         if (directory?.findFile(filename)?.exists() == true) {
@@ -137,17 +138,17 @@ object ExportsHandler {
     // The final blob looks like this:
     // {beginsalt}HEX_SALT_STRING{endsalt}
     // ENCRYPTED_EXPORT_HEX_STRING
-    const val _beginSaltStr = "{beginsalt}"
-    const val _endSaltStr = "{endsalt}"
+    const val SALT_START_TAG = "{beginsalt}"
+    const val SALT_END_TAG = "{endsalt}"
     fun protectExport(export: String, password: String): String {
 
         val blob: StringBuilder = StringBuilder()
-        blob.append(_beginSaltStr)
+        blob.append(SALT_START_TAG)
         val keyFromPWD = Keygen.deriveKeySaltPairFromMP(password, Keygen.KeyStrength.Moderate)
         if (keyFromPWD[CryptoNames.key] != null) {
             val encryptedExport = SodiumCrypto.encrypt(export, keyFromPWD[CryptoNames.key] as ByteArray)
             blob.append(SodiumCrypto.sodium.toHexStr(keyFromPWD[CryptoNames.salt]))
-            blob.append(_endSaltStr)
+            blob.append(SALT_END_TAG)
             blob.append(encryptedExport)
             return blob.toString().trim()
         }
@@ -157,10 +158,10 @@ object ExportsHandler {
     fun getProtectedExport(export: String, password: String): String {
         val INCORRECT_PASSWORD_EXCEPTION = Exception("Incorrect password!")
 
-        val salt = export.substring(export.indexOf(_beginSaltStr) + _beginSaltStr.length, export.indexOf(_endSaltStr))
+        val salt = export.substring(export.indexOf(SALT_START_TAG) + SALT_START_TAG.length, export.indexOf(SALT_END_TAG))
         val key = Keygen.getKeyWithMPnSalt(password, SodiumCrypto.sodium.toBinary(salt), strength = Keygen.KeyStrength.Moderate)
 
-        val exportBlob = export.substring(export.indexOf(_endSaltStr) + _endSaltStr.length)
+        val exportBlob = export.substring(export.indexOf(SALT_END_TAG) + SALT_END_TAG.length)
         try {
             val decryptedExport = SodiumCrypto.decrypt(exportBlob, key)
             return decryptedExport

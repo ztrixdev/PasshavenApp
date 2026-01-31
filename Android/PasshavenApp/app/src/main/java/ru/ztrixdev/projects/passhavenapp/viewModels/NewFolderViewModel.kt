@@ -10,7 +10,7 @@ import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import kotlin.uuid.Uuid
 
 class NewFolderViewModel: ViewModel() {

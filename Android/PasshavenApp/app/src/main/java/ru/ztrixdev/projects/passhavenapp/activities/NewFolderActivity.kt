@@ -49,8 +49,8 @@ import ru.ztrixdev.projects.passhavenapp.R
 import ru.ztrixdev.projects.passhavenapp.entryManagers.SortingKeys
 import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import ru.ztrixdev.projects.passhavenapp.viewModels.NewFolderViewModel
 

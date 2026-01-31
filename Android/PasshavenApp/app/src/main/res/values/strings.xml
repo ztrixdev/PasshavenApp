@@ -28,48 +28,24 @@
     <string name="login_enter_mp">Enter your MP</string>
     <string name="login_incorrect_mp">Incorrect MP! Can\'t log in!</string>
     <string name="login_incorrect_pin">Incorrect PIN! Can\'t log in!</string>
-    <string name="select_folder">Select a folder:</string>
     <string name="unfoldered">No folder</string>
-    <string name="select_type">Select type:</string>
     <string name="account">Account</string>
     <string name="card">Bank Card</string>
     <string name="newentryactivity_titlebar">New Entry</string>
-    <string name="card_number_placeholder">4242 4242 4242 4242</string>
-    <string name="card_mm_yy_placeholder">MM/YY</string>
     <string name="card_cvc_cvv_placeholder">CVC/CVV</string>
-    <string name="visa" translatable="false">VISA</string>
-    <string name="mastercard" translatable="false">Mastercard</string>
-    <string name="maestro" translatable="false">Maestro</string>
-    <string name="amex" translatable="false">American Express</string>
-    <string name="mir" translatable="false">МИР</string>
-    <string name="unionpay" translatable="false">UnionPay</string>
-    <string name="discover" translatable="false">Discover</string>
-    <string name="cardholder_name_placeholder">JORDAN TERRELL CARTER</string>
-    <string name="error_card_number_invalid">The card number is invalid</string>
-    <string name="error_card_number_too_short">The card number is too short</string>
-    <string name="error_card_number_too_long">Card number is too long</string>
-    <string name="error_card_expdate_invalid">The expiration date is invalid</string>
-    <string name="error_card_cvccvv_invalid">The CVV\CVC is invalid</string>
-    <string name="cards_brand">Card\'s brand:</string>
     <string name="new_entry_name">Name*</string>
     <string name="name_cannot_be_empty">Name cannot be empty</string>
     <string name="additional_note">Additional note</string>
     <string name="username">Username (login/email)</string>
     <string name="password">Password</string>
     <string name="mfa_secret">MFA Secret Key</string>
-    <string name="recovery_codes">Recovery Codes</string>
     <string name="card_number">Card Number</string>
     <string name="card_expdate">Expiration Date</string>
-    <string name="card_cvccvv" translatable="false">CVC/CVV</string>
     <string name="cardholder_name">Cardholder Name</string>
-    <string name="username_placeholder">TheGoochCollector</string>
-    <string name="password_placeholder" translatable="false">WoAiBeijingTiananmen0110</string>
     <string name="fill_this_field_up_pls">Please fill in this field.</string>
     <string name="mfa_secret_supporting_text"></string>
     <string name="mfa_secret_invalid">This doesn\'t appear to be a valid MFA secret</string>
     <string name="generate_password_for_me">Generate the password for me, please</string>
-    <string name="recovery_code_label">Recovery code #</string>
-    <string name="add_another_recovery_code">Add another recovery code</string>
     <string name="newfolderactivity_titlebar">New Folder</string>
     <string name="folder_name_placeholder">e.g. Game Launchers</string>
     <string name="folder_name_label">Folder name*</string>
@@ -77,7 +53,6 @@
     <string name="sort_by_alphabet">By alphabet</string>
     <string name="sort_by_date">By date</string>
     <string name="reverse_sorting">Reverse sorting?</string>
-    <string name="sort">Sorting…</string>
     <string name="appearance_setting">Appearance</string>
     <string name="export_backup_setting">Exports / Backups</string>
     <string name="import_setting">Import / Recovery</string>
@@ -86,10 +61,6 @@
     <string name="settings_titlebar">Settings</string>
     <string name="theme">App theme</string>
     <string name="theme_name_mint">Mint</string>
-    <string name="theme_name_ubuntu">Ubuntu</string>
-    <string name="theme_name_w10" translatable="false">Windows 10</string>
-    <string name="theme_name_osxlion" translatable="false">macOS X Lion</string>
-    <string name="theme_name_w81" translatable="false">Windows 8.1</string>
     <string name="dark_theme">Dark theme</string>
     <string name="developed_by">Developed with fierce hatred by ztrix &lt;\3&#179;</string>
     <string name="ph_desc">Passhaven is a fully open-source secret management solution. \n The main feature is the absence of a remote server.
@@ -98,11 +69,7 @@
     <string name="ph_credits">Credit goes to:</string>
     <string name="aegis_respect">Aegis team - you guys made the GOATed 2FA app</string>
     <string name="rossman_respect">Louis Rossman - the man who inspired me to believe in software freedom</string>
-    <string name="andy_respect">The Greatest Technician That\'s Ever Lived - idk, he\'s just a really cool dude</string>
-    <string name="fam_respect">My family and friends - the people who kept me working on this project</string>
-    <string name="me_respect">The Greatest Informatician That\'s Ever Lived... oh, that\'s me myself :3</string>
     <string name="source_code">Source code</string>
-    <string name="ztrix_socials">ztrix\'s socials</string>
     <string name="change_pin_btn">Change PIN</string>
     <string name="change_pin_desc">If you change your PIN, you\'ll no longer be able to login with the previous PIN.</string>
     <string name="enter_current_pin">Enter your current PIN</string>
@@ -122,25 +89,19 @@
     <string name="backup_folder_never_set">Not set</string>
     <string name="set">Set</string>
     <string name="change">Change</string>
-    <string name="open_in_finder">Open</string>
     <string name="enter_backup_password">Enter your desired backup password</string>
     <string name="cancel">Cancel</string>
     <string name="backup_password">Backup password</string>
-    <string name="open_backup_password_dialog">Set/change backup password</string>
     <string name="make_backup_now">Make a backup now</string>
     <string name="set_backup_password">Set a backup password</string>
     <string name="change_backup_password">Change the backup password</string>
     <string name="last_backup_date">Date of the last backup:</string>
-    <string name="backing_up_wait">Backing up, please wait...</string>
+    <string name="backing_up_wait">Backing up, please wait…</string>
     <string name="editentryactivity_titlebar">View entry</string>
     <string name="confirm">Confirm</string>
     <string name="edit">Edit</string>
     <string name="copied_to_clipboard">Copied!</string>
-    <string name="mfa_code_label">TOTP code\n</string>
     <string name="dynamic_colors">Use Dynamic Colors? (Android 12+)</string>
-    <string name="not_set">Not set</string>
-    <string name="in_folder">In folder:</string>
-    <string name="generator">Generator</string>
     <string name="overview">Overview</string>
     <string name="mfa">2FA</string>
     <string name="passhaven" translatable="false">Passhaven</string>
@@ -169,7 +130,7 @@
     <string name="import_selected">Import selected</string>
     <string name="no_entries_selected">No entries selected</string>
     <string name="successful_import">Successfully imported!</string>
-    <string name="creating_vault_pls_wait">Creating vault, please wait...</string>
+    <string name="creating_vault_pls_wait">Creating vault, please wait…</string>
     <string name="theme_name_aqua">Aqua</string>
     <string name="theme_name_hotpink">Hot pink</string>
     <string name="theme_name_codered">Code RED</string>

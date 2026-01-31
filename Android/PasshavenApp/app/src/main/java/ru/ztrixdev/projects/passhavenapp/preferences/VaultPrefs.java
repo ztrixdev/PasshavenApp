@@ -52,7 +52,7 @@ public class VaultPrefs {
     }
 
     public static long getBackupEvery(Context context) {
-        return PreferencesMaster.get(PREFS_NAME, PREFS_BACKUP_EVERY_KEY, 0L, context);
+        return PreferencesMaster.get(PREFS_NAME, PREFS_BACKUP_EVERY_KEY, DEFAULT_BACKUP_EVERY, context);
     }
     public static void saveLastBackupTimestamp(Context context, long timestamp) {
         PreferencesMaster.put(PREFS_NAME, PREFS_LAST_BACKUP_TIMESTAMP_KEY, timestamp, context);

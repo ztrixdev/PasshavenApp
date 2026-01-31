@@ -17,7 +17,7 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.mpProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.pinHashProtectingKeyName
 import ru.ztrixdev.projects.passhavenapp.preferences.VaultPrefs
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Vault
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Vault
 import ru.ztrixdev.projects.passhavenapp.room.dao.VaultDao
 import java.security.Key
 import java.security.KeyStore

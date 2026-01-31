@@ -1,26 +1,23 @@
 package ru.ztrixdev.projects.passhavenapp.entryManagers
 
-import ru.ztrixdev.projects.passhavenapp.room.Account
 import ru.ztrixdev.projects.passhavenapp.room.AppDatabase
-import ru.ztrixdev.projects.passhavenapp.room.decrypt
-import ru.ztrixdev.projects.passhavenapp.room.encrypt
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataServices.AccountService
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import kotlin.uuid.Uuid
 
 object AccountManager {
     suspend fun createAccount(database: AppDatabase, account: Account, encryptionKey: ByteArray): Uuid {
-        account.encrypt(encryptionKey)
+        val encryptedAccount = AccountService.encrypt(account, encryptionKey)
 
-        database.accountDao().insert(account)
+        database.accountDao().insert(encryptedAccount)
 
         return account.uuid
     }
 
     suspend fun getAllAccounts(database: AppDatabase, encryptionKey: ByteArray): List<Account> {
         val accounts = database.accountDao().getALl()
-        accounts.forEach { it.decrypt(encryptionKey) }
-
-        return accounts
+        return accounts.map { AccountService.decrypt(it, encryptionKey) }
     }
 
     suspend fun retrieveAccountByUuid(database: AppDatabase, uuid: Uuid): Account? {
@@ -38,15 +35,17 @@ object AccountManager {
         var isEditedAccountEncrypted = true
         try {
             // If a field can be decrypted - the Account object is encrypted
-            // (Account.encrypt() encrypts pretty much all the fields)
             SodiumCrypto.decrypt(editedAccount.username, encryptionKey)
-        } catch (_: IllegalArgumentException) { // caught the wrong exception
+        } catch (_: IllegalArgumentException) {
             isEditedAccountEncrypted = false
         }
-        if (!isEditedAccountEncrypted)
-            editedAccount.encrypt(encryptionKey)
+        
+        val accountToUpdate = if (!isEditedAccountEncrypted)
+            AccountService.encrypt(editedAccount, encryptionKey)
+        else
+            editedAccount
 
-        accountDao.update(editedAccount)
+        accountDao.update(accountToUpdate)
     }
 
     suspend fun deleteAccount(database: AppDatabase, uuid: Uuid) {

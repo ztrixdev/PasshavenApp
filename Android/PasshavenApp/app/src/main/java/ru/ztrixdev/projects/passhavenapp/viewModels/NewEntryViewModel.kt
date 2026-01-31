@@ -16,10 +16,10 @@ import ru.ztrixdev.projects.passhavenapp.entryManagers.CardManager
 import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes

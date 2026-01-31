@@ -19,11 +19,12 @@ import ru.ztrixdev.projects.passhavenapp.entryManagers.FolderManager
 import ru.ztrixdev.projects.passhavenapp.handlers.MFAHandler
 import ru.ztrixdev.projects.passhavenapp.handlers.VaultHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.generators.PasswordGenerator
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
-import ru.ztrixdev.projects.passhavenapp.room.decrypt
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataServices.AccountService
+import ru.ztrixdev.projects.passhavenapp.room.dataServices.CardService
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardBrands
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.CardCredentials
 import ru.ztrixdev.projects.passhavenapp.viewModels.enums.EntryTypes
@@ -96,7 +97,7 @@ class ViewEntryViewModel : ViewModel() {
         if (entryUuid!!.length != Utils.UUID_ALPHANUMERIC_STRING_LENGTH)
             return
 
-        val entry = EntryManager.getEntryByUuid(DatabaseProvider.getDatabase(context), Uuid.parse(entryUuid!!))
+        var entry = EntryManager.getEntryByUuid(DatabaseProvider.getDatabase(context), Uuid.parse(entryUuid!!))
         type = when (entry) {
             is Card -> EntryTypes.Card
             is Account -> EntryTypes.Account
@@ -104,9 +105,9 @@ class ViewEntryViewModel : ViewModel() {
         }
 
         val key = VaultHandler.getEncryptionKey(context)
-        when (entry) {
-            is Card -> entry.decrypt(key)
-            is Account -> entry.decrypt(key)
+        entry = when (entry) {
+            is Card -> CardService.decrypt(entry, key)
+            is Account -> AccountService.decrypt(entry, key)
             else -> return
         }
 

@@ -2,26 +2,19 @@ package ru.ztrixdev.projects.passhavenapp;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
-import android.provider.DocumentsContract;
-
-import androidx.activity.result.ActivityResultLauncher;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,32 +32,28 @@ public class Utils {
 
     // I politely stole ts from SO but it's very useful.
     public static Map<String, List<String>> getQueryParams(String url) {
-        try {
-            Map<String, List<String>> params = new HashMap<String, List<String>>();
-            String[] urlParts = url.split("\\?");
-            if (urlParts.length > 1) {
-                String query = urlParts[1];
-                for (String param : query.split("&")) {
-                    String[] pair = param.split("=");
-                    String key = URLDecoder.decode(pair[0], "UTF-8");
-                    String value = "";
-                    if (pair.length > 1) {
-                        value = URLDecoder.decode(pair[1], "UTF-8");
-                    }
-
-                    List<String> values = params.get(key);
-                    if (values == null) {
-                        values = new ArrayList<String>();
-                        params.put(key, values);
-                    }
-                    values.add(value);
+        Map<String, List<String>> params = new HashMap<>();
+        String[] urlParts = url.split("\\?");
+        if (urlParts.length > 1) {
+            String query = urlParts[1];
+            for (String param : query.split("&")) {
+                String[] pair = param.split("=");
+                String key = URLDecoder.decode(pair[0], StandardCharsets.UTF_8);
+                String value = "";
+                if (pair.length > 1) {
+                    value = URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
                 }
-            }
 
-            return params;
-        } catch (UnsupportedEncodingException ex) {
-            throw new AssertionError(ex);
+                List<String> values = params.get(key);
+                if (values == null) {
+                    values = new ArrayList<>();
+                    params.put(key, values);
+                }
+                values.add(value);
+            }
         }
+
+        return params;
     }
 
 
@@ -81,8 +70,7 @@ public class Utils {
                 total.append(line).append('\n');
             }
 
-            String content = total.toString().trim();
-            return content;
+            return total.toString().trim();
         } catch (FileNotFoundException e) {
             return FILE_NOT_FOUND_SIGNAL;
         } catch (IOException e) {

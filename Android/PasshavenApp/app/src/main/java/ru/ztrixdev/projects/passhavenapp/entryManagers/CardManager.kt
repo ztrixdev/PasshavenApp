@@ -2,16 +2,15 @@ package ru.ztrixdev.projects.passhavenapp.entryManagers
 
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.room.AppDatabase
-import ru.ztrixdev.projects.passhavenapp.room.Card
-import ru.ztrixdev.projects.passhavenapp.room.decrypt
-import ru.ztrixdev.projects.passhavenapp.room.encrypt
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataServices.CardService
 import kotlin.uuid.Uuid
 
 object CardManager {
     suspend fun createCard(database: AppDatabase, card: Card, encryptionKey: ByteArray): Uuid {
-        card.encrypt(encryptionKey)
+        val encryptedCard = CardService.encrypt(card, encryptionKey)
 
-        database.cardDao().insert(card)
+        database.cardDao().insert(encryptedCard)
 
         return card.uuid
     }
@@ -24,9 +23,7 @@ object CardManager {
 
     suspend fun getAllCards(database: AppDatabase, encryptionKey: ByteArray): List<Card> {
         val cards = database.cardDao().getALl()
-        cards.forEach { it.decrypt(encryptionKey) }
-
-        return cards
+        return cards.map { CardService.decrypt(it, encryptionKey) }
     }
 
     
@@ -39,15 +36,17 @@ object CardManager {
         var isEditedCardEncrypted = true
         try {
             // If a field can be decrypted - the Card object is encrypted
-            // (Card.encrypt() encrypts pretty much all the fields)
             SodiumCrypto.decrypt(editedCard.number, encryptionKey)
         } catch (_: IllegalArgumentException) {
             isEditedCardEncrypted = false
         }
-        if (!isEditedCardEncrypted)
-            editedCard.encrypt(encryptionKey)
 
-        cardDao.update(editedCard)
+        val cardToUpdate = if (!isEditedCardEncrypted)
+            CardService.encrypt(editedCard, encryptionKey)
+        else
+            editedCard
+
+        cardDao.update(cardToUpdate)
     }
 
     suspend fun deleteCard(database: AppDatabase, uuid: Uuid) {

@@ -1,7 +1,6 @@
 package ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto
 
 import com.goterl.lazysodium.interfaces.SecretBox
-import kotlin.random.Random
 import com.goterl.lazysodium.utils.Key
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.NONCE_HEXED_LENGTH
 
@@ -9,7 +8,7 @@ object SodiumCrypto {
     val sodium = SodiumHelper.getSodium()
 
     fun encrypt(blob: String, key: ByteArray): String {
-        val nonce = Random.nextBytes(SecretBox.NONCEBYTES)
+        val nonce = sodium.randomBytesBuf(SecretBox.NONCEBYTES)
         val encrypted = sodium.cryptoSecretBoxEasy(blob, nonce, Key.fromBytes(key))
         return encrypted + sodium.sodiumBin2Hex(nonce)
     }

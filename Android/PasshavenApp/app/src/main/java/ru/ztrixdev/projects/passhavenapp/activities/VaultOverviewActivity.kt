@@ -81,9 +81,9 @@ import ru.ztrixdev.projects.passhavenapp.handlers.SessionHandler
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
 import ru.ztrixdev.projects.passhavenapp.preferences.ThemePrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.ui.theme.PasshavenTheme
 import ru.ztrixdev.projects.passhavenapp.viewModels.VaultOverviewViewModel
 import kotlin.uuid.Uuid

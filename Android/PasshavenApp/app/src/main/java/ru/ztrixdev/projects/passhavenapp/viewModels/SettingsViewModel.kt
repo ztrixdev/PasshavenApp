@@ -21,10 +21,10 @@ import ru.ztrixdev.projects.passhavenapp.pHbeKt.MasterPassword
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.PIN_LENGTH_LIMIT
 import ru.ztrixdev.projects.passhavenapp.pHbeKt.crypto.SodiumCrypto
 import ru.ztrixdev.projects.passhavenapp.preferences.SecurityPrefs
-import ru.ztrixdev.projects.passhavenapp.room.Account
-import ru.ztrixdev.projects.passhavenapp.room.Card
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Account
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Card
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import ru.ztrixdev.projects.passhavenapp.specialCharacters
 
 class SettingsViewModel: ViewModel() {
@@ -140,7 +140,7 @@ class SettingsViewModel: ViewModel() {
         SecurityPrefs.saveBackupPassword(encryptedPassword, context)
     }
 
-    suspend fun export(context: Context): Boolean {
+    suspend fun export(context: Context) {
         val key = VaultHandler.getEncryptionKey(context)
 
         var password = SecurityPrefs.getBackupPassword(context)
@@ -155,8 +155,6 @@ class SettingsViewModel: ViewModel() {
             export = ExportsHandler.protectExport(export = export, password = password)
 
         ExportsHandler.exportToFolder(context.contentResolver, export, context)
-
-        return true
     }
 
     fun resetPIN() {
@@ -243,7 +241,7 @@ class SettingsViewModel: ViewModel() {
     fun checkImportability(fileContents: String): String {
         return if (fileContents == Utils.FILE_NOT_FOUND_SIGNAL || fileContents == Utils.IO_EXCEPTION_SIGNAL)
             fileContents
-        else if (fileContents.startsWith(ExportsHandler._beginSaltStr) && fileContents.contains(ExportsHandler._endSaltStr))
+        else if (fileContents.startsWith(ExportsHandler.SALT_START_TAG) && fileContents.contains(ExportsHandler.SALT_END_TAG))
             ENCRYPTED_SIGNAL
         else if (ImportsHandler.getImport(ExportTemplates.Passhaven, fileContents).isNotEmpty())
             IMPORTABLE_SIGNAL

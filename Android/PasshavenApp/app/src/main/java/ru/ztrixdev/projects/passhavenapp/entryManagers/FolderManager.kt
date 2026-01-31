@@ -3,7 +3,7 @@ package ru.ztrixdev.projects.passhavenapp.entryManagers
 import android.content.Context
 import ru.ztrixdev.projects.passhavenapp.room.AppDatabase
 import ru.ztrixdev.projects.passhavenapp.room.DatabaseProvider
-import ru.ztrixdev.projects.passhavenapp.room.Folder
+import ru.ztrixdev.projects.passhavenapp.room.dataModels.Folder
 import kotlin.uuid.Uuid
 
 object FolderManager {
